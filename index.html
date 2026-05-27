@@ -192,7 +192,14 @@ input[type="number"]:focus { outline: none; border-color: #003893; }
 
 .section-card { background: white; border-radius: 16px; padding: 22px; margin: 12px 0; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
 .section-card h3 { font-size: 1rem; font-weight: 800; color: #003893; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-.ai-text { font-size: 0.88rem; line-height: 1.7; color: #333; white-space: pre-wrap; }
+.ai-text { font-size: 0.88rem; line-height: 1.7; color: #333; }
+.ai-section-header {
+  font-size: 0.75rem; font-weight: 800; color: #003893;
+  text-transform: uppercase; letter-spacing: 0.9px;
+  margin: 18px 0 6px; padding-top: 16px;
+  border-top: 1px solid #e4eaf7;
+}
+.ai-section-header:first-child { margin-top: 4px; border-top: none; padding-top: 0; }
 
 .ai-cta-card {
   background: linear-gradient(160deg, #eef2ff 0%, #f8faff 100%);
@@ -1140,7 +1147,15 @@ function buildPrompt(result) {
     `  ¿Está en régimen de transición (Ley 2381)?: ${result.transicion ? 'SÍ — protegido/a por reglas de Ley 100' : 'NO — sujeto/a a reglas nuevas'}`
   ].join('\n');
 
-  return `Eres un experto en el sistema pensional colombiano con conocimiento profundo de la Reforma Pensional 2024 (Ley 2381 de 2023) y sus decretos reglamentarios de 2025.
+  return `Eres un asesor experto en el sistema pensional colombiano con dominio de la Reforma Pensional 2024 (Ley 2381) y sus decretos reglamentarios de 2025.
+
+REGLAS DE FORMATO (obligatorias):
+- NO uses headers markdown (#, ##, ###). Usa ÚNICAMENTE los cinco títulos en negrita exactos indicados abajo.
+- Respuestas concisas: máximo 2 oraciones por sección de texto, máximo 4 ítems en listas.
+- No repitas información que ya está en los datos.
+
+ALINEACIÓN CON EL ALGORITMO:
+La herramienta recomienda "${result.mejor.regimen}" con confianza ${result.confianza}. Tu análisis DEBE ser coherente con esta recomendación. Solo puedes disentir si identificas un error concreto en los datos del usuario — en ese caso explícalo brevemente.
 
 DATOS DE LA PERSONA:
 ${userInfo}
@@ -1148,23 +1163,21 @@ ${userInfo}
 RESULTADO DEL ANÁLISIS ALGORÍTMICO:
 ${algoInfo}
 
-Proporciona un análisis claro y personalizado en español con estas secciones exactas (usa los títulos en negrita tal como están):
+Responde ÚNICAMENTE con estas cinco secciones en este orden exacto:
 
-**RECOMENDACIÓN:** Una o dos oraciones directas sobre qué debería hacer esta persona con su fondo pensional. IMPORTANTE: si existe opción de pensión anticipada, NO la presentes como la edad de retiro principal — menciona primero la edad NORMAL de pensión (${result.afp.edad_pension} años) y luego la anticipada como opción opcional, dejando claro que implica una mesada menor.
+**RECOMENDACIÓN:** Una o dos oraciones directas. Si existe pensión anticipada, menciona primero la edad NORMAL (${result.afp.edad_pension} años) y la anticipada solo como opción secundaria con mesada menor.
 
 **¿POR QUÉ?**
-Explica en 2-3 párrafos breves los factores clave que determinan esta recomendación, considerando específicamente su edad, semanas cotizadas, salario y prioridades declaradas. Sé directo y usa lenguaje accesible.
+Máximo 2 párrafos cortos explicando los 2-3 factores decisivos: semanas, mesada proyectada, prioridades declaradas.
 
 **IMPACTO DE LA REFORMA 2024:**
-En 2-3 oraciones, explica cómo la Reforma Pensional afecta específicamente a esta persona. Si su salario cae en la zona de obligatoriedad (≤ 2.3 SMMLV), explícalo claramente. Si no, explica cómo el sistema de pilares le aplica.
+Máximo 2 oraciones sobre cómo la Ley 2381 afecta específicamente a esta persona.
 
 **FACTORES DE RIESGO:**
-Menciona 2-3 puntos concretos sobre los principales riesgos o incertidumbres en su situación específica.
+Lista de 2-3 puntos concretos, una línea cada uno.
 
 **PASOS INMEDIATOS:**
-Lista 3-4 acciones concretas que debería tomar en los próximos 3-6 meses.
-
-Usa un tono profesional pero accesible, como el de un asesor que habla con claridad. Si la confianza de la recomendación es "baja", explica por qué la decisión es compleja y qué información adicional sería clave. No incluyas disclaimers legales extensos (ya se gestionan por separado en la herramienta).`;
+Lista de 3-4 acciones concretas para los próximos 3-6 meses.`;
 }
 
 // ── Called when user clicks "Obtener análisis" button ──
@@ -1228,10 +1241,16 @@ function renderMd(text) {
   return text
     // Escape HTML entities first
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    // Strip top-level # title (redundant with card header)
+    .replace(/^#\s+.+\n?/m, '')
+    // ## Section headers → styled divs
+    .replace(/^##\s+(.+)$/gm, '<div class="ai-section-header">$1</div>')
     // Horizontal rules
     .replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid #e0e4ed;margin:12px 0;">')
-    // Bold headings like **TEXT:**
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    // Bold **text**
+    .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
+    // **SECTION:** at line start → section header div
+    .replace(/^<strong>([^<]+)<\/strong>\s*$/gm, '<div class="ai-section-header">$1</div>')
     // Bullet points
     .replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>')
     // Numbered list items
@@ -1240,7 +1259,7 @@ function renderMd(text) {
     .replace(/(<li>.*<\/li>\n?)+/g, m => `<ul style="padding-left:18px;margin:6px 0;">${m}</ul>`)
     // Double newline → paragraph break
     .replace(/\n{2,}/g, '<br><br>')
-    // Single newline → space (keep flow)
+    // Single newline → space
     .replace(/\n/g, ' ');
 }
 
