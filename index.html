@@ -1116,8 +1116,16 @@ function evalColp(data) {
   const ageAtWeeks = data.edad + yearsToWeeks;
   const pensionAge = Math.ceil(Math.max(ret, ageAtWeeks));
 
+  // Tasa de reemplazo — Ley 100 art. 34 (modif. Ley 797/2003):
+  //   r = 65.5 − 0.5·s   (s = IBL en SMMLV) → entre 55% y 65% para las 1.300 base
+  //   + 1.5% por cada 50 semanas extra, tope 80% (se llega al 80% a las 1.800).
+  // IBL: usamos el salario actual como aproximación (asume salario ~estable;
+  // el IBL real es el promedio de los últimos 10 años).
+  const ibl = sal; // en SMMLV
+  const rBase = Math.max(0.55, Math.min(0.65, 0.655 - 0.005 * ibl));
   const extra = Math.max(0, total - BASE_WEEKS);
-  const tasa = Math.min(0.80, 0.65 + Math.floor(extra / 50) * 0.015);
+  const bonus = Math.floor(extra / 50) * 0.015;
+  const tasa = Math.min(0.80, rBase + bonus);
   const mesada = Math.max(sal * tasa, 1.0);
 
   // Si planea dejar de cotizar antes de la edad de pensión, la mesada igual
@@ -1384,7 +1392,7 @@ function buildPrompt(result) {
     `  Mesada estimada: ${result.colp.mesada} SMMLV/mes`,
     `  Semanas actuales: ${result.colp.semanas_actuales}`,
     `  Semanas proyectadas al retiro: ${result.colp.semanas_proy}`,
-    result.colp.tasa ? `  Tasa de reemplazo: ${result.colp.tasa}%` : `  Semanas faltantes para requisito mínimo: ${result.colp.sem_faltantes}`,
+    result.colp.tasa ? `  Tasa de reemplazo: ${result.colp.tasa}% (Ley 100 art. 34, decreciente con el ingreso; IBL≈salario actual)` : `  Semanas faltantes para requisito mínimo: ${result.colp.sem_faltantes}`,
     result.colp.nota ? `  IMPORTANTE (no es indemnización): ${result.colp.nota}` : '',
     ``,
     `ESCENARIO AFP (RAIS):`,
@@ -1599,7 +1607,7 @@ function renderResults(res) {
               </span>
             </div>
           ` : ''}
-          ${sc.tasa !== undefined ? `<div class="sc-row"><span class="sc-k">Tasa de reemplazo</span><span class="sc-v">${sc.tasa}%</span></div>` : ''}
+          ${sc.tasa !== undefined ? `<div class="sc-row"><span class="sc-k">Tasa de reemplazo <i class="info-icon" onclick="this.classList.toggle('open')">i<span class="tooltip" style="white-space:normal;width:220px;">Ley 100 art. 34: 65.5 − 0.5×(IBL en SMMLV), +1.5% por cada 50 semanas extra (tope 80%). Usamos tu salario actual como IBL (asume salario estable; el real es el promedio de los últimos 10 años).</span></i></span><span class="sc-v">${sc.tasa}%</span></div>` : ''}
           <div class="sc-row"><span class="sc-k">Estabilidad</span><span class="sc-v">${bar(sc.estab,false)}</span></div>
           <div class="sc-row"><span class="sc-k">Herencia</span><span class="sc-v">${bar(sc.hereda,false)}</span></div>
           <div class="sc-row"><span class="sc-k">Riesgo</span><span class="sc-v">${bar(sc.riesgo,true)}</span></div>

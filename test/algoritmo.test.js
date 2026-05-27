@@ -90,6 +90,25 @@ test('Colpensiones: sin semanas suficientes => indemnización sustitutiva', () =
 });
 
 // ════════════════════════════════════════════════
+//  Colpensiones — tasa de reemplazo decreciente con el ingreso (Ley 100 art. 34)
+// ════════════════════════════════════════════════
+test('Colpensiones: la tasa de reemplazo baja cuando sube el salario', () => {
+  // mismas semanas (mismo bonus), distinto salario → el ingreso es lo único que cambia
+  const comun = { edad: 55, semanas_actuales: 1300, anos_lab: '<5', densidad: 'siempre' };
+  const bajo = T.evalColp(mk({ ...comun, salario: '1-2' }));   // IBL ≈ 1.5 SMMLV
+  const alto = T.evalColp(mk({ ...comun, salario: 'gt8' }));   // IBL ≈ 11 SMMLV
+  assert.ok(bajo.tasa > alto.tasa, `tasa baja-renta (${bajo.tasa}%) > alta-renta (${alto.tasa}%)`);
+  // La diferencia ≈ 0.5 × (11 − 1.5) ≈ 4.75 puntos
+  const gap = bajo.tasa - alto.tasa;
+  assert.ok(gap >= 4 && gap <= 6, `diferencia ~5 puntos por el ingreso (fue ${gap})`);
+});
+
+test('Colpensiones: la tasa nunca baja de 55% ni pasa de 80%', () => {
+  const muyAlto = T.evalColp(mk({ edad: 60, semanas_actuales: 2000, anos_lab: '<5', salario: 'gt8' }));
+  assert.ok(muyAlto.tasa >= 55 && muyAlto.tasa <= 80, `tasa en [55,80] (fue ${muyAlto.tasa})`);
+});
+
+// ════════════════════════════════════════════════
 //  Régimen de transición (Ley 2381)
 // ════════════════════════════════════════════════
 test('enTransicion: por edad y por semanas al 1-jul-2025', () => {
