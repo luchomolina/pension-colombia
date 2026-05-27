@@ -994,7 +994,11 @@ const RET_AGE = { M: 62, F: 57 };
 const BASE_WEEKS = 1300;
 const REFORM_THRESH = 2.3; // SMMLV
 const AFP_RATE = 0.115;    // fraction going to individual account
-const AFP_RETURN = 0.08;   // annual, conservative
+// Rendimiento REAL anual de la AFP, neto del crecimiento del salario mínimo.
+// Todo el modelo está en SMMLV (pesos de hoy), así que NO se usa la tasa
+// nominal (~8-10%): el SMMLV crece ~con la inflación, dejando un real ~3%.
+// Mostramos un rango pesimista / esperado / optimista por la incertidumbre.
+const AFP_RETURN_REAL = { lo: 0.015, mid: 0.03, hi: 0.045 };
 
 const SMMLV_2025 = 1423500; // pesos colombianos
 const SAL_MAP = { lt1: 0.85, '1-2': 1.5, '2-3': 2.5, '3-5': 4.0, '5-8': 6.5, gt8: 11.0 };
@@ -1147,25 +1151,35 @@ function evalAFP(data) {
   // Compound projection — use full declared working years (can work past ret age)
   // Independientes tienden a declarar IBC menor al ingreso real → factor 0.85 sobre la tasa
   const afpRate = data.especiales.includes('independiente_actual') ? AFP_RATE * 0.85 : AFP_RATE;
-  const mr = Math.pow(1 + AFP_RETURN, 1/12) - 1;
   const mc = sal * afpRate * df;
 
-  // Fase 1: años laborales (cotización + rendimiento)
-  const months = alab * 12;
-  let cap = balance;
-  for (let m = 0; m < months; m++) cap = cap * (1 + mr) + mc;
-  cap += bono;
-
-  // Fase 2: años de brecha (deja de trabajar pero el capital sigue rentando hasta edad de pensión)
   const stopAge = data.edad + alab;
   const retireAge = Math.max(ret, stopAge);
+  const months = alab * 12;
   const gapMonths = Math.max(0, Math.round((retireAge - stopAge) * 12));
-  for (let m = 0; m < gapMonths; m++) cap = cap * (1 + mr);
 
-  // Mesada al retiro normal
+  // Proyecta el capital (en SMMLV) para una tasa REAL anual dada.
+  const proyectar = (annualReal) => {
+    const mr = Math.pow(1 + annualReal, 1/12) - 1;
+    let c = balance;
+    for (let m = 0; m < months; m++) c = c * (1 + mr) + mc; // fase 1: cotiza + renta
+    c += bono;
+    for (let m = 0; m < gapMonths; m++) c = c * (1 + mr);    // fase 2: solo renta
+    return c;
+  };
+
+  // Tres escenarios de rendimiento real (pesimista / esperado / optimista)
+  const capLo  = proyectar(AFP_RETURN_REAL.lo);
+  const cap    = proyectar(AFP_RETURN_REAL.mid); // el "esperado" maneja la recomendación
+  const capHi  = proyectar(AFP_RETURN_REAL.hi);
+  const mr = Math.pow(1 + AFP_RETURN_REAL.mid, 1/12) - 1; // para la simulación anticipada
+
+  // Mesada al retiro normal (vida esperada desde la edad de retiro)
   const lifeExpYears = data.sexo === 'F' ? Math.max(85 - retireAge, 5) : Math.max(80 - retireAge, 5);
   const lifeM = lifeExpYears * 12;
   const mesadaCap = cap / lifeM;
+  const mesadaLo = capLo / lifeM;
+  const mesadaHi = capHi / lifeM;
 
   const futW = alab * 52 * df;
   const totalW = sem + futW;
@@ -1217,6 +1231,8 @@ function evalAFP(data) {
     edad_anticipada: edadAnticipada,
     mesada_anticipada: mesadaAnticipada,
     mesada: Math.round(mesada * 10) / 10,
+    mesada_lo: Math.round(mesadaLo * 10) / 10,
+    mesada_hi: Math.round(mesadaHi * 10) / 10,
     capital: Math.round(cap * 10) / 10,
     capital_pesos_m: capitalPesos,
     semanas_actuales: sem,
@@ -1362,8 +1378,9 @@ function buildPrompt(result) {
     `  ¿Logra pensión?: ${result.afp.logra_pension ? 'SÍ' : 'NO'}`,
     `  Beneficio esperado: ${result.afp.beneficio}`,
     `  Edad NORMAL de pensión AFP: ${result.afp.edad_pension} años (edad legal de retiro)`,
-    `  Mesada estimada a edad normal: ${result.afp.mesada} SMMLV/mes`,
-    `  Capital proyectado: ${result.afp.capital} SMMLV`,
+    `  Mesada estimada a edad normal (rendimiento real 3%): ${result.afp.mesada} SMMLV/mes`,
+    result.afp.mesada_lo != null ? `  Rango por rendimiento real (1.5% pesimista – 4.5% optimista): ${result.afp.mesada_lo} – ${result.afp.mesada_hi} SMMLV/mes` : '',
+    `  Capital proyectado: ${result.afp.capital} SMMLV (en pesos de hoy)`,
     result.afp.edad_anticipada != null
       ? `  Pensión ANTICIPADA (Art. 64 Ley 100): posible desde ${result.afp.edad_anticipada} años con mesada de ${result.afp.mesada_anticipada} SMMLV/mes — ${result.afp.edad_pension - result.afp.edad_anticipada} años ANTES de lo normal, pero con mesada MENOR`
       : `  Pensión anticipada: no aplica (capital insuficiente antes de edad normal)`,
@@ -1549,6 +1566,7 @@ function renderResults(res) {
         <div class="sc-regime">${sc.regimen}</div>
         <div class="sc-pension">${sc.logra_pension ? sc.mesada + ' SMMLV' : '—'}</div>
         <div class="sc-pension-label">${sc.logra_pension ? 'mesada mensual estimada' : sc.beneficio}</div>
+        ${(sc.logra_pension && sc.mesada_lo != null) ? `<div style="font-size:0.74rem;color:#5c6470;margin-bottom:8px;line-height:1.35;">Rango <strong>${sc.mesada_lo}–${sc.mesada_hi}</strong> SMMLV según el rendimiento real (1.5%–4.5%)</div>` : ''}
         ${sc.beneficio_desc ? `<div style="font-size:0.76rem;color:#888;margin-bottom:8px;line-height:1.4;">${sc.beneficio_desc}</div>` : ''}
         <div class="sc-rows">
           <div class="sc-row" style="border-bottom:1px solid #e8eeff;padding-bottom:7px;margin-bottom:4px;">
@@ -1563,7 +1581,7 @@ function renderResults(res) {
               <span class="sc-v" style="display:flex;align-items:center;gap:4px;">
                 $${sc.capital_pesos_m}M
                 <span style="font-weight:400;color:#94a3b8;font-size:0.8em;white-space:nowrap;">(${sc.capital} SMMLV)</span>
-                <i class="info-icon" onclick="this.classList.toggle('open')">i<span class="tooltip">saldo actual + aportes futuros + rendimiento 8%/año</span></i>
+                <i class="info-icon" onclick="this.classList.toggle('open')">i<span class="tooltip">saldo actual + aportes futuros + rendimiento real 3%/año (rango 1.5–4.5%)</span></i>
               </span>
             </div>
           ` : ''}
@@ -1751,6 +1769,7 @@ function construirTextoResultados() {
     if (sc.beneficio_desc) L.push('    ' + sc.beneficio_desc);
     if (sc.logra_pension) {
       L.push('    Mesada estimada: ' + sc.mesada + ' SMMLV/mes');
+      if (sc.mesada_lo != null) L.push('    Rango según rendimiento real (1.5%–4.5%): ' + sc.mesada_lo + ' – ' + sc.mesada_hi + ' SMMLV/mes');
       if (sc.edad_pension != null) L.push('    Edad de pensión: ' + sc.edad_pension + ' años');
       if (sc.tasa !== undefined) L.push('    Tasa de reemplazo: ' + sc.tasa + '%');
       if (sc.capital_pesos_m !== undefined) L.push('    Capital proyectado: $' + sc.capital_pesos_m + 'M (' + sc.capital + ' SMMLV)');
