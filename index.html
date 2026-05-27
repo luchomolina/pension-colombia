@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Colpensiones o AFP? · Herramienta de orientación pensional</title>
+<style>
+:root { color-scheme: light; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f4f6fb;
+  color: #1a1a2e;
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+#app { max-width: 680px; margin: 0 auto; padding: 16px; }
+
+/* ── Header ── */
+.header { text-align: center; padding: 24px 16px 8px; }
+.header h1 { font-size: 1.65rem; font-weight: 800; color: #003893; letter-spacing: -0.5px; }
+.header .subtitle { color: #666; font-size: 0.88rem; margin-top: 4px; }
+.flag { height: 5px; border-radius: 3px; margin: 14px auto 4px; max-width: 200px;
+  background: linear-gradient(to right, #FCD116 33.33%, #003893 33.33% 66.66%, #CE1126 66.66%); }
+
+/* ── Progress dots ── */
+.progress {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; margin: 20px 0 4px; padding: 0 16px;
+}
+.dot {
+  width: 34px; height: 34px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center;
+  font-size: 0.82rem; font-weight: 700;
+  border: 2.5px solid #d8dde8; background: white; color: #bbb;
+  transition: all 0.25s; flex-shrink: 0; position: relative;
+}
+.dot.active { background: #003893; color: white; border-color: #003893; box-shadow: 0 0 0 4px rgba(0,56,147,0.12); }
+.dot.done { background: #2e7d32; color: white; border-color: #2e7d32; }
+.line { flex: 1; height: 2.5px; background: #d8dde8; max-width: 72px; transition: background 0.25s; }
+.line.done { background: #2e7d32; }
+.step-labels { display: flex; justify-content: space-between; padding: 6px 2px 0; }
+.step-labels span { font-size: 0.7rem; color: #aaa; flex: 1; text-align: center; }
+
+/* ── Card ── */
+.card {
+  background: white; border-radius: 18px; padding: 24px;
+  margin: 14px 0; box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+}
+.card h2 { font-size: 1.15rem; font-weight: 800; color: #003893; margin-bottom: 2px; }
+.step-desc { color: #999; font-size: 0.82rem; margin-bottom: 22px; }
+
+/* ── Fields ── */
+.field { margin-bottom: 20px; }
+.field label {
+  display: block; font-size: 0.84rem; font-weight: 700;
+  color: #333; margin-bottom: 7px;
+}
+.hint { font-size: 0.78rem; color: #888; margin-top: -4px; margin-bottom: 8px; font-style: italic; line-height: 1.4; }
+
+input[type="number"] {
+  width: 100%; padding: 11px 14px; border: 2px solid #e0e4ed;
+  border-radius: 9px; font-size: 0.95rem; color: #1a1a2e;
+  transition: border-color 0.2s; background: white;
+}
+input[type="number"]:focus { outline: none; border-color: #003893; }
+
+/* ── Radio / Check items ── */
+.radio-group, .check-group { display: flex; flex-direction: column; gap: 8px; }
+.radio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.radio-item, .check-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px; border: 2px solid #e0e4ed; border-radius: 10px;
+  cursor: pointer; transition: all 0.18s; font-size: 0.88rem; line-height: 1.3;
+  background: white; user-select: none;
+}
+.radio-item:hover, .check-item:hover { border-color: #003893; background: #f0f4ff; }
+.radio-item.selected, .check-item.selected {
+  border-color: #003893; background: #e8eeff; font-weight: 600; color: #003893;
+}
+.radio-item input, .check-item input { display: none; }
+
+.warn-tag {
+  display: inline-block; font-size: 0.72rem; font-weight: 700;
+  background: #fff3cd; color: #856404; border-radius: 4px; padding: 1px 5px;
+  margin-left: 4px; vertical-align: middle;
+}
+
+/* ── Notices ── */
+.reform-notice {
+  background: #fff8e1; border: 1.5px solid #ffc107; border-radius: 9px;
+  padding: 10px 14px; font-size: 0.81rem; color: #856404; line-height: 1.4;
+  margin-top: 10px; display: none;
+}
+.reform-notice.visible { display: block; }
+.info-box {
+  background: #e8f4fd; border-left: 4px solid #2196f3; border-radius: 6px;
+  padding: 10px 14px; font-size: 0.82rem; color: #1565c0; margin-bottom: 18px; line-height: 1.4;
+}
+
+/* ── Buttons ── */
+.btn-primary {
+  width: 100%; padding: 14px; background: #003893; color: white;
+  border: none; border-radius: 11px; font-size: 1rem; font-weight: 700;
+  cursor: pointer; margin-top: 8px; transition: background 0.18s; letter-spacing: 0.2px;
+}
+.btn-primary:hover { background: #002776; }
+.btn-secondary {
+  width: 100%; padding: 12px; background: white; color: #003893;
+  border: 2px solid #003893; border-radius: 11px; font-size: 0.93rem;
+  font-weight: 700; cursor: pointer; margin-top: 8px; transition: all 0.18s;
+}
+.btn-secondary:hover { background: #f0f4ff; }
+.nav-row { display: flex; gap: 10px; margin-top: 14px; }
+.nav-row .btn-secondary { flex: 1; margin-top: 0; }
+.nav-row .btn-primary { flex: 2; margin-top: 0; }
+
+.error-msg { color: #c62828; font-size: 0.8rem; margin-top: 8px; display: none; font-weight: 600; }
+.error-msg.show { display: block; }
+
+/* ── Loading ── */
+.loading-card { text-align: center; padding: 44px 20px; }
+.spinner {
+  width: 48px; height: 48px; border: 4.5px solid #e0e4ed;
+  border-top-color: #003893; border-radius: 50%;
+  animation: spin 0.9s linear infinite; margin: 0 auto 18px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.ai-spinner {
+  display: inline-block; width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+.loading-msg { font-size: 0.95rem; color: #555; font-weight: 500; }
+.loading-sub { font-size: 0.8rem; color: #aaa; margin-top: 6px; }
+
+/* ── Results ── */
+.verdict-card {
+  border-radius: 18px; padding: 26px 24px;
+  background: linear-gradient(135deg, #002776 0%, #0045c4 100%);
+  color: white; margin: 14px 0; text-align: center;
+}
+.verdict-eyebrow { font-size: 0.8rem; opacity: 0.75; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
+.verdict-name { font-size: 1.55rem; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.3px; }
+.verdict-sub { font-size: 0.9rem; opacity: 0.88; }
+.conf-badge {
+  display: inline-block; padding: 5px 14px; border-radius: 20px;
+  font-size: 0.78rem; font-weight: 700; margin-top: 12px;
+}
+.conf-alta { background: rgba(76,175,80,0.3); color: #a5d6a7; }
+.conf-media { background: rgba(255,193,7,0.3); color: #fff176; }
+.conf-baja { background: rgba(255,82,82,0.3); color: #ef9a9a; }
+
+.scenarios-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
+.sc-card {
+  border-radius: 13px; padding: 16px; border: 2px solid #e0e4ed; background: white;
+}
+.sc-card.winner { border-color: #003893; background: #f7f9ff; }
+.sc-best-tag { font-size: 0.7rem; font-weight: 800; color: #003893; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.sc-regime { font-size: 0.78rem; font-weight: 700; color: #555; margin-bottom: 8px; }
+.sc-pension { font-size: 1.4rem; font-weight: 900; color: #1a1a2e; }
+.sc-pension-label { font-size: 0.72rem; color: #888; margin-bottom: 10px; }
+.sc-rows { border-top: 1px solid #f0f0f0; padding-top: 8px; }
+.sc-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; font-size: 0.78rem; }
+.sc-row .sc-k { color: #888; }
+.sc-row .sc-v { font-weight: 600; color: #333; }
+.sc-nopension { font-size: 0.8rem; color: #c62828; font-weight: 700; margin-top: 8px; }
+.info-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #cbd5e1; color: white; font-size: 9px; font-weight: 800;
+  cursor: pointer; margin-left: 4px; vertical-align: middle;
+  position: relative; flex-shrink: 0;
+  font-style: normal; line-height: 1; user-select: none;
+}
+.info-icon .tooltip {
+  display: none; position: absolute; bottom: calc(100% + 6px); right: 0;
+  background: #1a1a2e; color: #e2e8f0;
+  font-size: 0.72rem; font-weight: 400; line-height: 1.4;
+  white-space: nowrap; padding: 6px 10px; border-radius: 6px;
+  pointer-events: none; z-index: 10;
+}
+.info-icon .tooltip::after {
+  content: ''; position: absolute; top: 100%; right: 4px;
+  border: 5px solid transparent; border-top-color: #1a1a2e;
+}
+.info-icon:hover .tooltip, .info-icon.open .tooltip { display: block; }
+
+.section-card { background: white; border-radius: 16px; padding: 22px; margin: 12px 0; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.section-card h3 { font-size: 1rem; font-weight: 800; color: #003893; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.ai-text { font-size: 0.88rem; line-height: 1.7; color: #333; white-space: pre-wrap; }
+
+.cta-card { background: #e8f5e9; border: 2px solid #4caf50; border-radius: 14px; padding: 18px; margin: 12px 0; }
+.cta-card h4 { font-weight: 800; color: #2e7d32; margin-bottom: 10px; font-size: 0.95rem; }
+.cta-card li { font-size: 0.85rem; color: #388e3c; line-height: 1.8; margin-left: 16px; }
+
+.disclaimer {
+  background: #fff8e1; border-left: 4px solid #ffc107; border-radius: 9px;
+  padding: 14px 16px; margin: 12px 0; font-size: 0.8rem; color: #6d4c00; line-height: 1.5;
+}
+
+.reform-impact {
+  background: #fff3cd; border: 1.5px solid #ffc107; border-radius: 9px;
+  padding: 10px 14px; margin-top: 12px; font-size: 0.81rem; color: #856404; line-height: 1.4; display: none;
+}
+.reform-impact.show { display: block; }
+
+.mini-bar { display: inline-flex; gap: 2px; }
+.mini-bar span { font-size: 0.75rem; }
+
+@media (max-width: 480px) {
+  .scenarios-grid { grid-template-columns: 1fr; }
+  .radio-grid { grid-template-columns: 1fr; }
+  .header h1 { font-size: 1.4rem; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>¿Colpensiones o AFP?</h1>
+    <p class="subtitle">Herramienta de orientación pensional · Colombia 2025</p>
+    <div class="flag"></div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress" id="progress">
+    <div class="dot active" id="dot-1">1</div>
+    <div class="line" id="line-1"></div>
+    <div class="dot" id="dot-2">2</div>
+    <div class="line" id="line-2"></div>
+    <div class="dot" id="dot-3">3</div>
+    <div class="line" id="line-3"></div>
+    <div class="dot" id="dot-4">4</div>
+  </div>
+  <div class="step-labels" id="step-labels">
+    <span>Datos</span><span>Semanas</span><span>Trabajo</span><span>Prioridades</span>
+  </div>
+
+  <!-- ─────────────────── STEP 1 ─────────────────── -->
+  <div class="card" id="step-1">
+    <h2>Datos personales</h2>
+    <p class="step-desc">Paso 1 de 4</p>
+
+    <div class="field">
+      <label>¿Cuántos años tienes?</label>
+      <input type="number" id="edad" min="18" max="75" placeholder="Ej: 38">
+    </div>
+
+    <div class="field">
+      <label>Sexo biológico</label>
+      <p class="hint">Determina la edad de pensión: hombres 62 años, mujeres 57 años</p>
+      <div class="radio-grid" style="margin-top:8px;">
+        <div class="radio-item" onclick="pick('sexo','M',this)">
+          <input type="radio" name="sexo" value="M"> 👨 Hombre
+        </div>
+        <div class="radio-item" onclick="pick('sexo','F',this)">
+          <input type="radio" name="sexo" value="F"> 👩 Mujer
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿En qué fondo cotizas actualmente?</label>
+      <div class="radio-group">
+        <div class="radio-item" onclick="pick('fondo_actual','Colpensiones',this)">
+          <input type="radio" name="fondo" value="Colpensiones"> 🏛️ Colpensiones (RPM)
+        </div>
+        <div class="radio-item" onclick="pick('fondo_actual','Porvenir',this)">
+          <input type="radio" name="fondo" value="Porvenir"> 📈 AFP Porvenir
+        </div>
+        <div class="radio-item" onclick="pick('fondo_actual','Proteccion',this)">
+          <input type="radio" name="fondo" value="Proteccion"> 📈 AFP Protección
+        </div>
+        <div class="radio-item" onclick="pick('fondo_actual','Colfondos',this)">
+          <input type="radio" name="fondo" value="Colfondos"> 📈 AFP Colfondos
+        </div>
+        <div class="radio-item" onclick="pick('fondo_actual','Skandia',this)">
+          <input type="radio" name="fondo" value="Skandia"> 📈 AFP Skandia (Sura)
+        </div>
+        <div class="radio-item" onclick="pick('fondo_actual','ninguno',this)">
+          <input type="radio" name="fondo" value="ninguno"> ❓ Nunca he cotizado / No sé
+        </div>
+      </div>
+    </div>
+
+    <div class="error-msg" id="err1">Por favor completa todos los campos antes de continuar.</div>
+    <button class="btn-primary" onclick="next(1)">Continuar →</button>
+  </div>
+
+  <!-- ─────────────────── STEP 2 ─────────────────── -->
+  <div class="card" id="step-2" style="display:none">
+    <h2>Historial de cotización</h2>
+    <p class="step-desc">Paso 2 de 4</p>
+
+    <div class="info-box">
+      💡 Puedes consultar tus semanas cotizadas en <strong>www.colpensiones.gov.co</strong> (sección "Mi historia laboral") o en el portal de tu AFP.
+    </div>
+
+    <div class="field">
+      <label>Total de semanas cotizadas hasta hoy</label>
+      <p class="hint">Si no sabes exactamente, estima: cada año trabajado = ~52 semanas</p>
+      <input type="number" id="semanas_actuales" min="0" max="3500" placeholder="Ej: 820">
+    </div>
+
+    <div class="field">
+      <label>De esas, ¿cuántas tenías cotizadas al 1 de julio de 2025?</label>
+      <p class="hint">Fecha clave para las reglas de transición de la Reforma Pensional. Si no sabes, pon el mismo número de arriba.</p>
+      <input type="number" id="semanas_julio25" min="0" max="3500" placeholder="Ej: 760">
+    </div>
+
+    <div class="field" id="campo-saldo" style="display:none">
+      <label>Saldo acumulado en tu AFP (en pesos colombianos)</label>
+      <p class="hint">Puedes consultarlo en el portal de tu AFP. Escribe el valor en pesos — por ejemplo: 45000000 si tienes $45 millones. Escribe 0 si no sabes.</p>
+      <input type="number" id="saldo_afp" min="0" placeholder="Ej: 45000000">
+      <p class="hint" id="saldo-smmlv-hint" style="color:#003893; display:none;"></p>
+    </div>
+
+    <div class="field">
+      <label>¿Has trasladado de fondo alguna vez?</label>
+      <div class="radio-grid" style="margin-top:8px;">
+        <div class="radio-item" onclick="pick('ha_trasladado','si',this)">
+          <input type="radio" name="traslado" value="si"> ✅ Sí
+        </div>
+        <div class="radio-item" onclick="pick('ha_trasladado','no',this)">
+          <input type="radio" name="traslado" value="no"> ❌ No
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Situaciones especiales (marca las que apliquen)</label>
+      <div class="check-group">
+        <div class="check-item" onclick="checkToggle('bono_pensional',this)">
+          <input type="checkbox" value="bono_pensional">
+          📜 Tengo bono pensional (trabajé en entidad pública antes de 1994)
+        </div>
+        <div class="check-item" onclick="checkToggle('independiente_actual',this)">
+          <input type="checkbox" value="independiente_actual">
+          💼 Actualmente cotizo como independiente o freelance
+        </div>
+        <div class="check-item" onclick="checkToggle('ninguna',this)">
+          <input type="checkbox" value="ninguna">
+          — Ninguna aplica
+        </div>
+      </div>
+    </div>
+
+    <div class="error-msg" id="err2">Por favor completa los campos requeridos.</div>
+    <div class="nav-row">
+      <button class="btn-secondary" onclick="prev(2)">← Atrás</button>
+      <button class="btn-primary" onclick="next(2)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- ─────────────────── STEP 3 ─────────────────── -->
+  <div class="card" id="step-3" style="display:none">
+    <h2>Situación laboral actual</h2>
+    <p class="step-desc">Paso 3 de 4</p>
+
+    <div class="field">
+      <label>¿Cuánto ganas aproximadamente? (en salarios mínimos)</label>
+      <p class="hint">SMMLV 2025 ≈ $1.423.500. La reforma 2024 obliga a cotizar en Colpensiones si ganas ≤ 2.3 SMMLV.</p>
+      <div class="radio-group" style="margin-top:8px;">
+        <div class="radio-item" onclick="pick('salario','lt1',this)">
+          <input type="radio" name="salario" value="lt1"> Menos de 1 SMMLV (menos de $1.4M)
+        </div>
+        <div class="radio-item" onclick="pick('salario','1-2',this)">
+          <input type="radio" name="salario" value="1-2"> 1 – 2 SMMLV ($1.4M – $2.8M)
+        </div>
+        <div class="radio-item" onclick="pick('salario','2-3',this)" id="radio-2-3">
+          <input type="radio" name="salario" value="2-3">
+          2 – 3 SMMLV ($2.8M – $4.2M) <span class="warn-tag">⚠️ Zona reforma</span>
+        </div>
+        <div class="radio-item" onclick="pick('salario','3-5',this)">
+          <input type="radio" name="salario" value="3-5"> 3 – 5 SMMLV ($4.2M – $7.1M)
+        </div>
+        <div class="radio-item" onclick="pick('salario','5-8',this)">
+          <input type="radio" name="salario" value="5-8"> 5 – 8 SMMLV ($7.1M – $11.4M)
+        </div>
+        <div class="radio-item" onclick="pick('salario','gt8',this)">
+          <input type="radio" name="salario" value="gt8"> Más de 8 SMMLV (más de $11.4M)
+        </div>
+      </div>
+      <div class="reform-notice" id="reform-notice">
+        ⚡ <strong>Reforma Pensional 2024:</strong> Con ingresos ≤ 2.3 SMMLV la ley te obliga a cotizar en Colpensiones. Aun así, analicemos tu situación completa para que entiendas los pros y contras.
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿Cuántos años más planeas cotizar activamente?</label>
+      <p class="hint">Piensa en cuánto tiempo más estarás activo/a en el sistema pensional — ya sea como empleado o independiente. Si cotizarás de forma irregular, ajústalo con la pregunta de frecuencia abajo.</p>
+      <div class="radio-grid" style="margin-top:8px;">
+        <div class="radio-item" onclick="pick('anos_lab','3',this)">
+          <input type="radio" name="alab" value="3"> Menos de 5 años
+        </div>
+        <div class="radio-item" onclick="pick('anos_lab','7',this)">
+          <input type="radio" name="alab" value="7"> 5 – 10 años
+        </div>
+        <div class="radio-item" onclick="pick('anos_lab','12',this)">
+          <input type="radio" name="alab" value="12"> 10 – 15 años
+        </div>
+        <div class="radio-item" onclick="pick('anos_lab','17',this)">
+          <input type="radio" name="alab" value="17"> 15 – 20 años
+        </div>
+        <div class="radio-item" onclick="pick('anos_lab','25',this)">
+          <input type="radio" name="alab" value="25"> Más de 20 años
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿Con qué regularidad cotizarás durante ese período? <span style="font-weight:400;color:#888;">(promedio sobre los años que declaraste arriba)</span></label>
+      <div id="hint-independiente" style="display:none;margin-bottom:8px;padding:8px 12px;background:#fff3e0;border-left:3px solid #fb8c00;border-radius:0 6px 6px 0;font-size:0.82rem;color:#e65100;">
+        💼 Como independiente, sé conservador/a aquí — los períodos sin contrato suelen traducirse en cotizaciones irregulares aunque los ingresos sean buenos.
+      </div>
+      <div class="radio-group" style="margin-top:8px;">
+        <div class="radio-item" onclick="pick('densidad','siempre',this)">
+          <input type="radio" name="dens" value="siempre"> Siempre o casi siempre (90%+ del tiempo)
+        </div>
+        <div class="radio-item" onclick="pick('densidad','frecuente',this)">
+          <input type="radio" name="dens" value="frecuente"> Frecuentemente (70 – 80% del tiempo)
+        </div>
+        <div class="radio-item" onclick="pick('densidad','medio',this)">
+          <input type="radio" name="dens" value="medio"> Aproximadamente la mitad del tiempo
+        </div>
+        <div class="radio-item" onclick="pick('densidad','irregular',this)">
+          <input type="radio" name="dens" value="irregular"> Irregular o difícil de predecir
+        </div>
+      </div>
+    </div>
+
+    <div class="error-msg" id="err3">Por favor completa todos los campos.</div>
+    <div class="nav-row">
+      <button class="btn-secondary" onclick="prev(3)">← Atrás</button>
+      <button class="btn-primary" onclick="next(3)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- ─────────────────── STEP 4 ─────────────────── -->
+  <div class="card" id="step-4" style="display:none">
+    <h2>Factores personales</h2>
+    <p class="step-desc">Paso 4 de 4</p>
+
+    <div class="field">
+      <label>¿Cuántos hijos tienes?</label>
+      <p class="hint">Las mujeres con 3+ hijos necesitan menos semanas para pensionarse.</p>
+      <div class="radio-grid" style="margin-top:8px;">
+        <div class="radio-item" onclick="pick('hijos','0',this)">
+          <input type="radio" name="hijos" value="0"> 0 hijos
+        </div>
+        <div class="radio-item" onclick="pick('hijos','1',this)">
+          <input type="radio" name="hijos" value="1"> 1 hijo
+        </div>
+        <div class="radio-item" onclick="pick('hijos','2',this)">
+          <input type="radio" name="hijos" value="2"> 2 hijos
+        </div>
+        <div class="radio-item" onclick="pick('hijos','3',this)">
+          <input type="radio" name="hijos" value="3"> 3 o más hijos
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>¿Qué es lo más importante para ti? (puedes seleccionar varias)</label>
+      <div class="check-group" style="margin-top:8px;">
+        <div class="check-item" onclick="prefToggle('maximizar_mesada',this)">
+          <input type="checkbox" value="maximizar_mesada">
+          💰 Maximizar la mesada mensual que voy a recibir
+        </div>
+        <div class="check-item" onclick="prefToggle('retirar_pronto',this)">
+          <input type="checkbox" value="retirar_pronto">
+          ⏰ Retirarme lo antes posible, aunque la mesada sea menor
+        </div>
+        <div class="check-item" onclick="prefToggle('heredar',this)">
+          <input type="checkbox" value="heredar">
+          👨‍👩‍👧 Dejar herencia a mis hijos o beneficiarios
+        </div>
+        <div class="check-item" onclick="prefToggle('menor_riesgo',this)">
+          <input type="checkbox" value="menor_riesgo">
+          🛡️ El menor riesgo posible — prefiero seguridad antes que rentabilidad
+        </div>
+        <div class="check-item" onclick="prefToggle('garantia_estado',this)">
+          <input type="checkbox" value="garantia_estado">
+          🏛️ Quiero la garantía del Estado y estabilidad a largo plazo
+        </div>
+      </div>
+      <div id="pref-conflict" style="display:none;margin-top:10px;padding:10px 14px;background:#fffbeb;border:1px solid #fbbf24;border-radius:8px;font-size:0.82rem;color:#92400e;line-height:1.5;"></div>
+    </div>
+
+    <div class="error-msg" id="err4">Por favor selecciona al menos una prioridad y el número de hijos.</div>
+    <div class="nav-row">
+      <button class="btn-secondary" onclick="prev(4)">← Atrás</button>
+      <button class="btn-primary" onclick="analizar()">🔍 Analizar mi situación</button>
+    </div>
+  </div>
+
+  <!-- ─────────────────── LOADING ─────────────────── -->
+  <div class="card loading-card" id="loading" style="display:none">
+    <div class="spinner"></div>
+    <p class="loading-msg" id="load-msg">Calculando tus semanas proyectadas...</p>
+    <p class="loading-sub">Analizando con IA · un momento por favor</p>
+  </div>
+
+  <!-- ─────────────────── RESULTS ─────────────────── -->
+  <div id="results" style="display:none">
+    <div id="verdict-area"></div>
+
+    <div class="section-card">
+      <h3>📊 Comparación de escenarios</h3>
+      <div id="semanas-shared"></div>
+      <div class="scenarios-grid" id="scenarios-grid"></div>
+      <div id="anticipada-callout" style="display:none;"></div>
+      <div class="reform-impact" id="reform-impact"></div>
+    </div>
+
+    <div class="section-card" id="ai-section">
+      <h3>🤖 Análisis personalizado con IA</h3>
+      <p style="font-size:0.86rem;color:#666;margin:0 0 12px;">Obtén una explicación detallada y personalizada de tu situación, con impacto de la Reforma 2024 y pasos concretos a seguir.</p>
+      <button id="ai-btn" onclick="pedirAnalisisIA()" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#003893;color:#fff;border:none;border-radius:8px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">🤖 Obtener análisis personalizado</button>
+      <div class="ai-text" id="ai-text" style="display:none;margin-top:14px;"></div>
+    </div>
+
+    <div class="cta-card">
+      <h4>✅ Próximos pasos concretos</h4>
+      <ul>
+        <li>Solicita una <strong>asesoría oficial en Colpensiones</strong> (colpensiones.gov.co) — es gratuita y te dan tu historia laboral completa.</li>
+        <li>Pide una <strong>proyección oficial a tu AFP</strong> — tienen obligación de dártela.</li>
+        <li>Compara las proyecciones oficiales con estos resultados antes de decidir.</li>
+        <li>Si vas a trasladarte de régimen, inicia el proceso con al menos 6 meses de anticipación.</li>
+        <li>Considera consultar con un <strong>abogado o asesor pensional certificado</strong> para casos complejos.</li>
+      </ul>
+    </div>
+
+    <div class="disclaimer">
+      ⚠️ <strong>Aviso importante:</strong> Esta herramienta es orientativa y no constituye asesoría pensional profesional. Los cálculos son aproximaciones con supuestos simplificados y <em>no reemplazan</em> la consulta oficial con Colpensiones y tu AFP. El sistema pensional colombiano está en transición bajo la Reforma 2024 y algunas reglas aún se están reglamentando. Consulta siempre un asesor certificado antes de tomar decisiones definitivas.
+    </div>
+
+    <div style="display:flex;gap:10px;margin:4px 0 8px;">
+      <button class="btn-secondary" onclick="volverAEditar()" style="flex:2;">← Volver a editar</button>
+      <button class="btn-secondary" onclick="reiniciar()" style="flex:1;">🔄 Nueva consulta</button>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════
+const S = {
+  edad: null, sexo: null, fondo_actual: null,
+  semanas_actuales: 0, semanas_julio25: 0, saldo_afp: 0,
+  ha_trasladado: null, especiales: [],
+  salario: null, anos_lab: null, densidad: null,
+  hijos: null, preferencias: []
+};
+
+// ════════════════════════════════════════════════
+//  FORM HELPERS
+// ════════════════════════════════════════════════
+function pick(field, val, el) {
+  S[field] = val;
+  el.parentElement.querySelectorAll('.radio-item').forEach(x => x.classList.remove('selected'));
+  el.classList.add('selected');
+
+  // Show AFP balance field
+  if (field === 'fondo_actual') {
+    const c = document.getElementById('campo-saldo');
+    c.style.display = (val !== 'Colpensiones' && val !== 'ninguno') ? 'block' : 'none';
+  }
+
+  // Live SMMLV conversion hint (wired once on first pick of fondo)
+  const saldoInput = document.getElementById('saldo_afp');
+  if (saldoInput && !saldoInput._wired) {
+    saldoInput._wired = true;
+    saldoInput.addEventListener('input', () => {
+      const pesos = parseFloat(saldoInput.value) || 0;
+      const hint = document.getElementById('saldo-smmlv-hint');
+      if (pesos > 0) {
+        const smmlv = (pesos / SMMLV_2025).toFixed(1);
+        hint.textContent = `≈ ${smmlv} SMMLV (SMMLV 2025 = $1.423.500)`;
+        hint.style.display = 'block';
+      } else {
+        hint.style.display = 'none';
+      }
+    });
+  }
+  // Reform notice
+  if (field === 'salario') {
+    const mid = salMid(val);
+    const n = document.getElementById('reform-notice');
+    n.classList.toggle('visible', mid <= 2.3);
+  }
+}
+
+function checkToggle(val, el) {
+  const wasSelected = el.classList.contains('selected');
+
+  if (val === 'ninguna') {
+    // "Ninguna aplica" limpia todo lo demás
+    document.querySelectorAll('.check-group .check-item').forEach(item => item.classList.remove('selected'));
+    S.especiales = [];
+    if (!wasSelected) {
+      el.classList.add('selected');
+      S.especiales.push('ninguna');
+    }
+  } else {
+    // Cualquier otra opción desmarca "Ninguna aplica"
+    document.querySelectorAll('.check-group .check-item').forEach(item => {
+      if (item.querySelector('input[value="ninguna"]')) item.classList.remove('selected');
+    });
+    const ni = S.especiales.indexOf('ninguna');
+    if (ni > -1) S.especiales.splice(ni, 1);
+
+    el.classList.toggle('selected');
+    const i = S.especiales.indexOf(val);
+    if (i > -1) S.especiales.splice(i, 1); else S.especiales.push(val);
+  }
+
+  // Mostrar hint de densidad cuando el usuario marca que es independiente
+  const hint = document.getElementById('hint-independiente');
+  if (hint) hint.style.display = S.especiales.includes('independiente_actual') ? 'block' : 'none';
+}
+
+function prefToggle(val, el) {
+  el.classList.toggle('selected');
+  const i = S.preferencias.indexOf(val);
+  if (i > -1) S.preferencias.splice(i, 1); else S.preferencias.push(val);
+
+  // Detect contradictory combinations and show a soft hint
+  const p = S.preferencias;
+  const conflicts = [];
+  if (p.includes('maximizar_mesada') && p.includes('retirar_pronto'))
+    conflicts.push('⚠️ <strong>Maximizar mesada</strong> y <strong>retirarme pronto</strong> suelen ser objetivos opuestos — retirarse antes generalmente implica una mesada menor.');
+  if (p.includes('maximizar_mesada') && p.includes('menor_riesgo'))
+    conflicts.push('⚠️ <strong>Maximizar mesada</strong> y <strong>menor riesgo</strong> pueden ir en direcciones contrarias — mayor mesada suele implicar más exposición al riesgo del sistema.');
+  if (p.includes('retirar_pronto') && p.includes('heredar'))
+    conflicts.push('⚠️ <strong>Retirarme pronto</strong> y <strong>dejar herencia</strong> pueden ser difíciles de combinar — el capital AFP se agota más rápido si la pensión dura más años.');
+
+  const box = document.getElementById('pref-conflict');
+  if (conflicts.length) {
+    box.innerHTML = conflicts.join('<br>');
+    box.style.display = 'block';
+  } else {
+    box.style.display = 'none';
+  }
+}
+
+// ════════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════════
+function showStep(n) {
+  [1,2,3,4].forEach(i => {
+    document.getElementById('step-'+i).style.display = (i === n) ? 'block' : 'none';
+  });
+  window.scrollTo(0,0);
+}
+
+function next(cur) {
+  if (!validate(cur)) return;
+  document.getElementById('dot-'+cur).className = 'dot done';
+  if (cur < 4) document.getElementById('line-'+cur).classList.add('done');
+  const nxt = cur + 1;
+  document.getElementById('dot-'+nxt).classList.add('active');
+  showStep(nxt);
+}
+
+function prev(cur) {
+  document.getElementById('dot-'+cur).className = 'dot';
+  const prv = cur - 1;
+  document.getElementById('dot-'+prv).className = 'dot active';
+  if (cur <= 4) document.getElementById('line-'+prv)?.classList.remove('done');
+  showStep(prv);
+}
+
+// ════════════════════════════════════════════════
+//  VALIDATION
+// ════════════════════════════════════════════════
+function validate(step) {
+  const err = document.getElementById('err'+step);
+  err.classList.remove('show');
+  let ok = true;
+
+  if (step === 1) {
+    S.edad = parseInt(document.getElementById('edad').value);
+    if (!S.edad || S.edad < 18 || S.edad > 75 || !S.sexo || !S.fondo_actual) ok = false;
+  }
+  if (step === 2) {
+    const sa = parseInt(document.getElementById('semanas_actuales').value);
+    const sj = parseInt(document.getElementById('semanas_julio25').value);
+    if (isNaN(sa) || sa < 0) { ok = false; }
+    else {
+      S.semanas_actuales = sa;
+      S.semanas_julio25 = isNaN(sj) ? sa : sj;
+      const saldoPesos = parseFloat(document.getElementById('saldo_afp').value) || 0;
+      S.saldo_afp = saldoPesos / SMMLV_2025; // convert to SMMLV
+    }
+    if (!S.ha_trasladado) ok = false;
+  }
+  if (step === 3) {
+    if (!S.salario || !S.anos_lab || !S.densidad) ok = false;
+  }
+  if (step === 4) {
+    if (S.hijos === null || S.preferencias.length === 0) ok = false;
+  }
+
+  if (!ok) err.classList.add('show');
+  return ok;
+}
+
+// ════════════════════════════════════════════════
+//  ALGORITHM CONSTANTS
+// ════════════════════════════════════════════════
+const RET_AGE = { M: 62, F: 57 };
+const BASE_WEEKS = 1300;
+const REFORM_THRESH = 2.3; // SMMLV
+const AFP_RATE = 0.115;    // fraction going to individual account
+const AFP_RETURN = 0.08;   // annual, conservative
+
+const SMMLV_2025 = 1423500; // pesos colombianos
+const SAL_MAP = { lt1: 0.85, '1-2': 1.5, '2-3': 2.5, '3-5': 4.0, '5-8': 6.5, gt8: 11.0 };
+const DENS_MAP = { siempre: 0.92, frecuente: 0.75, medio: 0.55, irregular: 0.35 };
+const LIFE_EXP = { M: (80 - 62) * 12, F: (85 - 57) * 12 };
+
+function salMid(r) { return SAL_MAP[r] || 2.0; }
+function dens(d) { return DENS_MAP[d] || 0.70; }
+
+// ════════════════════════════════════════════════
+//  MINIMUM WEEKS
+// ════════════════════════════════════════════════
+function minWeeks(data) {
+  let w = BASE_WEEKS;
+  if (data.sexo === 'F' && data.hijos >= 3) w -= 25;
+  if (data.sexo === 'F' && data.hijos >= 4) w -= 50;
+  return w;
+}
+
+// ════════════════════════════════════════════════
+//  TRANSFER CHECK
+// ════════════════════════════════════════════════
+function puedeTransladarse(data) {
+  const ret = RET_AGE[data.sexo];
+  const lejosDePension = (ret - data.edad) > 10;
+  // Si ya se trasladó antes, puede estar dentro del bloqueo de 5 años
+  // (no sabemos la fecha exacta, así que lo señalamos pero no lo bloqueamos)
+  return {
+    puede: lejosDePension,
+    advertenciaTraslado: lejosDePension && data.ha_trasladado === 'si'
+  };
+}
+
+// ════════════════════════════════════════════════
+//  COLPENSIONES SCENARIO
+// ════════════════════════════════════════════════
+function evalColp(data) {
+  const ret = RET_AGE[data.sexo];
+  const alab = parseInt(data.anos_lab) || 0;
+  const df = dens(data.densidad);
+  const minW = minWeeks(data);
+  const sal = salMid(data.salario);
+
+  // Project weeks for the full working years declared — you CAN work and
+  // cotizar past the minimum retirement age in Colombia.
+  const future = alab * 52 * df;
+  const total = (data.semanas_actuales || 0) + future;
+
+  const cumpleEdad = data.edad >= ret || (data.edad + alab >= ret);
+  const cumpleW = total >= minW;
+  const logra = cumpleEdad && cumpleW;
+
+  // Determine exact reason for no-pension (important for AI clarity)
+  let razon_no_pension = null;
+  if (!logra) {
+    if (!cumpleEdad && !cumpleW) {
+      razon_no_pension = `No alcanza la edad de pensión (${ret} años — llegaría a ${data.edad + alab}) ni las semanas mínimas (${minW} — proyecta ${Math.round(total)})`;
+    } else if (!cumpleEdad) {
+      razon_no_pension = `No alcanza la edad de pensión: necesita ${ret} años, pero planea retirarse a los ${data.edad + alab}. Las semanas sí se cubrirían (${Math.round(total)} ≥ ${minW}).`;
+    } else {
+      razon_no_pension = `No alcanza las semanas mínimas: necesita ${minW}, proyecta ${Math.round(total)} (faltan ${Math.round(minW - total)}).`;
+    }
+
+    return {
+      regimen: 'Colpensiones (RPM)',
+      logra_pension: false,
+      beneficio: 'Sin pensión mensual',
+      beneficio_desc: 'Te devuelven lo cotizado en un solo pago (indemnización sustitutiva), sin mesada vitalicia.',
+      razon_no_pension,
+      edad_pension: null,
+      mesada: 0,
+      semanas_actuales: data.semanas_actuales,
+      semanas_proy: Math.round(total),
+      sem_faltantes: cumpleW ? 0 : Math.max(0, Math.round(minW - total)),
+      estab: 0.90, hereda: 0.15, riesgo: 0.65
+    };
+  }
+
+  // Age when both conditions (weeks + age) are first met
+  const weeksToGo = Math.max(0, minW - (data.semanas_actuales || 0));
+  const yearsToWeeks = df > 0 ? weeksToGo / (52 * df) : 999;
+  const ageAtWeeks = data.edad + yearsToWeeks;
+  const pensionAge = Math.ceil(Math.max(ret, ageAtWeeks));
+
+  const extra = Math.max(0, total - BASE_WEEKS);
+  const tasa = Math.min(0.80, 0.65 + Math.floor(extra / 50) * 0.015);
+  const mesada = Math.max(sal * tasa, 1.0);
+
+  return {
+    regimen: 'Colpensiones (RPM)',
+    logra_pension: true,
+    beneficio: 'Pensión de vejez vitalicia',
+    edad_pension: pensionAge,
+    mesada: Math.round(mesada * 10) / 10,
+    tasa: Math.round(tasa * 100),
+    semanas_actuales: data.semanas_actuales,
+    semanas_proy: Math.round(total),
+    estab: 0.95, hereda: 0.15, riesgo: 0.12
+  };
+}
+
+// ════════════════════════════════════════════════
+//  AFP SCENARIO
+// ════════════════════════════════════════════════
+function evalAFP(data) {
+  const ret = RET_AGE[data.sexo];
+  const ytr = Math.max(0, ret - data.edad);
+  const df = dens(data.densidad);
+  const minW = minWeeks(data);
+  const sal = salMid(data.salario);
+  const alab = parseInt(data.anos_lab) || 0;
+
+  // Current balance
+  const sem = data.semanas_actuales || 0;
+  const estBalance = sem > 0 && data.fondo_actual !== 'Colpensiones'
+    ? (sem / 4.33) * sal * AFP_RATE * 1.35
+    : 0;
+  const balance = data.saldo_afp > 0 ? data.saldo_afp : estBalance;
+  const bono = data.especiales.includes('bono_pensional') ? Math.min(sem * 0.04, 60) : 0;
+
+  // Compound projection — use full declared working years (can work past ret age)
+  // Independientes tienden a declarar IBC menor al ingreso real → factor 0.85 sobre la tasa
+  const afpRate = data.especiales.includes('independiente_actual') ? AFP_RATE * 0.85 : AFP_RATE;
+  const mr = Math.pow(1 + AFP_RETURN, 1/12) - 1;
+  const mc = sal * afpRate * df;
+
+  // Fase 1: años laborales (cotización + rendimiento)
+  const months = alab * 12;
+  let cap = balance;
+  for (let m = 0; m < months; m++) cap = cap * (1 + mr) + mc;
+  cap += bono;
+
+  // Fase 2: años de brecha (deja de trabajar pero el capital sigue rentando hasta edad de pensión)
+  const stopAge = data.edad + alab;
+  const retireAge = Math.max(ret, stopAge);
+  const gapMonths = Math.max(0, Math.round((retireAge - stopAge) * 12));
+  for (let m = 0; m < gapMonths; m++) cap = cap * (1 + mr);
+
+  // Mesada al retiro normal
+  const lifeExpYears = data.sexo === 'F' ? Math.max(85 - retireAge, 5) : Math.max(80 - retireAge, 5);
+  const lifeM = lifeExpYears * 12;
+  const mesadaCap = cap / lifeM;
+
+  const futW = alab * 52 * df;
+  const totalW = sem + futW;
+  const cumpleW = totalW >= minW;
+  const cumpleEdad = data.edad >= ret || stopAge >= ret;
+  const garantia = cumpleW && cumpleEdad;
+
+  const logra = mesadaCap >= 1.0 || (garantia && cap > 0);
+  const mesada = mesadaCap >= 1.0 ? mesadaCap : (garantia ? 1.0 : mesadaCap);
+
+  // ── Pensión anticipada (Art. 64 Ley 100) ──────────────────────────────────
+  // Si el capital proyectado financia una mesada ≥ 1.1 SMMLV, puede pensionarse
+  // antes de los 62/57. Calculamos la edad aproximada en que eso ocurre.
+  let edadAnticipada = null;
+  let mesadaAnticipada = null;
+  {
+    let capSim = balance;
+    let cotizando = true;
+    for (let yr = 0; yr <= 40; yr++) {
+      const edadSim = data.edad + yr;
+      if (edadSim >= retireAge) break;
+      const lifeYrs = data.sexo === 'F' ? Math.max(85 - edadSim, 5) : Math.max(80 - edadSim, 5);
+      const mesadaSim = capSim / (lifeYrs * 12);
+      if (mesadaSim >= 1.1 && edadSim >= (data.sexo === 'F' ? 50 : 55)) {
+        edadAnticipada = edadSim;
+        mesadaAnticipada = Math.round(mesadaSim * 10) / 10;
+        break;
+      }
+      const mesesAnio = 12;
+      if (cotizando && yr < alab) {
+        for (let m = 0; m < mesesAnio; m++) capSim = capSim * (1 + mr) + mc;
+      } else {
+        cotizando = false;
+        for (let m = 0; m < mesesAnio; m++) capSim = capSim * (1 + mr);
+      }
+    }
+  }
+
+  const afpPensionAge = logra && Number.isFinite(retireAge) ? retireAge : null;
+  // Capital en pesos y en SMMLV
+  const capitalPesos = Math.round(cap * SMMLV_2025 / 1e6 * 10) / 10; // en millones
+
+  return {
+    regimen: 'Fondo Privado (RAIS)',
+    logra_pension: logra,
+    beneficio: logra ? 'Renta vitalicia / retiro programado' : 'Sin pensión mensual',
+    beneficio_desc: logra ? null : 'Te devuelven el saldo acumulado (devolución de saldos), sin mesada vitalicia.',
+    edad_pension: afpPensionAge,
+    edad_anticipada: edadAnticipada,
+    mesada_anticipada: mesadaAnticipada,
+    mesada: Math.round(mesada * 10) / 10,
+    capital: Math.round(cap * 10) / 10,
+    capital_pesos_m: capitalPesos,
+    semanas_actuales: sem,
+    semanas_proy: Math.round(totalW),
+    garantia_min: garantia,
+    estab: 0.62, hereda: 0.92, riesgo: 0.42
+  };
+}
+
+// ════════════════════════════════════════════════
+//  WEIGHTED SCORING
+// ════════════════════════════════════════════════
+function pesos(prefs) {
+  let p = { pension: 0.28, mesada: 0.22, estab: 0.20, hereda: 0.10, riesgo: 0.20 };
+  if (prefs.includes('maximizar_mesada'))  { p.mesada += 0.15; }
+  if (prefs.includes('retirar_pronto'))    { p.pension += 0.20; p.mesada -= 0.10; }
+  if (prefs.includes('heredar'))           { p.hereda += 0.20; p.mesada -= 0.10; }
+  if (prefs.includes('menor_riesgo'))      { p.riesgo += 0.15; p.estab += 0.10; p.mesada -= 0.15; }
+  if (prefs.includes('garantia_estado'))   { p.estab += 0.15; p.riesgo += 0.05; p.mesada -= 0.10; }
+  const tot = Object.values(p).reduce((a,b) => a+b, 0);
+  Object.keys(p).forEach(k => p[k] /= tot);
+  return p;
+}
+
+function norm(v, min, max) {
+  return max === min ? 0.5 : Math.max(0, Math.min(1, (v - min) / (max - min)));
+}
+
+function score(esc, pw, maxM) {
+  return (
+    pw.pension * (esc.logra_pension ? 1 : 0.1) +
+    pw.mesada  * norm(esc.mesada, 0, maxM) +
+    pw.estab   * esc.estab +
+    pw.hereda  * esc.hereda -
+    pw.riesgo  * esc.riesgo
+  );
+}
+
+// ════════════════════════════════════════════════
+//  MAIN DECISION
+// ════════════════════════════════════════════════
+function enTransicion(data) {
+  // Régimen de transición Ley 2381: protege a quienes al 1-jul-2025 cumplían:
+  //   a) Mujer ≥ 47 años  o  Hombre ≥ 52 años
+  //   b) O cualquier persona con ≥ 750 semanas cotizadas a esa fecha
+  // Estimamos edad al 1-jul-2025 como edad actual − 1 (estamos en may-2026)
+  const edadJul25 = (data.edad || 0) - 1;
+  const cumpleEdad = data.sexo === 'F' ? edadJul25 >= 47 : edadJul25 >= 52;
+  const cumpleSemanas = (data.semanas_julio25 || 0) >= 750;
+  return cumpleEdad || cumpleSemanas;
+}
+
+function decidir(data) {
+  const colp = evalColp(data);
+  const afp  = evalAFP(data);
+  const traslado = puedeTransladarse(data);
+  const puede = traslado.puede;
+  const advertenciaTraslado = traslado.advertenciaTraslado;
+  const sal = salMid(data.salario);
+  const refOblig = sal <= REFORM_THRESH;
+  const transicion = enTransicion(data);
+
+  let escenarios;
+  if (data.fondo_actual === 'Colpensiones' && !puede) {
+    escenarios = [colp];
+  } else if (data.fondo_actual !== 'Colpensiones' && data.fondo_actual !== 'ninguno' && !puede) {
+    escenarios = [afp];
+  } else {
+    escenarios = [colp, afp];
+  }
+
+  const pw = pesos(data.preferencias || []);
+  const maxM = Math.max(...escenarios.map(e => e.mesada), 5);
+  const scored = escenarios.map(e => ({ ...e, score: score(e, pw, maxM) }));
+  scored.sort((a, b) => b.score - a.score);
+
+  const diff = scored.length > 1 ? Math.abs(scored[0].score - scored[1].score) : 1;
+  const confianza = diff > 0.15 ? 'alta' : diff > 0.07 ? 'media' : 'baja';
+
+  return { mejor: scored[0], todos: scored, colp, afp, puede, advertenciaTraslado, refOblig, transicion, confianza };
+}
+
+// ════════════════════════════════════════════════
+//  LOADING MESSAGES
+// ════════════════════════════════════════════════
+const MSGS = [
+  'Calculando tus semanas proyectadas...',
+  'Evaluando escenario en Colpensiones...',
+  'Proyectando capital en AFP...',
+  'Ponderando tus prioridades personales...',
+  'Consultando asesor con IA...',
+  'Preparando tu análisis personalizado...'
+];
+
+// ════════════════════════════════════════════════
+//  MAIN ANALYSIS
+// ════════════════════════════════════════════════
+function analizar() {
+  if (!validate(4)) return;
+
+  document.getElementById('step-4').style.display = 'none';
+  document.getElementById('progress').style.display = 'none';
+  document.getElementById('step-labels').style.display = 'none';
+  window.scrollTo(0,0);
+
+  const result = decidir(S);
+  renderResults(result);
+}
+
+// ── Builds the AI prompt from current S state + algorithm result ──
+function buildPrompt(result) {
+  const salLbl = { lt1:'menos de 1 SMMLV','1-2':'1–2 SMMLV','2-3':'2–3 SMMLV','3-5':'3–5 SMMLV','5-8':'5–8 SMMLV', gt8:'más de 8 SMMLV' };
+  const densLbl = { siempre:'siempre/casi siempre', frecuente:'frecuentemente', medio:'mitad del tiempo', irregular:'de forma irregular' };
+  const userInfo = [
+    `Edad: ${S.edad} años`,
+    `Sexo: ${S.sexo === 'M' ? 'Hombre' : 'Mujer'}`,
+    `Fondo actual: ${S.fondo_actual}`,
+    `Semanas cotizadas totales: ${S.semanas_actuales}`,
+    `Semanas al 1-jul-2025: ${S.semanas_julio25}`,
+    `Saldo AFP declarado (SMMLV): ${S.saldo_afp || 'no indicado'}`,
+    `Ha trasladado de fondo: ${S.ha_trasladado === 'si' ? 'Sí' : 'No'}`,
+    `Situaciones especiales: ${S.especiales.length ? S.especiales.join(', ') : 'ninguna'}`,
+    `Salario: ${salLbl[S.salario]}`,
+    `Años laborales estimados restantes: ~${S.anos_lab}`,
+    `Frecuencia cotización futura: ${densLbl[S.densidad]}`,
+    `Número de hijos: ${S.hijos}`,
+    `Prioridades: ${S.preferencias.join(', ')}`
+  ].join('\n');
+
+  const algoInfo = [
+    `ESCENARIO COLPENSIONES (RPM):`,
+    `  ¿Logra pensión?: ${result.colp.logra_pension ? 'SÍ' : 'NO'}`,
+    result.colp.razon_no_pension ? `  Razón exacta (NO pensión): ${result.colp.razon_no_pension}` : '',
+    `  Beneficio esperado: ${result.colp.beneficio}`,
+    `  Mesada estimada: ${result.colp.mesada} SMMLV/mes`,
+    `  Semanas actuales: ${result.colp.semanas_actuales}`,
+    `  Semanas proyectadas al retiro: ${result.colp.semanas_proy}`,
+    result.colp.tasa ? `  Tasa de reemplazo: ${result.colp.tasa}%` : `  Semanas faltantes para requisito mínimo: ${result.colp.sem_faltantes}`,
+    ``,
+    `ESCENARIO AFP (RAIS):`,
+    `  ¿Logra pensión?: ${result.afp.logra_pension ? 'SÍ' : 'NO'}`,
+    `  Beneficio esperado: ${result.afp.beneficio}`,
+    `  Edad NORMAL de pensión AFP: ${result.afp.edad_pension} años (edad legal de retiro)`,
+    `  Mesada estimada a edad normal: ${result.afp.mesada} SMMLV/mes`,
+    `  Capital proyectado: ${result.afp.capital} SMMLV`,
+    result.afp.edad_anticipada != null
+      ? `  Pensión ANTICIPADA (Art. 64 Ley 100): posible desde ${result.afp.edad_anticipada} años con mesada de ${result.afp.mesada_anticipada} SMMLV/mes — ${result.afp.edad_pension - result.afp.edad_anticipada} años ANTES de lo normal, pero con mesada MENOR`
+      : `  Pensión anticipada: no aplica (capital insuficiente antes de edad normal)`,
+    `  Semanas proyectadas: ${result.afp.semanas_proy}`,
+    ``,
+    `DECISIÓN DEL ALGORITMO:`,
+    `  Mejor opción según preferencias: ${result.mejor.regimen}`,
+    `  Confianza en la recomendación: ${result.confianza}`,
+    `  ¿Puede trasladarse de régimen?: ${result.puede ? 'SÍ (más de 10 años a la pensión)' : 'NO (menos de 10 años a la pensión)'}`,
+    `  ¿Aplica cotización obligatoria a Colpensiones por reforma?: ${result.refOblig && !result.transicion ? 'SÍ (salario ≤ 2.3 SMMLV)' : 'NO'}`,
+    `  ¿Está en régimen de transición (Ley 2381)?: ${result.transicion ? 'SÍ — protegido/a por reglas de Ley 100' : 'NO — sujeto/a a reglas nuevas'}`
+  ].join('\n');
+
+  return `Eres un experto en el sistema pensional colombiano con conocimiento profundo de la Reforma Pensional 2024 (Ley 2381 de 2023) y sus decretos reglamentarios de 2025.
+
+DATOS DE LA PERSONA:
+${userInfo}
+
+RESULTADO DEL ANÁLISIS ALGORÍTMICO:
+${algoInfo}
+
+Proporciona un análisis claro y personalizado en español con estas secciones exactas (usa los títulos en negrita tal como están):
+
+**RECOMENDACIÓN:** Una o dos oraciones directas sobre qué debería hacer esta persona con su fondo pensional. IMPORTANTE: si existe opción de pensión anticipada, NO la presentes como la edad de retiro principal — menciona primero la edad NORMAL de pensión (${result.afp.edad_pension} años) y luego la anticipada como opción opcional, dejando claro que implica una mesada menor.
+
+**¿POR QUÉ?**
+Explica en 2-3 párrafos breves los factores clave que determinan esta recomendación, considerando específicamente su edad, semanas cotizadas, salario y prioridades declaradas. Sé directo y usa lenguaje accesible.
+
+**IMPACTO DE LA REFORMA 2024:**
+En 2-3 oraciones, explica cómo la Reforma Pensional afecta específicamente a esta persona. Si su salario cae en la zona de obligatoriedad (≤ 2.3 SMMLV), explícalo claramente. Si no, explica cómo el sistema de pilares le aplica.
+
+**FACTORES DE RIESGO:**
+Menciona 2-3 puntos concretos sobre los principales riesgos o incertidumbres en su situación específica.
+
+**PASOS INMEDIATOS:**
+Lista 3-4 acciones concretas que debería tomar en los próximos 3-6 meses.
+
+Usa un tono profesional pero accesible, como el de un asesor que habla con claridad. Si la confianza de la recomendación es "baja", explica por qué la decisión es compleja y qué información adicional sería clave. No incluyas disclaimers legales extensos (ya se gestionan por separado en la herramienta).`;
+}
+
+// ── Called when user clicks "Obtener análisis" button ──
+async function pedirAnalisisIA() {
+  const btn = document.getElementById('ai-btn');
+  const aiDiv = document.getElementById('ai-text');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="ai-spinner"></span> Analizando con IA...';
+  aiDiv.style.display = 'none';
+
+  try {
+    const result = decidir(S);
+    const prompt = buildPrompt(result);
+
+    let aiText;
+
+    // Cowork runtime (artefacto en Cowork)
+    if (window.cowork?.askClaude) {
+      const aiResp = await window.cowork.askClaude(prompt);
+      if (typeof aiResp === 'string') { aiText = aiResp; }
+      else if (aiResp?.text) { aiText = aiResp.text; }
+      else if (Array.isArray(aiResp?.content)) { aiText = aiResp.content.filter(b => b.type === 'text').map(b => b.text).join('\n'); }
+      else if (typeof aiResp === 'object') { aiText = Object.values(aiResp).find(v => typeof v === 'string') || JSON.stringify(aiResp); }
+      else { aiText = String(aiResp); }
+    }
+    // Netlify Function (versión hospedada)
+    else {
+      const resp = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
+        throw new Error(err.error || `HTTP ${resp.status}`);
+      }
+      const data = await resp.json();
+      aiText = data.text;
+    }
+
+    btn.style.display = 'none';
+    aiDiv.style.display = 'block';
+    aiDiv.innerHTML = renderMd(aiText);
+  } catch (e) {
+    btn.disabled = false;
+    btn.innerHTML = '🤖 Obtener análisis personalizado';
+    aiDiv.style.display = 'block';
+    aiDiv.innerHTML = '<span style="color:#c62828;">⚠️ No se pudo obtener el análisis IA. Intenta de nuevo.<br><small>' + (e && (e.message || e.toString()) || 'Error desconocido') + '</small></span>';
+  }
+}
+
+// ════════════════════════════════════════════════
+//  RENDER RESULTS
+// ════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+//  MARKDOWN → HTML (minimal)
+// ════════════════════════════════════════════════
+function renderMd(text) {
+  return text
+    // Escape HTML entities first
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    // Horizontal rules
+    .replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid #e0e4ed;margin:12px 0;">')
+    // Bold headings like **TEXT:**
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    // Bullet points
+    .replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>')
+    // Numbered list items
+    .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
+    // Wrap consecutive <li> in <ul>
+    .replace(/(<li>.*<\/li>\n?)+/g, m => `<ul style="padding-left:18px;margin:6px 0;">${m}</ul>`)
+    // Double newline → paragraph break
+    .replace(/\n{2,}/g, '<br><br>')
+    // Single newline → space (keep flow)
+    .replace(/\n/g, ' ');
+}
+
+function bar(v, inv) {
+  const n = Math.round(v * 5);
+  let s = '';
+  for (let i = 0; i < 5; i++) {
+    const on = i < n;
+    const col = on ? (inv ? '#e53935' : '#003893') : '#dde1ea';
+    s += `<span style="color:${col};font-size:0.85rem;">■</span>`;
+  }
+  return s;
+}
+
+function renderResults(res) {
+  document.getElementById('results').style.display = 'block';
+
+  // Verdict
+  const isColp = res.mejor.regimen.includes('Colpensiones');
+  const cmap = { alta:'conf-alta', media:'conf-media', baja:'conf-baja' };
+  const ctxt = { alta:'✅ Recomendación firme', media:'⚠️ Recomendación con matices', baja:'❓ Caso complejo – consulta un experto' };
+
+  document.getElementById('verdict-area').innerHTML = `
+    <div class="verdict-card">
+      <div class="verdict-eyebrow">Tu mejor opción según tu situación</div>
+      <div class="verdict-name">${res.mejor.regimen}</div>
+      <div class="verdict-sub">${res.mejor.logra_pension
+        ? `📌 Proyección: pensión de ~${res.mejor.mesada} SMMLV/mes`
+        : `⚠️ Con tu situación actual no alcanzarías pensión completa`}</div>
+      <span class="conf-badge ${cmap[res.confianza]}">${ctxt[res.confianza]}</span>
+    </div>`;
+
+  // Shared weeks row (same value for both scenarios)
+  const sharedSem = res.colp.semanas_actuales;
+  const sharedFut = res.colp.semanas_proy - res.colp.semanas_actuales;
+  const sharedTot = res.colp.semanas_proy;
+  const semHtml = `
+    <div style="background:#f4f6fb;border-radius:9px;padding:10px 14px;margin-bottom:14px;font-size:0.84rem;color:#444;">
+      📅 <strong>Semanas cotizadas:</strong> ${sharedSem} actuales
+      · proyectas <strong>${Math.round(sharedFut)} más</strong>
+      · total estimado al retiro: <strong>${sharedTot}</strong>
+      <span style="color:#888;margin-left:4px;">(Colpensiones requiere mínimo 1.300)</span>
+    </div>`;
+
+  // Inject shared semanas row above the grid
+  document.getElementById('semanas-shared').innerHTML = semHtml;
+
+  // Scenarios
+  const both = [res.colp, res.afp];
+  let html = '';
+  both.forEach(sc => {
+    const win = sc.regimen === res.mejor.regimen;
+    html += `
+      <div class="sc-card ${win ? 'winner' : ''}">
+        ${win ? '<div class="sc-best-tag">⭐ Recomendada</div>' : ''}
+        <div class="sc-regime">${sc.regimen}</div>
+        <div class="sc-pension">${sc.logra_pension ? sc.mesada + ' SMMLV' : '—'}</div>
+        <div class="sc-pension-label">${sc.logra_pension ? 'mesada mensual estimada' : sc.beneficio}</div>
+        ${sc.beneficio_desc ? `<div style="font-size:0.76rem;color:#888;margin-bottom:8px;line-height:1.4;">${sc.beneficio_desc}</div>` : ''}
+        <div class="sc-rows">
+          <div class="sc-row" style="border-bottom:1px solid #e8eeff;padding-bottom:7px;margin-bottom:4px;">
+            <span class="sc-k" style="font-weight:700;color:#333;">Edad de pensión</span>
+            <span class="sc-v" style="font-size:1rem;color:${sc.edad_pension != null ? '#003893' : '#c62828'}">
+              ${sc.edad_pension != null ? '<strong>' + sc.edad_pension + ' años</strong>' : '—'}
+            </span>
+          </div>
+          ${sc.capital_pesos_m !== undefined ? `
+            <div class="sc-row">
+              <span class="sc-k">Capital proyectado</span>
+              <span class="sc-v" style="display:flex;align-items:center;gap:4px;">
+                $${sc.capital_pesos_m}M
+                <span style="font-weight:400;color:#94a3b8;font-size:0.8em;white-space:nowrap;">(${sc.capital} SMMLV)</span>
+                <i class="info-icon" onclick="this.classList.toggle('open')">i<span class="tooltip">saldo actual + aportes futuros + rendimiento 8%/año</span></i>
+              </span>
+            </div>
+          ` : ''}
+          ${sc.tasa !== undefined ? `<div class="sc-row"><span class="sc-k">Tasa de reemplazo</span><span class="sc-v">${sc.tasa}%</span></div>` : ''}
+          <div class="sc-row"><span class="sc-k">Estabilidad</span><span class="sc-v">${bar(sc.estab,false)}</span></div>
+          <div class="sc-row"><span class="sc-k">Herencia</span><span class="sc-v">${bar(sc.hereda,false)}</span></div>
+          <div class="sc-row"><span class="sc-k">Riesgo</span><span class="sc-v">${bar(sc.riesgo,true)}</span></div>
+        </div>
+        ${sc.razon_no_pension ? `<div class="sc-nopension" style="font-weight:400;font-size:0.76rem;margin-top:8px;">⚠️ ${sc.razon_no_pension}</div>` : ''}
+      </div>`;
+  });
+  document.getElementById('scenarios-grid').innerHTML = html;
+
+  // Pensión anticipada callout
+  const anticipadaEl = document.getElementById('anticipada-callout');
+  if (res.afp.edad_anticipada != null && res.afp.mesada_anticipada != null) {
+    const yearsDiff = res.afp.edad_pension - res.afp.edad_anticipada;
+    const mesadaNormal = res.afp.mesada;
+    const mesadaAntic = res.afp.mesada_anticipada;
+    anticipadaEl.style.display = 'block';
+    anticipadaEl.innerHTML = `
+      <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:14px 16px;margin-top:12px;font-size:0.85rem;line-height:1.6;">
+        <div style="font-weight:700;color:#166534;margin-bottom:6px;">💡 Opción de retiro anticipado en AFP</div>
+        <div style="color:#374151;">Con tu capital proyectado podrías pensionarte a los <strong>${res.afp.edad_anticipada} años</strong> — <strong>${yearsDiff} año${yearsDiff !== 1 ? 's' : ''} antes</strong> de lo normal.</div>
+        <div style="margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
+          <div style="background:white;border-radius:7px;padding:8px 14px;border:1px solid #bbf7d0;">
+            <div style="font-size:0.75rem;color:#6b7280;">A los ${res.afp.edad_anticipada} años</div>
+            <div style="font-size:1.1rem;font-weight:800;color:#166534;">${mesadaAntic} SMMLV/mes</div>
+          </div>
+          <div style="background:white;border-radius:7px;padding:8px 14px;border:1px solid #e5e7eb;">
+            <div style="font-size:0.75rem;color:#6b7280;">A los ${res.afp.edad_pension} años</div>
+            <div style="font-size:1.1rem;font-weight:800;color:#374151;">${mesadaNormal} SMMLV/mes</div>
+          </div>
+        </div>
+        <div style="color:#6b7280;margin-top:8px;font-size:0.78rem;">Retirarte antes implica una mesada menor porque el capital se distribuye en más años de vida esperada. Requiere verificación con tu AFP (Art. 64, Ley 100).</div>
+      </div>`;
+  } else {
+    anticipadaEl.style.display = 'none';
+  }
+
+  // Reform / transfer notice
+  const ri = document.getElementById('reform-impact');
+  const notices = [];
+
+  // Régimen de transición — mensaje prioritario, suprime la obligatoriedad Colpensiones
+  if (res.transicion) {
+    notices.push('🛡️ <strong>Régimen de transición (Ley 2381):</strong> Tu situación está protegida por las reglas anteriores a la reforma. Las condiciones que aplican a tu pensión son las de la Ley 100 — no estás sujeto/a a la cotización obligatoria en Colpensiones por nivel de ingresos.');
+  } else if (res.refOblig) {
+    notices.push('⚡ <strong>Reforma 2024:</strong> Con tu nivel de ingresos (≤ 2.3 SMMLV) la ley te obliga a cotizar en Colpensiones. Tu libertad de elección aplica principalmente al excedente de ese umbral.');
+  }
+
+  if (!res.puede) notices.push('⏰ <strong>Traslado bloqueado:</strong> Estás a menos de 10 años de la edad de pensión, por lo que no puedes cambiar de régimen en este momento.');
+  if (res.advertenciaTraslado) notices.push('🔄 <strong>Traslado previo:</strong> Recuerda que solo puedes trasladarte una vez cada 5 años. Verifica con tu fondo la fecha exacta de tu último traslado antes de iniciar cualquier trámite.');
+
+  if (notices.length) { ri.innerHTML = notices.join('<br><br>'); ri.classList.add('show'); }
+
+  // Reset AI section to show CTA button (in case user edits and re-runs)
+  const aiBtn = document.getElementById('ai-btn');
+  const aiDiv = document.getElementById('ai-text');
+  aiBtn.disabled = false;
+  aiBtn.style.display = 'inline-flex';
+  aiBtn.innerHTML = '🤖 Obtener análisis personalizado';
+  aiDiv.style.display = 'none';
+  aiDiv.innerHTML = '';
+}
+
+// ════════════════════════════════════════════════
+//  BACK TO EDIT (keep fields filled)
+// ════════════════════════════════════════════════
+function volverAEditar() {
+  document.getElementById('results').style.display = 'none';
+
+  // Restore progress: steps 1-3 done, step 4 active
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.getElementById('dot-' + i);
+    if (i < 4) {
+      dot.className = 'dot done';
+      document.getElementById('line-' + i).classList.add('done');
+    } else {
+      dot.className = 'dot active';
+    }
+  }
+
+  document.getElementById('progress').style.display = 'flex';
+  document.getElementById('step-labels').style.display = 'flex';
+  showStep(4);
+}
+
+// ════════════════════════════════════════════════
+//  RESTART
+// ════════════════════════════════════════════════
+function reiniciar() {
+  Object.assign(S, {
+    edad:null,sexo:null,fondo_actual:null,
+    semanas_actuales:0,semanas_julio25:0,saldo_afp:0,
+    ha_trasladado:null,especiales:[],
+    salario:null,anos_lab:null,densidad:null,
+    hijos:null,preferencias:[]
+  });
+
+  document.querySelectorAll('.radio-item').forEach(e => e.classList.remove('selected'));
+  document.querySelectorAll('.check-item').forEach(e => e.classList.remove('selected'));
+  document.querySelectorAll('input[type="number"]').forEach(e => e.value = '');
+  document.getElementById('campo-saldo').style.display = 'none';
+  document.getElementById('reform-notice').classList.remove('visible');
+  document.getElementById('reform-impact').classList.remove('show');
+  document.getElementById('results').style.display = 'none';
+
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById('dot-'+i).className = 'dot' + (i===1 ? ' active' : '');
+    if (i < 4) document.getElementById('line-'+i).classList.remove('done');
+  }
+
+  document.getElementById('progress').style.display = 'flex';
+  document.getElementById('step-labels').style.display = 'flex';
+  showStep(1);
+}
+</script>
+</body>
+</html>
