@@ -551,20 +551,20 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
       <label>¿Cuántos años más planeas cotizar activamente?</label>
       <p class="hint">Piensa en cuánto tiempo más estarás activo/a en el sistema pensional — ya sea como empleado o independiente. Si cotizarás de forma irregular, ajústalo con la pregunta de frecuencia abajo.</p>
       <div class="radio-grid" style="margin-top:8px;">
-        <div class="radio-item" onclick="pick('anos_lab','3',this)">
-          <input type="radio" name="alab" value="3"> Menos de 5 años
+        <div class="radio-item" onclick="pick('anos_lab','<5',this)">
+          <input type="radio" name="alab" value="<5"> Menos de 5 años
         </div>
-        <div class="radio-item" onclick="pick('anos_lab','7',this)">
-          <input type="radio" name="alab" value="7"> 5 – 10 años
+        <div class="radio-item" onclick="pick('anos_lab','5-10',this)">
+          <input type="radio" name="alab" value="5-10"> 5 – 10 años
         </div>
-        <div class="radio-item" onclick="pick('anos_lab','12',this)">
-          <input type="radio" name="alab" value="12"> 10 – 15 años
+        <div class="radio-item" onclick="pick('anos_lab','10-15',this)">
+          <input type="radio" name="alab" value="10-15"> 10 – 15 años
         </div>
-        <div class="radio-item" onclick="pick('anos_lab','17',this)">
-          <input type="radio" name="alab" value="17"> 15 – 20 años
+        <div class="radio-item" onclick="pick('anos_lab','15-20',this)">
+          <input type="radio" name="alab" value="15-20"> 15 – 20 años
         </div>
-        <div class="radio-item" onclick="pick('anos_lab','25',this)">
-          <input type="radio" name="alab" value="25"> Más de 20 años
+        <div class="radio-item" onclick="pick('anos_lab','>20',this)">
+          <input type="radio" name="alab" value=">20"> Más de 20 años
         </div>
       </div>
     </div>
@@ -1000,8 +1000,32 @@ const SMMLV_2025 = 1423500; // pesos colombianos
 const SAL_MAP = { lt1: 0.85, '1-2': 1.5, '2-3': 2.5, '3-5': 4.0, '5-8': 6.5, gt8: 11.0 };
 const DENS_MAP = { siempre: 0.92, frecuente: 0.75, medio: 0.55, irregular: 0.35 };
 
+// Rango de años de cotización. "mid" = valor neutral (sin preferencia de duración).
+const ANOS_RANGE = {
+  '<5':    { lo: 2,  mid: 3,  hi: 4,  label: 'menos de 5 años' },
+  '5-10':  { lo: 5,  mid: 7,  hi: 10, label: '5–10 años' },
+  '10-15': { lo: 10, mid: 12, hi: 15, label: '10–15 años' },
+  '15-20': { lo: 15, mid: 17, hi: 20, label: '15–20 años' },
+  '>20':   { lo: 20, mid: 25, hi: 30, label: 'más de 20 años' }
+};
+
 function salMid(r) { return SAL_MAP[r] || 2.0; }
 function dens(d) { return DENS_MAP[d] || 0.70; }
+
+// Resuelve los años de cotización según el rango elegido y las prioridades.
+// 'retirar pronto' → cota inferior · 'maximizar mesada' → cota superior.
+// Cualquier otro caso (ninguna de las dos, o ambas a la vez) → punto medio.
+function resolverAnos(data) {
+  const r = ANOS_RANGE[data.anos_lab];
+  if (!r) return { anos: parseInt(data.anos_lab) || 0, nota: null }; // fallback defensivo
+  const prefs = data.preferencias || [];
+  const early = prefs.includes('retirar_pronto');
+  const max = prefs.includes('maximizar_mesada');
+  if (early && !max) return { anos: r.lo, nota: `Proyectamos ${r.lo} años (el mínimo de tu rango "${r.label}") porque priorizas retirarte pronto.` };
+  if (max && !early) return { anos: r.hi, nota: `Proyectamos ${r.hi} años (el máximo de tu rango "${r.label}") porque priorizas maximizar la mesada.` };
+  return { anos: r.mid, nota: null };
+}
+function anosLab(data) { return resolverAnos(data).anos; }
 
 // ════════════════════════════════════════════════
 //  MINIMUM WEEKS
@@ -1032,7 +1056,7 @@ function puedeTransladarse(data) {
 // ════════════════════════════════════════════════
 function evalColp(data) {
   const ret = RET_AGE[data.sexo];
-  const alab = parseInt(data.anos_lab) || 0;
+  const alab = anosLab(data);
   const df = dens(data.densidad);
   const minW = minWeeks(data);
   const sal = salMid(data.salario);
@@ -1110,7 +1134,7 @@ function evalAFP(data) {
   const df = dens(data.densidad);
   const minW = minWeeks(data);
   const sal = salMid(data.salario);
-  const alab = parseInt(data.anos_lab) || 0;
+  const alab = anosLab(data);
 
   // Current balance
   const sem = data.semanas_actuales || 0;
@@ -1273,7 +1297,8 @@ function decidir(data) {
   const diff = scored.length > 1 ? Math.abs(scored[0].score - scored[1].score) : 1;
   const confianza = diff > 0.15 ? 'alta' : diff > 0.07 ? 'media' : 'baja';
 
-  return { mejor: scored[0], todos: scored, colp, afp, puede, advertenciaTraslado, refOblig, transicion, confianza };
+  const ra = resolverAnos(data);
+  return { mejor: scored[0], todos: scored, colp, afp, puede, advertenciaTraslado, refOblig, transicion, confianza, anosUsados: ra.anos, anosNota: ra.nota };
 }
 
 // ════════════════════════════════════════════════
@@ -1315,7 +1340,7 @@ function buildPrompt(result) {
     `Ha trasladado de fondo: ${S.ha_trasladado === 'si' ? 'Sí' : 'No'}`,
     `Situaciones especiales: ${S.especiales.length ? S.especiales.join(', ') : 'ninguna'}`,
     `Salario: ${SAL_LBL[S.salario]}`,
-    `Años laborales estimados restantes: ~${S.anos_lab}`,
+    `Años que planea cotizar (resuelto según prioridades): ~${anosLab(S)} (rango elegido: ${ANOS_RANGE[S.anos_lab]?.label || S.anos_lab})`,
     `Frecuencia cotización futura: ${DENS_LBL[S.densidad]}`,
     `Número de hijos: ${S.hijos}`,
     `Prioridades: ${S.preferencias.join(', ')}`
@@ -1507,6 +1532,7 @@ function renderResults(res) {
       · proyectas <strong>${Math.round(sharedFut)} más</strong>
       · total estimado al retiro: <strong>${sharedTot}</strong>
       <span style="color:#888;margin-left:4px;">(Colpensiones requiere mínimo 1.300)</span>
+      ${res.anosNota ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid #e2e8f5;color:#33415c;font-size:0.8rem;">ℹ️ ${res.anosNota}</div>` : ''}
     </div>`;
 
   // Inject shared semanas row above the grid
@@ -1700,7 +1726,8 @@ function construirTextoResultados() {
   L.push(`  ¿Se ha trasladado de fondo?: ${S.ha_trasladado === 'si' ? 'Sí' : 'No'}`);
   L.push(`  Situaciones especiales: ${S.especiales.length ? S.especiales.map(e => ESP_LBL[e] || e).join('; ') : 'ninguna'}`);
   L.push(`  Salario: ${SAL_LBL[S.salario] || '—'}`);
-  L.push(`  Años que planea seguir cotizando: ~${S.anos_lab}`);
+  L.push(`  Años que planea seguir cotizando: ~${anosLab(S)} (rango elegido: ${ANOS_RANGE[S.anos_lab]?.label || S.anos_lab})`);
+  if (r.anosNota) L.push(`    ${r.anosNota}`);
   L.push(`  Regularidad de cotización futura: ${DENS_LBL[S.densidad] || '—'}`);
   L.push(`  Número de hijos: ${S.hijos}`);
   L.push(`  Prioridades: ${S.preferencias.length ? S.preferencias.map(p => PREF_LBL[p] || p).join('; ') : '—'}`);
