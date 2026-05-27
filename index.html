@@ -520,7 +520,7 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
 
     <div class="field">
       <label>¿Cuánto ganas aproximadamente? (en salarios mínimos)</label>
-      <p class="hint">SMMLV 2025 = $1.423.500. La reforma 2024 obliga a cotizar en Colpensiones si ganas ≤ 2.3 SMMLV.</p>
+      <p class="hint">SMMLV 2026 = $1.750.905. La reforma 2024 obliga a cotizar en Colpensiones si ganas ≤ 2.3 SMMLV.</p>
       <div class="radio-group" style="margin-top:8px;">
         <div class="radio-item" onclick="pick('salario','lt1',this)">
           <input type="radio" name="salario" value="lt1"> Menos de 1 SMMLV (menos de $1.4M)
@@ -670,6 +670,9 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
       <h3>📊 Comparación de escenarios</h3>
       <div id="semanas-shared"></div>
       <div class="scenarios-grid" id="scenarios-grid"></div>
+      <div style="background:#eef4ff;border-radius:9px;padding:11px 14px;margin-top:12px;font-size:0.78rem;color:#33415c;line-height:1.5;">
+        💡 <strong>¿Pesos de hoy o de cuando me pensione?</strong> Las cifras están en <strong>pesos de hoy</strong> (lo que comprarían hoy). Recibirás esa cantidad de <strong>salarios mínimos</strong> al pensionarte: el número en pesos será mayor por la inflación, pero su poder de compra será parecido. Por eso medimos todo en SMMLV.
+      </div>
       <div id="anticipada-callout" style="display:none;"></div>
       <div class="reform-impact" id="reform-impact"></div>
     </div>
@@ -814,8 +817,8 @@ function pick(field, val, el) {
       const pesos = parseFloat(saldoInput.value) || 0;
       const hint = document.getElementById('saldo-smmlv-hint');
       if (pesos > 0) {
-        const smmlv = (pesos / SMMLV_2025).toFixed(1);
-        hint.textContent = `≈ ${smmlv} SMMLV (SMMLV 2025 = $1.423.500)`;
+        const smmlv = (pesos / SMMLV).toFixed(1);
+        hint.textContent = `≈ ${smmlv} SMMLV (SMMLV 2026 = $1.750.905)`;
         hint.style.display = 'block';
       } else {
         hint.style.display = 'none';
@@ -965,7 +968,7 @@ function validate(step) {
       S.semanas_actuales = sa;
       S.semanas_julio25 = isNaN(sj) ? sa : sj;
       const saldoPesos = parseFloat(document.getElementById('saldo_afp').value) || 0;
-      S.saldo_afp = saldoPesos / SMMLV_2025; // convert to SMMLV
+      S.saldo_afp = saldoPesos / SMMLV; // convert to SMMLV
     }
   }
 
@@ -1000,7 +1003,7 @@ const AFP_RATE = 0.115;    // fraction going to individual account
 // Mostramos un rango pesimista / esperado / optimista por la incertidumbre.
 const AFP_RETURN_REAL = { lo: 0.015, mid: 0.03, hi: 0.045 };
 
-const SMMLV_2025 = 1423500; // pesos colombianos
+const SMMLV = 1750905; // SMMLV 2026 (Decreto 1469 de 2025) — actualizar cada año
 const SAL_MAP = { lt1: 0.85, '1-2': 1.5, '2-3': 2.5, '3-5': 4.0, '5-8': 6.5, gt8: 11.0 };
 const DENS_MAP = { siempre: 0.92, frecuente: 0.75, medio: 0.55, irregular: 0.35 };
 
@@ -1019,7 +1022,7 @@ function dens(d) { return DENS_MAP[d] || 0.70; }
 // Convierte un monto en SMMLV (pesos de hoy) a un texto en pesos legible.
 // Ej: 5.1 → "$7,3 millones" · 537.9 → "$766 millones" · 0.6 → "$854.000"
 function fmtPesos(smmlv) {
-  const v = (smmlv || 0) * SMMLV_2025;
+  const v = (smmlv || 0) * SMMLV;
   const millones = v / 1e6;
   if (millones < 1) return '$' + (Math.round(v / 1000) * 1000).toLocaleString('es-CO');
   if (millones < 100) return '$' + (Math.round(millones * 10) / 10).toLocaleString('es-CO', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' millones';
@@ -1230,7 +1233,7 @@ function evalAFP(data) {
 
   const afpPensionAge = logra && Number.isFinite(retireAge) ? retireAge : null;
   // Capital en pesos y en SMMLV
-  const capitalPesos = Math.round(cap * SMMLV_2025 / 1e6 * 10) / 10; // en millones
+  const capitalPesos = Math.round(cap * SMMLV / 1e6 * 10) / 10; // en millones
 
   return {
     regimen: 'Fondo Privado (RAIS)',
@@ -1544,7 +1547,7 @@ function renderResults(res) {
       <div class="verdict-eyebrow">Tu mejor opción según tu situación</div>
       <div class="verdict-name">${res.mejor.regimen}</div>
       <div class="verdict-sub">${res.mejor.logra_pension
-        ? `📌 Proyección: pensión de ~${res.mejor.mesada} SMMLV/mes (≈ ${fmtPesos(res.mejor.mesada)}/mes)`
+        ? `📌 Proyección: pensión de ~${res.mejor.mesada} SMMLV/mes (≈ ${fmtPesos(res.mejor.mesada)}/mes en pesos de hoy)`
         : `⚠️ Con tu situación actual no alcanzarías pensión completa`}</div>
       <span class="conf-badge ${cmap[res.confianza]}">${ctxt[res.confianza]}</span>
     </div>`;
@@ -1576,7 +1579,7 @@ function renderResults(res) {
         <div class="sc-regime">${sc.regimen}</div>
         <div class="sc-pension">${sc.logra_pension ? sc.mesada + ' SMMLV' : '—'}</div>
         <div class="sc-pension-label">${sc.logra_pension ? 'mesada mensual estimada' : sc.beneficio}</div>
-        ${sc.logra_pension ? `<div style="font-size:0.86rem;font-weight:800;color:#1a1a2e;margin:2px 0 6px;">≈ ${fmtPesos(sc.mesada)}/mes</div>` : ''}
+        ${sc.logra_pension ? `<div style="font-size:0.86rem;font-weight:800;color:#1a1a2e;margin:2px 0 6px;">≈ ${fmtPesos(sc.mesada)}/mes <span style="font-weight:500;color:#5c6470;font-size:0.82em;">en pesos de hoy</span></div>` : ''}
         ${(sc.logra_pension && sc.mesada_lo != null) ? `<div style="font-size:0.74rem;color:#5c6470;margin-bottom:8px;line-height:1.35;">Rango <strong>${sc.mesada_lo}–${sc.mesada_hi}</strong> SMMLV (${fmtPesos(sc.mesada_lo)}–${fmtPesos(sc.mesada_hi)}) según el rendimiento real</div>` : ''}
         ${sc.beneficio_desc ? `<div style="font-size:0.76rem;color:#888;margin-bottom:8px;line-height:1.4;">${sc.beneficio_desc}</div>` : ''}
         <div class="sc-rows">
@@ -1741,8 +1744,9 @@ function construirTextoResultados() {
   L.push('TU MEJOR OPCIÓN SEGÚN TU SITUACIÓN');
   L.push('  ' + r.mejor.regimen);
   L.push('  ' + (r.mejor.logra_pension
-    ? `Proyección: pensión de ~${r.mejor.mesada} SMMLV/mes (≈ ${fmtPesos(r.mejor.mesada)}/mes)`
+    ? `Proyección: pensión de ~${r.mejor.mesada} SMMLV/mes (≈ ${fmtPesos(r.mejor.mesada)}/mes en pesos de hoy)`
     : 'Con tu situación actual no alcanzarías pensión completa'));
+  if (r.mejor.logra_pension) L.push('  (Cifras en pesos de hoy. Recibirás esa cantidad de salarios mínimos al pensionarte; en pesos será más por la inflación, pero comprará algo similar.)');
   L.push('  Confianza: ' + (CONF_LBL[r.confianza] || r.confianza));
   L.push('', sub, '');
 
