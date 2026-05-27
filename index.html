@@ -1016,6 +1016,16 @@ const ANOS_RANGE = {
 function salMid(r) { return SAL_MAP[r] || 2.0; }
 function dens(d) { return DENS_MAP[d] || 0.70; }
 
+// Convierte un monto en SMMLV (pesos de hoy) a un texto en pesos legible.
+// Ej: 5.1 → "$7,3 millones" · 537.9 → "$766 millones" · 0.6 → "$854.000"
+function fmtPesos(smmlv) {
+  const v = (smmlv || 0) * SMMLV_2025;
+  const millones = v / 1e6;
+  if (millones < 1) return '$' + (Math.round(v / 1000) * 1000).toLocaleString('es-CO');
+  if (millones < 100) return '$' + (Math.round(millones * 10) / 10).toLocaleString('es-CO', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' millones';
+  return '$' + Math.round(millones).toLocaleString('es-CO') + ' millones';
+}
+
 // Resuelve los años de cotización según el rango elegido y las prioridades.
 // 'retirar pronto' → cota inferior · 'maximizar mesada' → cota superior.
 // Cualquier otro caso (ninguna de las dos, o ambas a la vez) → punto medio.
@@ -1534,7 +1544,7 @@ function renderResults(res) {
       <div class="verdict-eyebrow">Tu mejor opción según tu situación</div>
       <div class="verdict-name">${res.mejor.regimen}</div>
       <div class="verdict-sub">${res.mejor.logra_pension
-        ? `📌 Proyección: pensión de ~${res.mejor.mesada} SMMLV/mes`
+        ? `📌 Proyección: pensión de ~${res.mejor.mesada} SMMLV/mes (≈ ${fmtPesos(res.mejor.mesada)}/mes)`
         : `⚠️ Con tu situación actual no alcanzarías pensión completa`}</div>
       <span class="conf-badge ${cmap[res.confianza]}">${ctxt[res.confianza]}</span>
     </div>`;
@@ -1566,7 +1576,8 @@ function renderResults(res) {
         <div class="sc-regime">${sc.regimen}</div>
         <div class="sc-pension">${sc.logra_pension ? sc.mesada + ' SMMLV' : '—'}</div>
         <div class="sc-pension-label">${sc.logra_pension ? 'mesada mensual estimada' : sc.beneficio}</div>
-        ${(sc.logra_pension && sc.mesada_lo != null) ? `<div style="font-size:0.74rem;color:#5c6470;margin-bottom:8px;line-height:1.35;">Rango <strong>${sc.mesada_lo}–${sc.mesada_hi}</strong> SMMLV según el rendimiento real (1.5%–4.5%)</div>` : ''}
+        ${sc.logra_pension ? `<div style="font-size:0.86rem;font-weight:800;color:#1a1a2e;margin:2px 0 6px;">≈ ${fmtPesos(sc.mesada)}/mes</div>` : ''}
+        ${(sc.logra_pension && sc.mesada_lo != null) ? `<div style="font-size:0.74rem;color:#5c6470;margin-bottom:8px;line-height:1.35;">Rango <strong>${sc.mesada_lo}–${sc.mesada_hi}</strong> SMMLV (${fmtPesos(sc.mesada_lo)}–${fmtPesos(sc.mesada_hi)}) según el rendimiento real</div>` : ''}
         ${sc.beneficio_desc ? `<div style="font-size:0.76rem;color:#888;margin-bottom:8px;line-height:1.4;">${sc.beneficio_desc}</div>` : ''}
         <div class="sc-rows">
           <div class="sc-row" style="border-bottom:1px solid #e8eeff;padding-bottom:7px;margin-bottom:4px;">
@@ -1579,7 +1590,7 @@ function renderResults(res) {
             <div class="sc-row">
               <span class="sc-k">Capital proyectado</span>
               <span class="sc-v" style="display:flex;align-items:center;gap:4px;">
-                $${sc.capital_pesos_m}M
+                ${fmtPesos(sc.capital)}
                 <span style="font-weight:400;color:#94a3b8;font-size:0.8em;white-space:nowrap;">(${sc.capital} SMMLV)</span>
                 <i class="info-icon" onclick="this.classList.toggle('open')">i<span class="tooltip">saldo actual + aportes futuros + rendimiento real 3%/año (rango 1.5–4.5%)</span></i>
               </span>
@@ -1611,10 +1622,12 @@ function renderResults(res) {
           <div style="background:white;border-radius:7px;padding:8px 14px;border:1px solid #bbf7d0;">
             <div style="font-size:0.75rem;color:#6b7280;">A los ${res.afp.edad_anticipada} años</div>
             <div style="font-size:1.1rem;font-weight:800;color:#166534;">${mesadaAntic} SMMLV/mes</div>
+            <div style="font-size:0.72rem;color:#6b7280;">≈ ${fmtPesos(mesadaAntic)}/mes</div>
           </div>
           <div style="background:white;border-radius:7px;padding:8px 14px;border:1px solid #e5e7eb;">
             <div style="font-size:0.75rem;color:#6b7280;">A los ${res.afp.edad_pension} años</div>
             <div style="font-size:1.1rem;font-weight:800;color:#374151;">${mesadaNormal} SMMLV/mes</div>
+            <div style="font-size:0.72rem;color:#6b7280;">≈ ${fmtPesos(mesadaNormal)}/mes</div>
           </div>
         </div>
         <div style="color:#6b7280;margin-top:8px;font-size:0.78rem;">Retirarte antes implica una mesada menor porque el capital se distribuye en más años de vida esperada. Requiere verificación con tu AFP (Art. 64, Ley 100).</div>
@@ -1728,7 +1741,7 @@ function construirTextoResultados() {
   L.push('TU MEJOR OPCIÓN SEGÚN TU SITUACIÓN');
   L.push('  ' + r.mejor.regimen);
   L.push('  ' + (r.mejor.logra_pension
-    ? `Proyección: pensión de ~${r.mejor.mesada} SMMLV/mes`
+    ? `Proyección: pensión de ~${r.mejor.mesada} SMMLV/mes (≈ ${fmtPesos(r.mejor.mesada)}/mes)`
     : 'Con tu situación actual no alcanzarías pensión completa'));
   L.push('  Confianza: ' + (CONF_LBL[r.confianza] || r.confianza));
   L.push('', sub, '');
@@ -1768,11 +1781,11 @@ function construirTextoResultados() {
     L.push('    Beneficio: ' + sc.beneficio);
     if (sc.beneficio_desc) L.push('    ' + sc.beneficio_desc);
     if (sc.logra_pension) {
-      L.push('    Mesada estimada: ' + sc.mesada + ' SMMLV/mes');
-      if (sc.mesada_lo != null) L.push('    Rango según rendimiento real (1.5%–4.5%): ' + sc.mesada_lo + ' – ' + sc.mesada_hi + ' SMMLV/mes');
+      L.push('    Mesada estimada: ' + sc.mesada + ' SMMLV/mes (≈ ' + fmtPesos(sc.mesada) + '/mes)');
+      if (sc.mesada_lo != null) L.push('    Rango según rendimiento real (1.5%–4.5%): ' + sc.mesada_lo + ' – ' + sc.mesada_hi + ' SMMLV/mes (' + fmtPesos(sc.mesada_lo) + ' – ' + fmtPesos(sc.mesada_hi) + ')');
       if (sc.edad_pension != null) L.push('    Edad de pensión: ' + sc.edad_pension + ' años');
       if (sc.tasa !== undefined) L.push('    Tasa de reemplazo: ' + sc.tasa + '%');
-      if (sc.capital_pesos_m !== undefined) L.push('    Capital proyectado: $' + sc.capital_pesos_m + 'M (' + sc.capital + ' SMMLV)');
+      if (sc.capital_pesos_m !== undefined) L.push('    Capital proyectado: ' + fmtPesos(sc.capital) + ' (' + sc.capital + ' SMMLV)');
     } else if (sc.razon_no_pension) {
       L.push('    Motivo: ' + sc.razon_no_pension);
     }
