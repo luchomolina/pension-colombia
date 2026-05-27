@@ -248,10 +248,37 @@ input[type="number"]:focus { outline: none; border-color: #003893; }
 .mini-bar { display: inline-flex; gap: 2px; }
 .mini-bar span { font-size: 0.75rem; }
 
+/* ── Trust intro ── */
+.trust-intro { border: 2px solid #dce6ff; }
+.trust-heading { text-align: center; margin-bottom: 20px; }
+.trust-heading h2 { font-size: 1.1rem; font-weight: 800; color: #003893; margin-bottom: 4px; }
+.trust-heading p { font-size: 0.82rem; color: #888; margin: 0; }
+.trust-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 18px;
+}
+.trust-item {
+  background: #f4f7ff; border-radius: 12px; padding: 14px 12px;
+}
+.trust-icon { font-size: 1.55rem; margin-bottom: 8px; line-height: 1; display: block; }
+.trust-title { font-size: 0.83rem; font-weight: 800; color: #1a1a2e; margin-bottom: 4px; }
+.trust-body { font-size: 0.75rem; color: #666; line-height: 1.45; }
+.trust-body a { color: #003893; font-weight: 600; text-decoration: none; border-bottom: 1px solid #c5d0f0; }
+.trust-flow {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #f0fdf4; border-radius: 10px; padding: 14px 10px;
+  margin-bottom: 18px;
+}
+.trust-flow-step { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; }
+.trust-flow-step .tf-icon { font-size: 1.35rem; }
+.trust-flow-step .tf-label { font-size: 0.7rem; font-weight: 700; color: #374151; text-align: center; line-height: 1.25; }
+.trust-flow-arrow { font-size: 1rem; color: #9ca3af; flex-shrink: 0; padding: 0 4px; }
+
 @media (max-width: 480px) {
   .scenarios-grid { grid-template-columns: 1fr; }
   .radio-grid { grid-template-columns: 1fr; }
   .header h1 { font-size: 1.4rem; }
+  .trust-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -265,8 +292,58 @@ input[type="number"]:focus { outline: none; border-color: #003893; }
     <div class="flag"></div>
   </div>
 
+  <!-- Trust Intro -->
+  <div class="card trust-intro" id="trust-intro">
+    <div class="trust-heading">
+      <h2>Antes de empezar</h2>
+      <p>Lo que deberías saber sobre esta herramienta</p>
+    </div>
+
+    <div class="trust-grid">
+      <div class="trust-item">
+        <span class="trust-icon">🔒</span>
+        <div class="trust-title">Tus datos no salen de aquí</div>
+        <div class="trust-body">Nada se guarda ni se envía a ningún servidor. Cuando cierras la pestaña, todo desaparece — igual que una calculadora.</div>
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">⚖️</span>
+        <div class="trust-title">Sin tinte político</div>
+        <div class="trust-body">Sin afiliación con Colpensiones, ninguna AFP, ni ningún partido. Solo la ley colombiana y matemáticas.</div>
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">🔍</span>
+        <div class="trust-title">Código abierto</div>
+        <div class="trust-body">Es un solo archivo. Todo el código está <a href="https://github.com/luchomolina/pension-colombia" target="_blank" rel="noopener">en GitHub</a> — cualquiera puede leerlo y verificarlo.</div>
+      </div>
+      <div class="trust-item">
+        <span class="trust-icon">🤖</span>
+        <div class="trust-title">Hecho con IA, con cuidado</div>
+        <div class="trust-body">Desarrollado con inteligencia artificial, revisado para ser objetivo y sin favorecer ningún régimen sobre el otro.</div>
+      </div>
+    </div>
+
+    <div class="trust-flow">
+      <div class="trust-flow-step">
+        <span class="tf-icon">📋</span>
+        <span class="tf-label">Respondes unas preguntas</span>
+      </div>
+      <span class="trust-flow-arrow">→</span>
+      <div class="trust-flow-step">
+        <span class="tf-icon">🖥️</span>
+        <span class="tf-label">Tu navegador hace los cálculos</span>
+      </div>
+      <span class="trust-flow-arrow">→</span>
+      <div class="trust-flow-step">
+        <span class="tf-icon">📊</span>
+        <span class="tf-label">Ves tu análisis</span>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="dismissTrust()">Entendido — empezar →</button>
+  </div>
+
   <!-- Progress -->
-  <div class="progress" id="progress">
+  <div class="progress" id="progress" style="display:none">
     <div class="dot active" id="dot-1">1</div>
     <div class="line" id="line-1"></div>
     <div class="dot" id="dot-2">2</div>
@@ -275,12 +352,12 @@ input[type="number"]:focus { outline: none; border-color: #003893; }
     <div class="line" id="line-3"></div>
     <div class="dot" id="dot-4">4</div>
   </div>
-  <div class="step-labels" id="step-labels">
+  <div class="step-labels" id="step-labels" style="display:none">
     <span>Datos</span><span>Semanas</span><span>Trabajo</span><span>Prioridades</span>
   </div>
 
   <!-- ─────────────────── STEP 1 ─────────────────── -->
-  <div class="card" id="step-1">
+  <div class="card" id="step-1" style="display:none">
     <h2>Datos personales</h2>
     <p class="step-desc">Paso 1 de 4</p>
 
@@ -723,6 +800,17 @@ function prefToggle(val, el) {
   } else {
     box.style.display = 'none';
   }
+}
+
+// ════════════════════════════════════════════════
+//  TRUST INTRO
+// ════════════════════════════════════════════════
+function dismissTrust() {
+  document.getElementById('trust-intro').style.display = 'none';
+  document.getElementById('progress').style.display = 'flex';
+  document.getElementById('step-labels').style.display = 'flex';
+  document.getElementById('step-1').style.display = 'block';
+  window.scrollTo(0, 0);
 }
 
 // ════════════════════════════════════════════════
