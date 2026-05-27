@@ -36,9 +36,11 @@ Opcionalmente, el usuario puede solicitar un **análisis personalizado con IA** 
 pension-colombia/
 ├── index.html                  # Toda la UI y lógica del algoritmo (SPA)
 ├── netlify.toml                # Configuración de build y redirect /api/analyze
-└── netlify/
-    └── functions/
-        └── analyze.js          # Serverless function que llama a la Anthropic API
+├── netlify/
+│   └── functions/
+│       └── analyze.js          # Serverless function que llama a la Anthropic API
+└── test/
+    └── algoritmo.test.js       # Tests del algoritmo (Node, sin dependencias)
 ```
 
 ## Despliegue en Netlify
@@ -66,6 +68,16 @@ netlify dev
 ```
 
 La herramienta abre en `http://localhost:8888`. Sin la variable de entorno, el análisis IA muestra un error pero el algoritmo de comparación funciona igual.
+
+## Tests
+
+El algoritmo (proyección de semanas, escenarios Colpensiones/AFP, puntuación, régimen de transición) tiene una suite de tests sin dependencias. Para no duplicar código, el test carga el `<script>` real de `index.html` y lo evalúa en un sandbox de Node, así que siempre corre contra el código de producción.
+
+```bash
+node --test
+```
+
+Requiere Node 18+ (usa el runner integrado `node:test`). No hay paso de build ni `package.json`: la app sigue siendo un único `index.html`.
 
 ## Algoritmo y cálculos
 
