@@ -1042,21 +1042,18 @@ function evalColp(data) {
   const future = alab * 52 * df;
   const total = (data.semanas_actuales || 0) + future;
 
-  const cumpleEdad = data.edad >= ret || (data.edad + alab >= ret);
+  // En el RPM (Colpensiones) las SEMANAS son el requisito de elegibilidad.
+  // La edad solo define CUÁNDO empieza la mesada: si tienes las semanas pero
+  // aún no la edad, no pierdes nada — esperas hasta los 62/57 y te pensionas.
+  // La indemnización sustitutiva solo aplica si llegas a la edad de pensión
+  // SIN las semanas mínimas (Art. 37, Ley 100).
   const cumpleW = total >= minW;
-  const logra = cumpleEdad && cumpleW;
+  const logra = cumpleW;
+  const stopAge = data.edad + alab; // edad a la que planea dejar de cotizar
 
-  // Determine exact reason for no-pension (important for AI clarity)
-  let razon_no_pension = null;
+  // No logra pensión: no alcanzará las semanas mínimas → indemnización sustitutiva
   if (!logra) {
-    if (!cumpleEdad && !cumpleW) {
-      razon_no_pension = `No alcanza la edad de pensión (${ret} años — llegaría a ${data.edad + alab}) ni las semanas mínimas (${minW} — proyecta ${Math.round(total)})`;
-    } else if (!cumpleEdad) {
-      razon_no_pension = `No alcanza la edad de pensión: necesita ${ret} años, pero planea retirarse a los ${data.edad + alab}. Las semanas sí se cubrirían (${Math.round(total)} ≥ ${minW}).`;
-    } else {
-      razon_no_pension = `No alcanza las semanas mínimas: necesita ${minW}, proyecta ${Math.round(total)} (faltan ${Math.round(minW - total)}).`;
-    }
-
+    const razon_no_pension = `No alcanzas las semanas mínimas: necesitas ${minW}, proyectas ${Math.round(total)} (faltan ${Math.round(minW - total)}). Al llegar a los ${ret} años sin completarlas, recibes una indemnización sustitutiva.`;
     return {
       regimen: 'Colpensiones (RPM)',
       logra_pension: false,
@@ -1067,7 +1064,7 @@ function evalColp(data) {
       mesada: 0,
       semanas_actuales: data.semanas_actuales,
       semanas_proy: Math.round(total),
-      sem_faltantes: cumpleW ? 0 : Math.max(0, Math.round(minW - total)),
+      sem_faltantes: Math.max(0, Math.round(minW - total)),
       estab: 0.90, hereda: 0.15, riesgo: 0.65
     };
   }
@@ -1082,11 +1079,20 @@ function evalColp(data) {
   const tasa = Math.min(0.80, 0.65 + Math.floor(extra / 50) * 0.015);
   const mesada = Math.max(sal * tasa, 1.0);
 
+  // Si planea dejar de cotizar antes de la edad de pensión, la mesada igual
+  // empieza a los 62/57 — las semanas no se pierden. Lo explicamos.
+  let nota = null;
+  if (stopAge < pensionAge) {
+    nota = `Ya tendrías las semanas, pero en Colpensiones la mesada de vejez se reclama a los ${pensionAge} años. Como planeas dejar de cotizar a los ${Math.round(stopAge)}, empezarías a recibirla a los ${pensionAge} (tus semanas no se pierden). Entre los ${Math.round(stopAge)} y los ${pensionAge} años no recibirías esta pensión, salvo que sigas cotizando.`;
+  }
+
   return {
     regimen: 'Colpensiones (RPM)',
     logra_pension: true,
     beneficio: 'Pensión de vejez vitalicia',
     edad_pension: pensionAge,
+    edad_stop: Math.round(stopAge),
+    nota,
     mesada: Math.round(mesada * 10) / 10,
     tasa: Math.round(tasa * 100),
     semanas_actuales: data.semanas_actuales,
@@ -1320,10 +1326,12 @@ function buildPrompt(result) {
     `  ¿Logra pensión?: ${result.colp.logra_pension ? 'SÍ' : 'NO'}`,
     result.colp.razon_no_pension ? `  Razón exacta (NO pensión): ${result.colp.razon_no_pension}` : '',
     `  Beneficio esperado: ${result.colp.beneficio}`,
+    result.colp.edad_pension != null ? `  Edad a la que empieza la mesada: ${result.colp.edad_pension} años` : '',
     `  Mesada estimada: ${result.colp.mesada} SMMLV/mes`,
     `  Semanas actuales: ${result.colp.semanas_actuales}`,
     `  Semanas proyectadas al retiro: ${result.colp.semanas_proy}`,
     result.colp.tasa ? `  Tasa de reemplazo: ${result.colp.tasa}%` : `  Semanas faltantes para requisito mínimo: ${result.colp.sem_faltantes}`,
+    result.colp.nota ? `  IMPORTANTE (no es indemnización): ${result.colp.nota}` : '',
     ``,
     `ESCENARIO AFP (RAIS):`,
     `  ¿Logra pensión?: ${result.afp.logra_pension ? 'SÍ' : 'NO'}`,
@@ -1539,6 +1547,7 @@ function renderResults(res) {
           <div class="sc-row"><span class="sc-k">Riesgo</span><span class="sc-v">${bar(sc.riesgo,true)}</span></div>
         </div>
         ${sc.razon_no_pension ? `<div class="sc-nopension" style="font-weight:400;font-size:0.76rem;margin-top:8px;">⚠️ ${sc.razon_no_pension}</div>` : ''}
+        ${sc.nota ? `<div style="background:#eef4ff;border-radius:8px;padding:9px 11px;margin-top:8px;font-size:0.75rem;color:#33415c;line-height:1.45;">ℹ️ ${sc.nota}</div>` : ''}
       </div>`;
   });
   document.getElementById('scenarios-grid').innerHTML = html;
@@ -1721,6 +1730,7 @@ function construirTextoResultados() {
     } else if (sc.razon_no_pension) {
       L.push('    Motivo: ' + sc.razon_no_pension);
     }
+    if (sc.nota) L.push('    Nota: ' + sc.nota);
     L.push('    Semanas actuales: ' + sc.semanas_actuales + ' · proyectadas al retiro: ' + sc.semanas_proy);
     if (sc.sem_faltantes) L.push('    Semanas faltantes para el mínimo: ' + sc.sem_faltantes);
     if (sc.edad_anticipada != null) {
