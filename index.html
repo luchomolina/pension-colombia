@@ -34,7 +34,7 @@ body {
   width: 34px; height: 34px; border-radius: 50%; display: flex;
   align-items: center; justify-content: center;
   font-size: 0.82rem; font-weight: 700;
-  border: 2.5px solid #d8dde8; background: white; color: #bbb;
+  border: 2.5px solid #c2c9d6; background: white; color: #6b7280;
   transition: all 0.25s; flex-shrink: 0; position: relative;
 }
 .dot.active { background: #003893; color: white; border-color: #003893; box-shadow: 0 0 0 4px rgba(0,56,147,0.12); }
@@ -42,7 +42,7 @@ body {
 .line { flex: 1; height: 2.5px; background: #d8dde8; max-width: 72px; transition: background 0.25s; }
 .line.done { background: #2e7d32; }
 .step-labels { display: flex; justify-content: space-between; padding: 6px 2px 0; }
-.step-labels span { font-size: 0.7rem; color: #aaa; flex: 1; text-align: center; }
+.step-labels span { font-size: 0.7rem; color: #5c6470; flex: 1; text-align: center; }
 
 /* ── Card ── */
 .card {
@@ -50,7 +50,7 @@ body {
   margin: 14px 0; box-shadow: 0 2px 14px rgba(0,0,0,0.07);
 }
 .card h2 { font-size: 1.15rem; font-weight: 800; color: #003893; margin-bottom: 2px; }
-.step-desc { color: #999; font-size: 0.82rem; margin-bottom: 22px; }
+.step-desc { color: #5c6470; font-size: 0.82rem; margin-bottom: 22px; }
 
 /* ── Fields ── */
 .field { margin-bottom: 20px; }
@@ -58,14 +58,14 @@ body {
   display: block; font-size: 0.84rem; font-weight: 700;
   color: #333; margin-bottom: 7px;
 }
-.hint { font-size: 0.78rem; color: #888; margin-top: -4px; margin-bottom: 8px; font-style: italic; line-height: 1.4; }
+.hint { font-size: 0.78rem; color: #5c6470; margin-top: -4px; margin-bottom: 8px; font-style: italic; line-height: 1.4; }
 
 input[type="number"] {
   width: 100%; padding: 11px 14px; border: 2px solid #e0e4ed;
   border-radius: 9px; font-size: 0.95rem; color: #1a1a2e;
   transition: border-color 0.2s; background: white;
 }
-input[type="number"]:focus { outline: none; border-color: #003893; }
+input[type="number"]:focus { outline: none; border-color: #003893; box-shadow: 0 0 0 3px rgba(0,56,147,0.18); }
 
 /* ── Radio / Check items ── */
 .radio-group, .check-group { display: flex; flex-direction: column; gap: 8px; }
@@ -136,7 +136,7 @@ input[type="number"]:focus { outline: none; border-color: #003893; }
   vertical-align: middle;
 }
 .loading-msg { font-size: 0.95rem; color: #555; font-weight: 500; }
-.loading-sub { font-size: 0.8rem; color: #aaa; margin-top: 6px; }
+.loading-sub { font-size: 0.8rem; color: #6b7280; margin-top: 6px; }
 
 /* ── Results ── */
 .verdict-card {
@@ -163,10 +163,10 @@ input[type="number"]:focus { outline: none; border-color: #003893; }
 .sc-best-tag { font-size: 0.7rem; font-weight: 800; color: #003893; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
 .sc-regime { font-size: 0.78rem; font-weight: 700; color: #555; margin-bottom: 8px; }
 .sc-pension { font-size: 1.4rem; font-weight: 900; color: #1a1a2e; }
-.sc-pension-label { font-size: 0.72rem; color: #888; margin-bottom: 10px; }
+.sc-pension-label { font-size: 0.72rem; color: #5c6470; margin-bottom: 10px; }
 .sc-rows { border-top: 1px solid #f0f0f0; padding-top: 8px; }
 .sc-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; font-size: 0.78rem; }
-.sc-row .sc-k { color: #888; }
+.sc-row .sc-k { color: #5c6470; }
 .sc-row .sc-v { font-weight: 600; color: #333; }
 .sc-nopension { font-size: 0.8rem; color: #c62828; font-weight: 700; margin-top: 8px; }
 .info-icon {
@@ -206,7 +206,7 @@ input[type="number"]:focus { outline: none; border-color: #003893; }
   border: 2px solid #c5d0f0;
 }
 .ai-cta-card h3 { margin-bottom: 2px; }
-.ai-cta-tagline { font-size: 0.8rem; color: #7080a8; margin: 0 0 16px; }
+.ai-cta-tagline { font-size: 0.8rem; color: #566388; margin: 0 0 16px; }
 .ai-preview { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
 .ai-preview-item {
   display: flex; align-items: center; gap: 12px;
@@ -216,7 +216,7 @@ input[type="number"]:focus { outline: none; border-color: #003893; }
 .ai-preview-icon { font-size: 1.05rem; flex-shrink: 0; }
 .ai-preview-label { flex: 1; }
 .ai-preview-title { font-size: 0.84rem; font-weight: 700; color: #1a1a2e; }
-.ai-preview-desc { font-size: 0.75rem; color: #94a3b8; margin-top: 1px; }
+.ai-preview-desc { font-size: 0.75rem; color: #5f6b7c; margin-top: 1px; }
 .ai-lock { font-size: 0.85rem; opacity: 0.4; flex-shrink: 0; }
 .ai-unlock-btn {
   width: 100%; padding: 15px;
@@ -252,7 +252,7 @@ input[type="number"]:focus { outline: none; border-color: #003893; }
 .trust-intro { border: 2px solid #dce6ff; }
 .trust-heading { text-align: center; margin-bottom: 20px; }
 .trust-heading h2 { font-size: 1.1rem; font-weight: 800; color: #003893; margin-bottom: 4px; }
-.trust-heading p { font-size: 0.82rem; color: #888; margin: 0; }
+.trust-heading p { font-size: 0.82rem; color: #5c6470; margin: 0; }
 .trust-grid {
   display: grid; grid-template-columns: 1fr 1fr;
   gap: 10px; margin-bottom: 18px;
@@ -272,7 +272,17 @@ input[type="number"]:focus { outline: none; border-color: #003893; }
 .trust-flow-step { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; }
 .trust-flow-step .tf-icon { font-size: 1.35rem; }
 .trust-flow-step .tf-label { font-size: 0.7rem; font-weight: 700; color: #374151; text-align: center; line-height: 1.25; }
-.trust-flow-arrow { font-size: 1rem; color: #9ca3af; flex-shrink: 0; padding: 0 4px; }
+.trust-flow-arrow { font-size: 1rem; color: #6b7280; flex-shrink: 0; padding: 0 4px; }
+
+/* ── Accesibilidad: foco visible para teclado ── */
+.radio-item:focus-visible, .check-item:focus-visible {
+  outline: 3px solid #0a58ca; outline-offset: 2px; border-color: #003893;
+}
+.btn-primary:focus-visible, .btn-secondary:focus-visible, .ai-unlock-btn:focus-visible {
+  outline: 3px solid #1a1a2e; outline-offset: 2px;
+}
+.info-icon:focus-visible { outline: 2px solid #003893; outline-offset: 2px; }
+a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius: 3px; }
 
 @media (max-width: 480px) {
   .scenarios-grid { grid-template-columns: 1fr; }
@@ -691,6 +701,9 @@ input[type="number"]:focus { outline: none; border-color: #003893; }
       ⚠️ <strong>Aviso importante:</strong> Esta herramienta es orientativa y no constituye asesoría pensional profesional. Los cálculos son aproximaciones con supuestos simplificados y <em>no reemplazan</em> la consulta oficial con Colpensiones y tu AFP. El sistema pensional colombiano está en transición bajo la Reforma 2024 y algunas reglas aún se están reglamentando. Consulta siempre un asesor certificado antes de tomar decisiones definitivas.
     </div>
 
+    <button class="btn-primary" onclick="descargarResultados()" style="width:100%;margin:4px 0 8px;">⬇️ Descargar mis resultados</button>
+    <p style="font-size:0.74rem;color:#5c6470;text-align:center;margin:0 0 10px;">Se guarda como archivo de texto en tu dispositivo. Nada se envía a internet.</p>
+
     <div style="display:flex;gap:10px;margin:4px 0 8px;">
       <button class="btn-secondary" onclick="volverAEditar()" style="flex:2;">← Volver a editar</button>
       <button class="btn-secondary" onclick="reiniciar()" style="flex:1;">🔄 Nueva consulta</button>
@@ -710,6 +723,9 @@ const S = {
   salario: null, anos_lab: null, densidad: null,
   hijos: null, preferencias: []
 };
+
+// Último resultado calculado (para descargar)
+let LAST = null;
 
 // ════════════════════════════════════════════════
 //  FORM HELPERS
@@ -747,6 +763,7 @@ function pick(field, val, el) {
     const n = document.getElementById('reform-notice');
     n.classList.toggle('visible', mid <= 2.3);
   }
+  refreshAria();
 }
 
 function checkToggle(val, el) {
@@ -776,6 +793,7 @@ function checkToggle(val, el) {
   // Mostrar hint de densidad cuando el usuario marca que es independiente
   const hint = document.getElementById('hint-independiente');
   if (hint) hint.style.display = S.especiales.includes('independiente_actual') ? 'block' : 'none';
+  refreshAria();
 }
 
 function prefToggle(val, el) {
@@ -800,6 +818,7 @@ function prefToggle(val, el) {
   } else {
     box.style.display = 'none';
   }
+  refreshAria();
 }
 
 // ════════════════════════════════════════════════
@@ -1363,6 +1382,7 @@ function bar(v, inv) {
 }
 
 function renderResults(res) {
+  LAST = res;
   document.getElementById('results').style.display = 'block';
 
   // Verdict
@@ -1487,6 +1507,9 @@ function renderResults(res) {
   aiPreview.style.display = 'flex';
   aiDiv.style.display = 'none';
   aiDiv.innerHTML = '';
+
+  // Hacer accesibles los info-icon recién creados
+  initA11y();
 }
 
 // ════════════════════════════════════════════════
@@ -1539,7 +1562,126 @@ function reiniciar() {
   document.getElementById('progress').style.display = 'flex';
   document.getElementById('step-labels').style.display = 'flex';
   showStep(1);
+  refreshAria();
 }
+
+// ════════════════════════════════════════════════
+//  DESCARGAR RESULTADOS (100% local, vía Blob)
+// ════════════════════════════════════════════════
+function descargarResultados() {
+  if (!LAST) return;
+  const r = LAST;
+  const salLbl = { lt1:'menos de 1 SMMLV','1-2':'1–2 SMMLV','2-3':'2–3 SMMLV','3-5':'3–5 SMMLV','5-8':'5–8 SMMLV', gt8:'más de 8 SMMLV' };
+  const densLbl = { siempre:'siempre/casi siempre', frecuente:'frecuentemente', medio:'mitad del tiempo', irregular:'de forma irregular' };
+  const confLbl = { alta:'Alta (recomendación firme)', media:'Media (con matices)', baja:'Baja (caso complejo — consulta un experto)' };
+  const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
+  const sep = '='.repeat(56);
+  const sub = '-'.repeat(56);
+
+  const L = [];
+  L.push('¿COLPENSIONES O AFP?  ·  RESULTADO DE TU ORIENTACIÓN PENSIONAL');
+  L.push('Generado el ' + fecha);
+  L.push('Herramienta orientativa · github.com/luchomolina/pension-colombia');
+  L.push(sep, '');
+
+  L.push('TU MEJOR OPCIÓN SEGÚN TU SITUACIÓN');
+  L.push('  ' + r.mejor.regimen);
+  L.push('  ' + (r.mejor.logra_pension
+    ? `Proyección: pensión de ~${r.mejor.mesada} SMMLV/mes`
+    : 'Con tu situación actual no alcanzarías pensión completa'));
+  L.push('  Confianza: ' + (confLbl[r.confianza] || r.confianza));
+  L.push('', sub, '');
+
+  L.push('TUS DATOS');
+  L.push(`  Edad: ${S.edad} años`);
+  L.push(`  Sexo: ${S.sexo === 'M' ? 'Hombre' : 'Mujer'}`);
+  L.push(`  Fondo actual: ${S.fondo_actual}`);
+  L.push(`  Semanas cotizadas: ${S.semanas_actuales}`);
+  L.push(`  Semanas al 1-jul-2025: ${S.semanas_julio25}`);
+  L.push(`  Salario: ${salLbl[S.salario] || '—'}`);
+  L.push(`  Años laborales restantes: ~${S.anos_lab}`);
+  L.push(`  Frecuencia de cotización: ${densLbl[S.densidad] || '—'}`);
+  L.push(`  Número de hijos: ${S.hijos}`);
+  L.push('', sub, '');
+
+  L.push('COMPARACIÓN DE ESCENARIOS', '');
+  [r.colp, r.afp].forEach(sc => {
+    L.push('  ' + sc.regimen);
+    L.push('    ¿Logra pensión?: ' + (sc.logra_pension ? 'Sí' : 'No'));
+    if (sc.logra_pension) {
+      L.push('    Mesada estimada: ' + sc.mesada + ' SMMLV/mes');
+      if (sc.edad_pension != null) L.push('    Edad de pensión: ' + sc.edad_pension + ' años');
+      if (sc.tasa !== undefined) L.push('    Tasa de reemplazo: ' + sc.tasa + '%');
+      if (sc.capital_pesos_m !== undefined) L.push('    Capital proyectado: $' + sc.capital_pesos_m + 'M (' + sc.capital + ' SMMLV)');
+    } else if (sc.razon_no_pension) {
+      L.push('    ' + sc.razon_no_pension);
+    }
+    if (sc.edad_anticipada != null) {
+      L.push('    Pensión anticipada posible: ' + sc.edad_anticipada + ' años con ' + sc.mesada_anticipada + ' SMMLV/mes');
+    }
+    L.push('');
+  });
+
+  // Análisis IA, si se generó
+  const aiDiv = document.getElementById('ai-text');
+  if (aiDiv && aiDiv.style.display !== 'none' && aiDiv.innerText.trim()) {
+    L.push(sub, '', 'ANÁLISIS PERSONALIZADO CON IA', '');
+    L.push(aiDiv.innerText.trim());
+    L.push('');
+  }
+
+  L.push(sep);
+  L.push('AVISO: Esta herramienta es orientativa y no constituye asesoría');
+  L.push('pensional profesional. Los cálculos son aproximaciones y no');
+  L.push('reemplazan la consulta oficial con Colpensiones y tu AFP.');
+
+  const blob = new Blob([L.join('\n')], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const fechaArchivo = new Date().toISOString().slice(0, 10);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `mi-pension-${fechaArchivo}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// ════════════════════════════════════════════════
+//  ACCESIBILIDAD — teclado y lectores de pantalla
+// ════════════════════════════════════════════════
+function initA11y() {
+  document.querySelectorAll('.radio-item, .check-item').forEach(el => {
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('role', el.classList.contains('radio-item') ? 'radio' : 'checkbox');
+    el.setAttribute('aria-checked', el.classList.contains('selected') ? 'true' : 'false');
+  });
+  document.querySelectorAll('.info-icon').forEach(el => {
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('role', 'button');
+    if (!el.getAttribute('aria-label')) el.setAttribute('aria-label', 'Más información');
+  });
+}
+
+// Mantiene aria-checked sincronizado con la clase .selected
+function refreshAria() {
+  document.querySelectorAll('.radio-item, .check-item').forEach(el => {
+    el.setAttribute('aria-checked', el.classList.contains('selected') ? 'true' : 'false');
+  });
+}
+
+// Enter / Espacio activan los controles custom (como un control nativo)
+document.addEventListener('keydown', e => {
+  const t = e.target;
+  if (!t || !t.classList) return;
+  const isControl = t.classList.contains('radio-item') || t.classList.contains('check-item') || t.classList.contains('info-icon');
+  if (isControl && (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar')) {
+    e.preventDefault();
+    t.click();
+  }
+});
+
+document.addEventListener('DOMContentLoaded', initA11y);
 </script>
 </body>
 </html>
