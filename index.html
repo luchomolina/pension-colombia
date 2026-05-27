@@ -866,31 +866,59 @@ function validate(step) {
   const err = document.getElementById('err'+step);
   err.classList.remove('show');
   let ok = true;
+  let msg = '';
 
   if (step === 1) {
     S.edad = parseInt(document.getElementById('edad').value);
-    if (!S.edad || S.edad < 18 || S.edad > 75 || !S.sexo || !S.fondo_actual) ok = false;
+    if (isNaN(S.edad)) { ok = false; msg = 'Ingresa tu edad.'; }
+    else if (S.edad < 18 || S.edad > 75) { ok = false; msg = 'La edad debe estar entre 18 y 75 años.'; }
+    else if (!S.sexo) { ok = false; msg = 'Selecciona tu sexo biológico.'; }
+    else if (!S.fondo_actual) { ok = false; msg = 'Selecciona en qué fondo cotizas actualmente.'; }
   }
+
   if (step === 2) {
     const sa = parseInt(document.getElementById('semanas_actuales').value);
     const sj = parseInt(document.getElementById('semanas_julio25').value);
-    if (isNaN(sa) || sa < 0) { ok = false; }
-    else {
+    // Tope plausible por edad: no se puede cotizar antes de los ~15 años
+    const maxPlausible = S.edad ? Math.max(0, S.edad - 15) * 52 : 3500;
+
+    if (isNaN(sa) || sa < 0) {
+      ok = false; msg = 'Ingresa el total de semanas cotizadas (0 o más).';
+    } else if (sa > 3500) {
+      ok = false; msg = 'El total de semanas no parece válido (máximo 3.500).';
+    } else if (S.edad && sa > maxPlausible) {
+      ok = false; msg = `Con ${S.edad} años no es posible tener ${sa} semanas (máximo ~${maxPlausible}). Revisa el dato.`;
+    } else if (!isNaN(sj) && sj < 0) {
+      ok = false; msg = 'Las semanas al 1-jul-2025 no pueden ser negativas.';
+    } else if (!isNaN(sj) && sj > sa) {
+      ok = false; msg = 'Las semanas al 1-jul-2025 no pueden ser más que tu total actual — solo acumulas semanas con el tiempo.';
+    } else if (!isNaN(sj) && (sa - sj) > 52) {
+      ok = false; msg = 'Entre jul-2025 y hoy ha pasado menos de un año: la diferencia no puede superar ~52 semanas.';
+    } else if (!S.ha_trasladado) {
+      ok = false; msg = 'Indica si te has trasladado de fondo alguna vez.';
+    } else {
       S.semanas_actuales = sa;
       S.semanas_julio25 = isNaN(sj) ? sa : sj;
       const saldoPesos = parseFloat(document.getElementById('saldo_afp').value) || 0;
       S.saldo_afp = saldoPesos / SMMLV_2025; // convert to SMMLV
     }
-    if (!S.ha_trasladado) ok = false;
-  }
-  if (step === 3) {
-    if (!S.salario || !S.anos_lab || !S.densidad) ok = false;
-  }
-  if (step === 4) {
-    if (S.hijos === null || S.preferencias.length === 0) ok = false;
   }
 
-  if (!ok) err.classList.add('show');
+  if (step === 3) {
+    if (!S.salario) { ok = false; msg = 'Selecciona tu rango salarial.'; }
+    else if (!S.anos_lab) { ok = false; msg = 'Indica cuántos años más planeas cotizar.'; }
+    else if (!S.densidad) { ok = false; msg = 'Indica con qué regularidad cotizarás.'; }
+  }
+
+  if (step === 4) {
+    if (S.hijos === null) { ok = false; msg = 'Indica cuántos hijos tienes.'; }
+    else if (S.preferencias.length === 0) { ok = false; msg = 'Selecciona al menos una prioridad.'; }
+  }
+
+  if (!ok) {
+    if (msg) err.textContent = msg;
+    err.classList.add('show');
+  }
   return ok;
 }
 
