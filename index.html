@@ -774,6 +774,25 @@ const S = {
 let LAST = null;
 
 // ════════════════════════════════════════════════
+//  ETIQUETAS LEGIBLES (compartidas: prompt IA + descarga)
+// ════════════════════════════════════════════════
+const SAL_LBL  = { lt1:'menos de 1 SMMLV', '1-2':'1–2 SMMLV', '2-3':'2–3 SMMLV', '3-5':'3–5 SMMLV', '5-8':'5–8 SMMLV', gt8:'más de 8 SMMLV' };
+const DENS_LBL = { siempre:'siempre o casi siempre', frecuente:'frecuentemente', medio:'la mitad del tiempo', irregular:'de forma irregular' };
+const CONF_LBL = { alta:'Alta (recomendación firme)', media:'Media (con matices)', baja:'Baja (caso complejo — consulta un experto)' };
+const PREF_LBL = {
+  maximizar_mesada:'Maximizar la mesada mensual',
+  retirar_pronto:'Retirarme lo antes posible',
+  heredar:'Dejar herencia a mis beneficiarios',
+  menor_riesgo:'El menor riesgo posible',
+  garantia_estado:'La garantía del Estado y estabilidad'
+};
+const ESP_LBL = {
+  bono_pensional:'Tiene bono pensional (entidad pública antes de 1994)',
+  independiente_actual:'Cotiza como independiente / freelance',
+  ninguna:'Ninguna'
+};
+
+// ════════════════════════════════════════════════
 //  FORM HELPERS
 // ════════════════════════════════════════════════
 function pick(field, val, el) {
@@ -1280,8 +1299,6 @@ function analizar() {
 
 // ── Builds the AI prompt from current S state + algorithm result ──
 function buildPrompt(result) {
-  const salLbl = { lt1:'menos de 1 SMMLV','1-2':'1–2 SMMLV','2-3':'2–3 SMMLV','3-5':'3–5 SMMLV','5-8':'5–8 SMMLV', gt8:'más de 8 SMMLV' };
-  const densLbl = { siempre:'siempre/casi siempre', frecuente:'frecuentemente', medio:'mitad del tiempo', irregular:'de forma irregular' };
   const userInfo = [
     `Edad: ${S.edad} años`,
     `Sexo: ${S.sexo === 'M' ? 'Hombre' : 'Mujer'}`,
@@ -1291,9 +1308,9 @@ function buildPrompt(result) {
     `Saldo AFP declarado (SMMLV): ${S.saldo_afp || 'no indicado'}`,
     `Ha trasladado de fondo: ${S.ha_trasladado === 'si' ? 'Sí' : 'No'}`,
     `Situaciones especiales: ${S.especiales.length ? S.especiales.join(', ') : 'ninguna'}`,
-    `Salario: ${salLbl[S.salario]}`,
+    `Salario: ${SAL_LBL[S.salario]}`,
     `Años laborales estimados restantes: ~${S.anos_lab}`,
-    `Frecuencia cotización futura: ${densLbl[S.densidad]}`,
+    `Frecuencia cotización futura: ${DENS_LBL[S.densidad]}`,
     `Número de hijos: ${S.hijos}`,
     `Prioridades: ${S.preferencias.join(', ')}`
   ].join('\n');
@@ -1643,21 +1660,6 @@ function reiniciar() {
 function construirTextoResultados() {
   const r = LAST;
   if (!r) return '';
-  const salLbl = { lt1:'menos de 1 SMMLV','1-2':'1–2 SMMLV','2-3':'2–3 SMMLV','3-5':'3–5 SMMLV','5-8':'5–8 SMMLV', gt8:'más de 8 SMMLV' };
-  const densLbl = { siempre:'siempre o casi siempre', frecuente:'frecuentemente', medio:'la mitad del tiempo', irregular:'de forma irregular' };
-  const confLbl = { alta:'Alta (recomendación firme)', media:'Media (con matices)', baja:'Baja (caso complejo — consulta un experto)' };
-  const prefLbl = {
-    maximizar_mesada:'Maximizar la mesada mensual',
-    retirar_pronto:'Retirarme lo antes posible',
-    heredar:'Dejar herencia a mis beneficiarios',
-    menor_riesgo:'El menor riesgo posible',
-    garantia_estado:'La garantía del Estado y estabilidad'
-  };
-  const espLbl = {
-    bono_pensional:'Tiene bono pensional (entidad pública antes de 1994)',
-    independiente_actual:'Cotiza como independiente / freelance',
-    ninguna:'Ninguna'
-  };
   const rating = v => '★'.repeat(Math.round(v * 5)) + '☆'.repeat(5 - Math.round(v * 5));
   const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
   const sep = '='.repeat(60);
@@ -1675,7 +1677,7 @@ function construirTextoResultados() {
   L.push('  ' + (r.mejor.logra_pension
     ? `Proyección: pensión de ~${r.mejor.mesada} SMMLV/mes`
     : 'Con tu situación actual no alcanzarías pensión completa'));
-  L.push('  Confianza: ' + (confLbl[r.confianza] || r.confianza));
+  L.push('  Confianza: ' + (CONF_LBL[r.confianza] || r.confianza));
   L.push('', sub, '');
 
   // ── Datos del usuario (completos) ──
@@ -1687,12 +1689,12 @@ function construirTextoResultados() {
   L.push(`  Semanas al 1-jul-2025: ${S.semanas_julio25}`);
   L.push(`  Saldo AFP declarado: ${S.saldo_afp > 0 ? S.saldo_afp.toFixed(1) + ' SMMLV' : 'no indicado'}`);
   L.push(`  ¿Se ha trasladado de fondo?: ${S.ha_trasladado === 'si' ? 'Sí' : 'No'}`);
-  L.push(`  Situaciones especiales: ${S.especiales.length ? S.especiales.map(e => espLbl[e] || e).join('; ') : 'ninguna'}`);
-  L.push(`  Salario: ${salLbl[S.salario] || '—'}`);
+  L.push(`  Situaciones especiales: ${S.especiales.length ? S.especiales.map(e => ESP_LBL[e] || e).join('; ') : 'ninguna'}`);
+  L.push(`  Salario: ${SAL_LBL[S.salario] || '—'}`);
   L.push(`  Años que planea seguir cotizando: ~${S.anos_lab}`);
-  L.push(`  Regularidad de cotización futura: ${densLbl[S.densidad] || '—'}`);
+  L.push(`  Regularidad de cotización futura: ${DENS_LBL[S.densidad] || '—'}`);
   L.push(`  Número de hijos: ${S.hijos}`);
-  L.push(`  Prioridades: ${S.preferencias.length ? S.preferencias.map(p => prefLbl[p] || p).join('; ') : '—'}`);
+  L.push(`  Prioridades: ${S.preferencias.length ? S.preferencias.map(p => PREF_LBL[p] || p).join('; ') : '—'}`);
   L.push('', sub, '');
 
   // ── Situación normativa ──
