@@ -194,6 +194,35 @@ input[type="number"]:focus { outline: none; border-color: #003893; }
 .section-card h3 { font-size: 1rem; font-weight: 800; color: #003893; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 .ai-text { font-size: 0.88rem; line-height: 1.7; color: #333; white-space: pre-wrap; }
 
+.ai-cta-card {
+  background: linear-gradient(160deg, #eef2ff 0%, #f8faff 100%);
+  border: 2px solid #c5d0f0;
+}
+.ai-cta-card h3 { margin-bottom: 2px; }
+.ai-cta-tagline { font-size: 0.8rem; color: #7080a8; margin: 0 0 16px; }
+.ai-preview { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+.ai-preview-item {
+  display: flex; align-items: center; gap: 12px;
+  background: white; border-radius: 9px; padding: 10px 14px;
+  border: 1px solid #e4eaf7;
+}
+.ai-preview-icon { font-size: 1.05rem; flex-shrink: 0; }
+.ai-preview-label { flex: 1; }
+.ai-preview-title { font-size: 0.84rem; font-weight: 700; color: #1a1a2e; }
+.ai-preview-desc { font-size: 0.75rem; color: #94a3b8; margin-top: 1px; }
+.ai-lock { font-size: 0.85rem; opacity: 0.4; flex-shrink: 0; }
+.ai-unlock-btn {
+  width: 100%; padding: 15px;
+  background: linear-gradient(135deg, #003893 0%, #0050c8 100%);
+  color: white; border: none; border-radius: 11px; font-size: 1rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; letter-spacing: 0.2px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  box-shadow: 0 4px 14px rgba(0,56,147,0.25);
+}
+.ai-unlock-btn:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(0,56,147,0.38); transform: translateY(-1px); }
+.ai-unlock-btn:active:not(:disabled) { transform: translateY(0); }
+.ai-unlock-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
 .cta-card { background: #e8f5e9; border: 2px solid #4caf50; border-radius: 14px; padding: 18px; margin: 12px 0; }
 .cta-card h4 { font-weight: 800; color: #2e7d32; margin-bottom: 10px; font-size: 0.95rem; }
 .cta-card li { font-size: 0.85rem; color: #388e3c; line-height: 1.8; margin-left: 16px; }
@@ -520,11 +549,47 @@ input[type="number"]:focus { outline: none; border-color: #003893; }
       <div class="reform-impact" id="reform-impact"></div>
     </div>
 
-    <div class="section-card" id="ai-section">
-      <h3>🤖 Análisis personalizado con IA</h3>
-      <p style="font-size:0.86rem;color:#666;margin:0 0 12px;">Obtén una explicación detallada y personalizada de tu situación, con impacto de la Reforma 2024 y pasos concretos a seguir.</p>
-      <button id="ai-btn" onclick="pedirAnalisisIA()" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#003893;color:#fff;border:none;border-radius:8px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">🤖 Obtener análisis personalizado</button>
-      <div class="ai-text" id="ai-text" style="display:none;margin-top:14px;"></div>
+    <div class="section-card ai-cta-card" id="ai-section">
+      <h3>🤖 Tu análisis personalizado</h3>
+      <p class="ai-cta-tagline">Explicación adaptada a tus datos exactos · generado en ~10 segundos</p>
+      <div class="ai-preview" id="ai-preview">
+        <div class="ai-preview-item">
+          <span class="ai-preview-icon">🎯</span>
+          <div class="ai-preview-label">
+            <div class="ai-preview-title">Recomendación clara</div>
+            <div class="ai-preview-desc">Qué deberías hacer con tu fondo y por qué</div>
+          </div>
+          <span class="ai-lock">🔒</span>
+        </div>
+        <div class="ai-preview-item">
+          <span class="ai-preview-icon">📋</span>
+          <div class="ai-preview-label">
+            <div class="ai-preview-title">Impacto de la Reforma 2024</div>
+            <div class="ai-preview-desc">Cómo te afecta la nueva ley específicamente a ti</div>
+          </div>
+          <span class="ai-lock">🔒</span>
+        </div>
+        <div class="ai-preview-item">
+          <span class="ai-preview-icon">⚠️</span>
+          <div class="ai-preview-label">
+            <div class="ai-preview-title">Factores de riesgo</div>
+            <div class="ai-preview-desc">Las 2–3 cosas que más podrían afectar tu pensión</div>
+          </div>
+          <span class="ai-lock">🔒</span>
+        </div>
+        <div class="ai-preview-item">
+          <span class="ai-preview-icon">✅</span>
+          <div class="ai-preview-label">
+            <div class="ai-preview-title">Pasos concretos</div>
+            <div class="ai-preview-desc">Qué hacer en los próximos 3–6 meses</div>
+          </div>
+          <span class="ai-lock">🔒</span>
+        </div>
+      </div>
+      <button id="ai-btn" onclick="pedirAnalisisIA()" class="ai-unlock-btn">
+        🔓 Obtener mi análisis personalizado
+      </button>
+      <div class="ai-text" id="ai-text" style="display:none;margin-top:16px;"></div>
     </div>
 
     <div class="cta-card">
@@ -1142,6 +1207,7 @@ async function pedirAnalisisIA() {
     }
 
     btn.style.display = 'none';
+    document.getElementById('ai-preview').style.display = 'none';
     aiDiv.style.display = 'block';
     aiDiv.innerHTML = renderMd(aiText);
   } catch (e) {
@@ -1307,9 +1373,11 @@ function renderResults(res) {
   // Reset AI section to show CTA button (in case user edits and re-runs)
   const aiBtn = document.getElementById('ai-btn');
   const aiDiv = document.getElementById('ai-text');
+  const aiPreview = document.getElementById('ai-preview');
   aiBtn.disabled = false;
-  aiBtn.style.display = 'inline-flex';
-  aiBtn.innerHTML = '🤖 Obtener análisis personalizado';
+  aiBtn.style.display = 'flex';
+  aiBtn.innerHTML = '🔓 Obtener mi análisis personalizado';
+  aiPreview.style.display = 'flex';
   aiDiv.style.display = 'none';
   aiDiv.innerHTML = '';
 }
