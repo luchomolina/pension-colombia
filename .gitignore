@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude Code
+.claude/
+
+# Node (por si se agrega en el futuro)
+node_modules/
+npm-debug.log*
+
+# Env
+.env
+.env.local
+
+# Netlify local
+.netlify/
