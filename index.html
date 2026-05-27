@@ -935,6 +935,7 @@ function pesos(prefs) {
   if (prefs.includes('heredar'))           { p.hereda += 0.20; p.mesada -= 0.10; }
   if (prefs.includes('menor_riesgo'))      { p.riesgo += 0.15; p.estab += 0.10; p.mesada -= 0.15; }
   if (prefs.includes('garantia_estado'))   { p.estab += 0.15; p.riesgo += 0.05; p.mesada -= 0.10; }
+  Object.keys(p).forEach(k => { if (p[k] < 0) p[k] = 0; });
   const tot = Object.values(p).reduce((a,b) => a+b, 0);
   Object.keys(p).forEach(k => p[k] /= tot);
   return p;
