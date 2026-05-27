@@ -245,9 +245,6 @@ input[type="number"]:focus { outline: none; border-color: #003893; box-shadow: 0
 }
 .reform-impact.show { display: block; }
 
-.mini-bar { display: inline-flex; gap: 2px; }
-.mini-bar span { font-size: 0.75rem; }
-
 /* ── Trust intro ── */
 .trust-intro { border: 2px solid #dce6ff; }
 .trust-heading { text-align: center; margin-bottom: 20px; }
@@ -523,7 +520,7 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
 
     <div class="field">
       <label>¿Cuánto ganas aproximadamente? (en salarios mínimos)</label>
-      <p class="hint">SMMLV 2025 ≈ $1.423.500. La reforma 2024 obliga a cotizar en Colpensiones si ganas ≤ 2.3 SMMLV.</p>
+      <p class="hint">SMMLV 2025 = $1.423.500. La reforma 2024 obliga a cotizar en Colpensiones si ganas ≤ 2.3 SMMLV.</p>
       <div class="radio-group" style="margin-top:8px;">
         <div class="radio-item" onclick="pick('salario','lt1',this)">
           <input type="radio" name="salario" value="lt1"> Menos de 1 SMMLV (menos de $1.4M)
@@ -983,7 +980,6 @@ const AFP_RETURN = 0.08;   // annual, conservative
 const SMMLV_2025 = 1423500; // pesos colombianos
 const SAL_MAP = { lt1: 0.85, '1-2': 1.5, '2-3': 2.5, '3-5': 4.0, '5-8': 6.5, gt8: 11.0 };
 const DENS_MAP = { siempre: 0.92, frecuente: 0.75, medio: 0.55, irregular: 0.35 };
-const LIFE_EXP = { M: (80 - 62) * 12, F: (85 - 57) * 12 };
 
 function salMid(r) { return SAL_MAP[r] || 2.0; }
 function dens(d) { return DENS_MAP[d] || 0.70; }
@@ -1416,9 +1412,6 @@ async function pedirAnalisisIA() {
 }
 
 // ════════════════════════════════════════════════
-//  RENDER RESULTS
-// ════════════════════════════════════════════════
-// ════════════════════════════════════════════════
 //  MARKDOWN → HTML (minimal)
 // ════════════════════════════════════════════════
 function renderMd(text) {
@@ -1458,12 +1451,14 @@ function bar(v, inv) {
   return s;
 }
 
+// ════════════════════════════════════════════════
+//  RENDER RESULTS
+// ════════════════════════════════════════════════
 function renderResults(res) {
   LAST = res;
   document.getElementById('results').style.display = 'block';
 
   // Verdict
-  const isColp = res.mejor.regimen.includes('Colpensiones');
   const cmap = { alta:'conf-alta', media:'conf-media', baja:'conf-baja' };
   const ctxt = { alta:'✅ Recomendación firme', media:'⚠️ Recomendación con matices', baja:'❓ Caso complejo – consulta un experto' };
 
