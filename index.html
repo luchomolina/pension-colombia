@@ -274,11 +274,45 @@ input[type="number"]:focus { outline: none; border-color: #003893; box-shadow: 0
 .trust-flow-step .tf-label { font-size: 0.7rem; font-weight: 700; color: #374151; text-align: center; line-height: 1.25; }
 .trust-flow-arrow { font-size: 1rem; color: #6b7280; flex-shrink: 0; padding: 0 4px; }
 
+/* ── Guardar resultados ── */
+.save-card { background: #f4f7ff; border: 2px solid #dce6ff; border-radius: 14px; padding: 16px; margin: 12px 0; }
+.save-card h4 { font-weight: 800; color: #003893; font-size: 0.95rem; margin-bottom: 12px; }
+.save-btn {
+  display: flex; align-items: center; gap: 14px; width: 100%;
+  background: white; border: 2px solid #c5d0f0; border-radius: 11px;
+  padding: 14px; margin-bottom: 10px; cursor: pointer; text-align: left;
+  transition: all 0.18s;
+}
+.save-btn:last-child { margin-bottom: 0; }
+.save-btn:hover { border-color: #003893; background: #eef3ff; }
+.save-btn-icon { font-size: 1.5rem; flex-shrink: 0; }
+.save-btn-text { display: flex; flex-direction: column; gap: 2px; }
+.save-btn-title { font-size: 0.92rem; font-weight: 800; color: #1a1a2e; }
+.save-btn-desc { font-size: 0.76rem; color: #5c6470; line-height: 1.35; }
+
+/* ── Impresión / Guardar como PDF ── */
+@media print {
+  body { background: #fff; padding: 0; color: #000; }
+  .header .subtitle, .flag,
+  #progress, #step-labels, #trust-intro, #loading,
+  #step-1, #step-2, #step-3, #step-4,
+  .save-card, .results-actions,
+  #ai-preview, #ai-btn, .print-hide { display: none !important; }
+  #app { max-width: 100%; padding: 0; }
+  .section-card, .verdict-card, .cta-card, .disclaimer { box-shadow: none !important; }
+  .section-card, .verdict-card, .cta-card, .sc-card, .disclaimer {
+    break-inside: avoid; page-break-inside: avoid;
+  }
+  .verdict-card, .conf-badge, .sc-card.winner, .sc-best-tag {
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+}
+
 /* ── Accesibilidad: foco visible para teclado ── */
 .radio-item:focus-visible, .check-item:focus-visible {
   outline: 3px solid #0a58ca; outline-offset: 2px; border-color: #003893;
 }
-.btn-primary:focus-visible, .btn-secondary:focus-visible, .ai-unlock-btn:focus-visible {
+.btn-primary:focus-visible, .btn-secondary:focus-visible, .ai-unlock-btn:focus-visible, .save-btn:focus-visible {
   outline: 3px solid #1a1a2e; outline-offset: 2px;
 }
 .info-icon:focus-visible { outline: 2px solid #003893; outline-offset: 2px; }
@@ -701,10 +735,25 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
       ⚠️ <strong>Aviso importante:</strong> Esta herramienta es orientativa y no constituye asesoría pensional profesional. Los cálculos son aproximaciones con supuestos simplificados y <em>no reemplazan</em> la consulta oficial con Colpensiones y tu AFP. El sistema pensional colombiano está en transición bajo la Reforma 2024 y algunas reglas aún se están reglamentando. Consulta siempre un asesor certificado antes de tomar decisiones definitivas.
     </div>
 
-    <button class="btn-primary" onclick="descargarResultados()" style="width:100%;margin:4px 0 8px;">⬇️ Descargar mis resultados</button>
-    <p style="font-size:0.74rem;color:#5c6470;text-align:center;margin:0 0 10px;">Se guarda como archivo de texto en tu dispositivo. Nada se envía a internet.</p>
+    <div class="save-card">
+      <h4>💾 Guarda tus resultados</h4>
+      <button class="save-btn" onclick="descargarResultados()">
+        <span class="save-btn-icon">⬇️</span>
+        <span class="save-btn-text">
+          <span class="save-btn-title">Descargar archivo</span>
+          <span class="save-btn-desc">Se guarda en tu teléfono o computador. Nada se envía a internet.</span>
+        </span>
+      </button>
+      <button class="save-btn" onclick="imprimirResultados()">
+        <span class="save-btn-icon">🖨️</span>
+        <span class="save-btn-text">
+          <span class="save-btn-title">Imprimir o guardar como PDF</span>
+          <span class="save-btn-desc">Abre la ventana de impresión. Para tener un PDF, elige la opción “Guardar como PDF”.</span>
+        </span>
+      </button>
+    </div>
 
-    <div style="display:flex;gap:10px;margin:4px 0 8px;">
+    <div class="results-actions" style="display:flex;gap:10px;margin:4px 0 8px;">
       <button class="btn-secondary" onclick="volverAEditar()" style="flex:2;">← Volver a editar</button>
       <button class="btn-secondary" onclick="reiniciar()" style="flex:1;">🔄 Nueva consulta</button>
     </div>
@@ -1594,24 +1643,38 @@ function reiniciar() {
 }
 
 // ════════════════════════════════════════════════
-//  DESCARGAR RESULTADOS (100% local, vía Blob)
+//  TEXTO COMPLETO DE RESULTADOS (compartido por descarga e impresión)
 // ════════════════════════════════════════════════
-function descargarResultados() {
-  if (!LAST) return;
+function construirTextoResultados() {
   const r = LAST;
+  if (!r) return '';
   const salLbl = { lt1:'menos de 1 SMMLV','1-2':'1–2 SMMLV','2-3':'2–3 SMMLV','3-5':'3–5 SMMLV','5-8':'5–8 SMMLV', gt8:'más de 8 SMMLV' };
-  const densLbl = { siempre:'siempre/casi siempre', frecuente:'frecuentemente', medio:'mitad del tiempo', irregular:'de forma irregular' };
+  const densLbl = { siempre:'siempre o casi siempre', frecuente:'frecuentemente', medio:'la mitad del tiempo', irregular:'de forma irregular' };
   const confLbl = { alta:'Alta (recomendación firme)', media:'Media (con matices)', baja:'Baja (caso complejo — consulta un experto)' };
+  const prefLbl = {
+    maximizar_mesada:'Maximizar la mesada mensual',
+    retirar_pronto:'Retirarme lo antes posible',
+    heredar:'Dejar herencia a mis beneficiarios',
+    menor_riesgo:'El menor riesgo posible',
+    garantia_estado:'La garantía del Estado y estabilidad'
+  };
+  const espLbl = {
+    bono_pensional:'Tiene bono pensional (entidad pública antes de 1994)',
+    independiente_actual:'Cotiza como independiente / freelance',
+    ninguna:'Ninguna'
+  };
+  const rating = v => '★'.repeat(Math.round(v * 5)) + '☆'.repeat(5 - Math.round(v * 5));
   const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
-  const sep = '='.repeat(56);
-  const sub = '-'.repeat(56);
-
+  const sep = '='.repeat(60);
+  const sub = '-'.repeat(60);
   const L = [];
+
   L.push('¿COLPENSIONES O AFP?  ·  RESULTADO DE TU ORIENTACIÓN PENSIONAL');
   L.push('Generado el ' + fecha);
   L.push('Herramienta orientativa · github.com/luchomolina/pension-colombia');
   L.push(sep, '');
 
+  // ── Recomendación ──
   L.push('TU MEJOR OPCIÓN SEGÚN TU SITUACIÓN');
   L.push('  ' + r.mejor.regimen);
   L.push('  ' + (r.mejor.logra_pension
@@ -1620,37 +1683,57 @@ function descargarResultados() {
   L.push('  Confianza: ' + (confLbl[r.confianza] || r.confianza));
   L.push('', sub, '');
 
+  // ── Datos del usuario (completos) ──
   L.push('TUS DATOS');
   L.push(`  Edad: ${S.edad} años`);
   L.push(`  Sexo: ${S.sexo === 'M' ? 'Hombre' : 'Mujer'}`);
   L.push(`  Fondo actual: ${S.fondo_actual}`);
-  L.push(`  Semanas cotizadas: ${S.semanas_actuales}`);
+  L.push(`  Semanas cotizadas hasta hoy: ${S.semanas_actuales}`);
   L.push(`  Semanas al 1-jul-2025: ${S.semanas_julio25}`);
+  L.push(`  Saldo AFP declarado: ${S.saldo_afp > 0 ? S.saldo_afp.toFixed(1) + ' SMMLV' : 'no indicado'}`);
+  L.push(`  ¿Se ha trasladado de fondo?: ${S.ha_trasladado === 'si' ? 'Sí' : 'No'}`);
+  L.push(`  Situaciones especiales: ${S.especiales.length ? S.especiales.map(e => espLbl[e] || e).join('; ') : 'ninguna'}`);
   L.push(`  Salario: ${salLbl[S.salario] || '—'}`);
-  L.push(`  Años laborales restantes: ~${S.anos_lab}`);
-  L.push(`  Frecuencia de cotización: ${densLbl[S.densidad] || '—'}`);
+  L.push(`  Años que planea seguir cotizando: ~${S.anos_lab}`);
+  L.push(`  Regularidad de cotización futura: ${densLbl[S.densidad] || '—'}`);
   L.push(`  Número de hijos: ${S.hijos}`);
+  L.push(`  Prioridades: ${S.preferencias.length ? S.preferencias.map(p => prefLbl[p] || p).join('; ') : '—'}`);
   L.push('', sub, '');
 
+  // ── Situación normativa ──
+  L.push('SITUACIÓN NORMATIVA');
+  L.push(`  Régimen de transición (Ley 2381): ${r.transicion ? 'SÍ — protegido por reglas de la Ley 100' : 'No — sujeto a las reglas nuevas'}`);
+  L.push(`  Cotización obligatoria en Colpensiones por reforma: ${r.refOblig && !r.transicion ? 'SÍ (salario ≤ 2.3 SMMLV)' : 'No'}`);
+  L.push(`  ¿Puede trasladarse de régimen?: ${r.puede ? 'Sí (más de 10 años a la pensión)' : 'No (a menos de 10 años de la pensión)'}`);
+  if (r.advertenciaTraslado) L.push('  Aviso: solo puede trasladarse una vez cada 5 años — verifique la fecha de su último traslado.');
+  L.push('', sub, '');
+
+  // ── Escenarios (todos los campos) ──
   L.push('COMPARACIÓN DE ESCENARIOS', '');
   [r.colp, r.afp].forEach(sc => {
-    L.push('  ' + sc.regimen);
+    const winner = sc.regimen === r.mejor.regimen ? '  ⭐ RECOMENDADA' : '';
+    L.push('  ' + sc.regimen + winner);
     L.push('    ¿Logra pensión?: ' + (sc.logra_pension ? 'Sí' : 'No'));
+    L.push('    Beneficio: ' + sc.beneficio);
+    if (sc.beneficio_desc) L.push('    ' + sc.beneficio_desc);
     if (sc.logra_pension) {
       L.push('    Mesada estimada: ' + sc.mesada + ' SMMLV/mes');
       if (sc.edad_pension != null) L.push('    Edad de pensión: ' + sc.edad_pension + ' años');
       if (sc.tasa !== undefined) L.push('    Tasa de reemplazo: ' + sc.tasa + '%');
       if (sc.capital_pesos_m !== undefined) L.push('    Capital proyectado: $' + sc.capital_pesos_m + 'M (' + sc.capital + ' SMMLV)');
     } else if (sc.razon_no_pension) {
-      L.push('    ' + sc.razon_no_pension);
+      L.push('    Motivo: ' + sc.razon_no_pension);
     }
+    L.push('    Semanas actuales: ' + sc.semanas_actuales + ' · proyectadas al retiro: ' + sc.semanas_proy);
+    if (sc.sem_faltantes) L.push('    Semanas faltantes para el mínimo: ' + sc.sem_faltantes);
     if (sc.edad_anticipada != null) {
-      L.push('    Pensión anticipada posible: ' + sc.edad_anticipada + ' años con ' + sc.mesada_anticipada + ' SMMLV/mes');
+      L.push('    Pensión anticipada posible: ' + sc.edad_anticipada + ' años con ' + sc.mesada_anticipada + ' SMMLV/mes (mesada menor)');
     }
+    L.push('    Estabilidad: ' + rating(sc.estab) + '   Herencia: ' + rating(sc.hereda) + '   Riesgo: ' + rating(sc.riesgo));
     L.push('');
   });
 
-  // Análisis IA, si se generó
+  // ── Análisis IA, si se generó ──
   const aiDiv = document.getElementById('ai-text');
   if (aiDiv && aiDiv.style.display !== 'none' && aiDiv.innerText.trim()) {
     L.push(sub, '', 'ANÁLISIS PERSONALIZADO CON IA', '');
@@ -1658,12 +1741,33 @@ function descargarResultados() {
     L.push('');
   }
 
-  L.push(sep);
-  L.push('AVISO: Esta herramienta es orientativa y no constituye asesoría');
-  L.push('pensional profesional. Los cálculos son aproximaciones y no');
-  L.push('reemplazan la consulta oficial con Colpensiones y tu AFP.');
+  // ── Próximos pasos ──
+  L.push(sub, '', 'PRÓXIMOS PASOS CONCRETOS');
+  L.push('  1. Solicita una asesoría oficial gratuita en Colpensiones (colpensiones.gov.co)');
+  L.push('     y pide tu historia laboral completa.');
+  L.push('  2. Pide una proyección oficial a tu AFP — están obligados a dártela.');
+  L.push('  3. Compara las proyecciones oficiales con estos resultados antes de decidir.');
+  L.push('  4. Si vas a trasladarte de régimen, inicia el proceso con al menos 6 meses de anticipación.');
+  L.push('  5. Para casos complejos, consulta a un abogado o asesor pensional certificado.');
+  L.push('', sep);
 
-  const blob = new Blob([L.join('\n')], { type: 'text/plain;charset=utf-8' });
+  // ── Aviso ──
+  L.push('AVISO IMPORTANTE: Esta herramienta es orientativa y no constituye');
+  L.push('asesoría pensional profesional. Los cálculos son aproximaciones con');
+  L.push('supuestos simplificados y no reemplazan la consulta oficial con');
+  L.push('Colpensiones y tu AFP. El sistema pensional colombiano está en');
+  L.push('transición bajo la Reforma 2024 y algunas reglas aún se reglamentan.');
+
+  return L.join('\n');
+}
+
+// ════════════════════════════════════════════════
+//  DESCARGAR RESULTADOS (100% local, vía Blob)
+// ════════════════════════════════════════════════
+function descargarResultados() {
+  if (!LAST) return;
+  const texto = construirTextoResultados();
+  const blob = new Blob([texto], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const fechaArchivo = new Date().toISOString().slice(0, 10);
   const a = document.createElement('a');
@@ -1673,6 +1777,17 @@ function descargarResultados() {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+// ════════════════════════════════════════════════
+//  IMPRIMIR / GUARDAR COMO PDF
+// ════════════════════════════════════════════════
+function imprimirResultados() {
+  // Si no se generó análisis IA, ocultamos esa tarjeta al imprimir
+  const aiDiv = document.getElementById('ai-text');
+  const hasAI = aiDiv && aiDiv.style.display !== 'none' && aiDiv.innerText.trim();
+  document.getElementById('ai-section').classList.toggle('print-hide', !hasAI);
+  window.print();
 }
 
 // ════════════════════════════════════════════════
