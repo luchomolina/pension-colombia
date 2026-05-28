@@ -2033,11 +2033,66 @@ function restoreState() {
 // ════════════════════════════════════════════════
 const SHARE_FIELDS = ['edad','sexo','fondo_actual','semanas_actuales','semanas_julio25','saldo_afp','ha_trasladado','especiales','salario','anos_lab','densidad','hijos','preferencias'];
 
+// Diccionarios para el codec posicional (#s=). El ORDEN es el contrato del
+// enlace: no reordenar sin romper compatibilidad de links ya compartidos.
+const COD = {
+  fondo: ['Colpensiones','Porvenir','Proteccion','Colfondos','Skandia','ninguno'],
+  sal:   ['lt1','1-2','2-3','3-5','5-8','gt8'],
+  anos:  ['<5','5-10','10-15','15-20','>20'],
+  dens:  ['siempre','frecuente','medio','irregular'],
+  esp:   ['bono_pensional','independiente_actual','ninguna'],
+  pref:  ['maximizar_mesada','retirar_pronto','heredar','menor_riesgo','garantia_estado']
+};
+const idxOf = (arr, v) => { const i = arr.indexOf(v); return i < 0 ? '' : i; };
+const maskOf = (arr, list) => (list || []).reduce((m, v) => { const i = arr.indexOf(v); return i < 0 ? m : m | (1 << i); }, 0);
+const fromMask = (arr, mask) => arr.filter((_, i) => (mask & (1 << i)) !== 0);
+
+// Codifica el estado en una cadena posicional corta separada por '.'.
+// v1: version.edad.sexo.fondo.semA.semJ.saldo×100.traslado.espMask.sal.anos.dens.hijos.prefMask
+function codShort() {
+  return [
+    '1',
+    S.edad ?? '',
+    S.sexo === 'F' ? 1 : 0,
+    idxOf(COD.fondo, S.fondo_actual),
+    S.semanas_actuales || 0,
+    S.semanas_julio25 || 0,
+    Math.round((S.saldo_afp || 0) * 100),
+    S.ha_trasladado === 'si' ? 1 : 0,
+    maskOf(COD.esp, S.especiales),
+    idxOf(COD.sal, S.salario),
+    idxOf(COD.anos, S.anos_lab),
+    idxOf(COD.dens, S.densidad),
+    S.hijos ?? '',
+    maskOf(COD.pref, S.preferencias)
+  ].join('.');
+}
+
+// Aplica una cadena posicional a S. Devuelve true si parece válida.
+function decShort(code) {
+  const p = code.split('.');
+  if (p[0] !== '1' || p.length < 14) return false;
+  const num = (s) => { const n = parseInt(s, 10); return isNaN(n) ? null : n; };
+  const edad = num(p[1]);
+  if (edad === null) return false;
+  S.edad = edad;
+  S.sexo = p[2] === '1' ? 'F' : 'M';
+  S.fondo_actual = COD.fondo[num(p[3])] ?? null;
+  S.semanas_actuales = num(p[4]) || 0;
+  S.semanas_julio25 = num(p[5]) || 0;
+  S.saldo_afp = (num(p[6]) || 0) / 100;
+  S.ha_trasladado = p[7] === '1' ? 'si' : 'no';
+  S.especiales = fromMask(COD.esp, num(p[8]) || 0);
+  S.salario = COD.sal[num(p[9])] ?? null;
+  S.anos_lab = COD.anos[num(p[10])] ?? null;
+  S.densidad = COD.dens[num(p[11])] ?? null;
+  S.hijos = p[12] === '' ? null : String(num(p[12]) ?? '');
+  S.preferencias = fromMask(COD.pref, num(p[13]) || 0);
+  return true;
+}
+
 function enlaceResultado() {
-  const payload = {};
-  SHARE_FIELDS.forEach(f => { payload[f] = S[f]; });
-  const code = btoa(encodeURIComponent(JSON.stringify(payload)));
-  return location.origin + location.pathname + '#r=' + code;
+  return location.origin + location.pathname + '#s=' + codShort();
 }
 
 function compartirWhatsApp() {
@@ -2061,12 +2116,19 @@ async function copiarEnlace() {
 }
 
 // Lee un resultado compartido desde el hash; devuelve true si lo aplicó.
+// Soporta el codec corto (#s=, actual) y el base64 antiguo (#r=, compat).
 function leerHash() {
-  if (!location.hash.startsWith('#r=')) return false;
-  let data;
-  try { data = JSON.parse(decodeURIComponent(atob(location.hash.slice(3)))); } catch (e) { return false; }
-  if (!data || !data.edad || !data.sexo) return false;
-  SHARE_FIELDS.forEach(f => { if (data[f] !== undefined) S[f] = data[f]; });
+  const h = location.hash;
+  if (h.startsWith('#s=')) {
+    try { if (!decShort(h.slice(3))) return false; } catch (e) { return false; }
+  } else if (h.startsWith('#r=')) {
+    let data;
+    try { data = JSON.parse(decodeURIComponent(atob(h.slice(3)))); } catch (e) { return false; }
+    if (!data || !data.edad || !data.sexo) return false;
+    SHARE_FIELDS.forEach(f => { if (data[f] !== undefined) S[f] = data[f]; });
+  } else {
+    return false;
+  }
   document.getElementById('trust-intro').style.display = 'none';
   document.getElementById('progress').style.display = 'none';
   document.getElementById('step-labels').style.display = 'none';
