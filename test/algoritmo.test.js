@@ -111,11 +111,17 @@ test('Colpensiones: la tasa nunca baja de 55% ni pasa de 80%', () => {
 // ════════════════════════════════════════════════
 //  Régimen de transición (Ley 2381)
 // ════════════════════════════════════════════════
-test('enTransicion: por edad y por semanas al 1-jul-2025', () => {
-  assert.strictEqual(T.enTransicion(mk({ sexo: 'M', edad: 54, semanas_julio25: 100 })), true);  // 53 en jul-25 ≥ 52
-  assert.strictEqual(T.enTransicion(mk({ sexo: 'M', edad: 50, semanas_julio25: 100 })), false); // 49 < 52
-  assert.strictEqual(T.enTransicion(mk({ sexo: 'F', edad: 48, semanas_julio25: 100 })), true);  // 47 ≥ 47
-  assert.strictEqual(T.enTransicion(mk({ sexo: 'M', edad: 35, semanas_julio25: 800 })), true);  // ≥ 750 semanas
+test('enTransicion: por semanas, diferenciado por sexo (Ley 2381 art. 75)', () => {
+  // Hombres: umbral 900
+  assert.strictEqual(T.enTransicion(mk({ sexo: 'M', semanas_julio25: 899 })), false);
+  assert.strictEqual(T.enTransicion(mk({ sexo: 'M', semanas_julio25: 900 })), true);
+  // Mujeres: umbral 750
+  assert.strictEqual(T.enTransicion(mk({ sexo: 'F', semanas_julio25: 749 })), false);
+  assert.strictEqual(T.enTransicion(mk({ sexo: 'F', semanas_julio25: 750 })), true);
+  // La edad NO otorga transición por sí sola
+  assert.strictEqual(T.enTransicion(mk({ sexo: 'M', edad: 60, semanas_julio25: 400 })), false);
+  // El caso auditado: hombre con 795 semanas NO es transición
+  assert.strictEqual(T.enTransicion(mk({ sexo: 'M', semanas_julio25: 795 })), false);
 });
 
 // ════════════════════════════════════════════════

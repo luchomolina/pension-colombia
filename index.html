@@ -1436,14 +1436,11 @@ function score(esc, pw, maxM) {
 //  MAIN DECISION
 // ════════════════════════════════════════════════
 function enTransicion(data) {
-  // Régimen de transición Ley 2381: protege a quienes al 1-jul-2025 cumplían:
-  //   a) Mujer ≥ 47 años  o  Hombre ≥ 52 años
-  //   b) O cualquier persona con ≥ 750 semanas cotizadas a esa fecha
-  // Estimamos edad al 1-jul-2025 como edad actual − 1 (estamos en may-2026)
-  const edadJul25 = (data.edad || 0) - 1;
-  const cumpleEdad = data.sexo === 'F' ? edadJul25 >= 47 : edadJul25 >= 52;
-  const cumpleSemanas = (data.semanas_julio25 || 0) >= 750;
-  return cumpleEdad || cumpleSemanas;
+  // Régimen de transición (Ley 2381 art. 75): siguen bajo la Ley 100 quienes al
+  // corte (30-jun-2025) tenían ≥ 900 semanas los HOMBRES o ≥ 750 las MUJERES.
+  // Es SOLO por semanas y diferenciado por sexo (no hay criterio por edad).
+  const req = data.sexo === 'F' ? 750 : 900;
+  return (data.semanas_julio25 || 0) >= req;
 }
 
 function decidir(data) {
