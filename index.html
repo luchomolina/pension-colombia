@@ -398,6 +398,7 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
     </div>
 
     <button class="btn-primary" onclick="dismissTrust()">Entendido — empezar →</button>
+    <button class="btn-secondary" onclick="verEjemplo()" style="width:100%;margin-top:8px;">👀 Ver un ejemplo primero</button>
   </div>
 
   <!-- Progress -->
@@ -421,7 +422,7 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
 
     <div class="field">
       <label>¿Cuántos años tienes?</label>
-      <input type="number" id="edad" min="18" max="75" placeholder="Ej: 38">
+      <input type="number" inputmode="numeric" id="edad" min="18" max="75" placeholder="Ej: 38">
     </div>
 
     <div class="field">
@@ -477,19 +478,30 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
     <div class="field">
       <label>Total de semanas cotizadas hasta hoy</label>
       <p class="hint">Si no sabes exactamente, estima: cada año trabajado = ~52 semanas</p>
-      <input type="number" id="semanas_actuales" min="0" max="3500" placeholder="Ej: 820">
+      <input type="number" inputmode="numeric" id="semanas_actuales" min="0" max="3500" placeholder="Ej: 820">
+      <details style="margin-top:8px;">
+        <summary style="cursor:pointer;font-size:0.8rem;color:#003893;font-weight:600;list-style:none;">🧮 ¿No sabes tus semanas? Estímalas</summary>
+        <div style="display:flex;gap:8px;align-items:flex-end;margin-top:8px;">
+          <div style="flex:1;">
+            <label style="font-size:0.78rem;font-weight:600;color:#333;display:block;margin-bottom:5px;">Años cotizando formalmente (aprox.)</label>
+            <input type="number" inputmode="numeric" id="est-anos" min="0" max="60" placeholder="Ej: 16">
+          </div>
+          <button type="button" onclick="estimarSemanas()" style="padding:11px 16px;background:#003893;color:#fff;border:none;border-radius:9px;font-size:0.85rem;font-weight:700;cursor:pointer;white-space:nowrap;">Estimar</button>
+        </div>
+        <p class="hint" style="margin-top:6px;">Multiplicamos por ~52 semanas/año y llenamos los campos. Es solo un estimado — tu historia laboral en colpensiones.gov.co tiene el dato exacto.</p>
+      </details>
     </div>
 
     <div class="field">
       <label>De esas, ¿cuántas tenías cotizadas al 1 de julio de 2025?</label>
       <p class="hint">Fecha clave para las reglas de transición de la Reforma Pensional. Si no sabes, pon el mismo número de arriba.</p>
-      <input type="number" id="semanas_julio25" min="0" max="3500" placeholder="Ej: 760">
+      <input type="number" inputmode="numeric" id="semanas_julio25" min="0" max="3500" placeholder="Ej: 760">
     </div>
 
     <div class="field" id="campo-saldo" style="display:none">
       <label>Saldo acumulado en tu AFP (en pesos colombianos)</label>
       <p class="hint">Puedes consultarlo en el portal de tu AFP. Escribe el valor en pesos — por ejemplo: 45000000 si tienes $45 millones. Escribe 0 si no sabes.</p>
-      <input type="number" id="saldo_afp" min="0" placeholder="Ej: 45000000">
+      <input type="number" inputmode="numeric" id="saldo_afp" min="0" placeholder="Ej: 45000000">
       <p class="hint" id="saldo-smmlv-hint" style="color:#003893; display:none;"></p>
     </div>
 
@@ -537,7 +549,7 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
 
     <div class="field">
       <label>¿Cuánto ganas aproximadamente? (en salarios mínimos)</label>
-      <p class="hint">SMMLV 2026 = $1.750.905. La reforma 2024 obliga a cotizar en Colpensiones si ganas ≤ 2.3 SMMLV.</p>
+      <p class="hint"><strong>SMMLV</strong> = un salario mínimo ($1.750.905 en 2026). Así que "2–3 SMMLV" es ganar entre 2 y 3 salarios mínimos. La reforma 2024 obliga a cotizar en Colpensiones si ganas ≤ 2.3 SMMLV.</p>
       <div class="radio-group" style="margin-top:8px;">
         <div class="radio-item" onclick="pick('salario','lt1',this)">
           <input type="radio" name="salario" value="lt1"> Menos de 1 SMMLV (menos de $1.4M)
@@ -884,6 +896,7 @@ function pick(field, val, el) {
     n.classList.toggle('visible', mid <= 2.3);
   }
   refreshAria();
+  saveState();
 }
 
 function checkToggle(val, el) {
@@ -914,6 +927,7 @@ function checkToggle(val, el) {
   const hint = document.getElementById('hint-independiente');
   if (hint) hint.style.display = S.especiales.includes('independiente_actual') ? 'block' : 'none';
   refreshAria();
+  saveState();
 }
 
 function prefToggle(val, el) {
@@ -939,6 +953,7 @@ function prefToggle(val, el) {
     box.style.display = 'none';
   }
   refreshAria();
+  saveState();
 }
 
 // ════════════════════════════════════════════════
@@ -1039,6 +1054,7 @@ function validate(step) {
     if (msg) err.textContent = msg;
     err.classList.add('show');
   }
+  saveState();
   return ok;
 }
 
@@ -1185,7 +1201,7 @@ function evalColp(data) {
   // empieza a los 62/57 — las semanas no se pierden. Lo explicamos.
   let nota = null;
   if (stopAge < pensionAge) {
-    nota = `Ya tendrías las semanas, pero en Colpensiones la mesada de vejez se reclama a los ${pensionAge} años. Como planeas dejar de cotizar a los ${Math.round(stopAge)}, empezarías a recibirla a los ${pensionAge} (tus semanas no se pierden). Entre los ${Math.round(stopAge)} y los ${pensionAge} años no recibirías esta pensión, salvo que sigas cotizando.`;
+    nota = `Ya tendrías las semanas, pero en Colpensiones la pensión de vejez solo se puede reclamar a los ${pensionAge} años. Aunque dejes de cotizar a los ${Math.round(stopAge)}, tus semanas no se pierden: empezarías a recibir la mesada a los ${pensionAge}. Entre los ${Math.round(stopAge)} y los ${pensionAge} años no recibirías esta pensión — seguir cotizando aumentaría tu mesada, pero NO adelanta la edad de pensión.`;
   }
 
   return {
@@ -1782,6 +1798,85 @@ function reiniciar() {
   document.getElementById('step-labels').style.display = 'flex';
   showStep(1);
   refreshAria();
+  try { sessionStorage.removeItem('pension_S'); } catch (e) {}
+}
+
+// ════════════════════════════════════════════════
+//  VER UN EJEMPLO (caso de muestra)
+// ════════════════════════════════════════════════
+function verEjemplo() {
+  Object.assign(S, {
+    edad: 38, sexo: 'M', fondo_actual: 'Porvenir',
+    semanas_actuales: 700, semanas_julio25: 660, saldo_afp: 0,
+    ha_trasladado: 'no', especiales: [],
+    salario: '2-3', anos_lab: '15-20', densidad: 'frecuente',
+    hijos: '2', preferencias: ['maximizar_mesada', 'menor_riesgo']
+  });
+  document.getElementById('trust-intro').style.display = 'none';
+  document.getElementById('progress').style.display = 'none';
+  document.getElementById('step-labels').style.display = 'none';
+  for (let i = 1; i <= 4; i++) document.getElementById('step-' + i).style.display = 'none';
+  window.scrollTo(0, 0);
+  renderResults(decidir(S));
+}
+
+// ════════════════════════════════════════════════
+//  ESTIMADOR DE SEMANAS
+// ════════════════════════════════════════════════
+function estimarSemanas() {
+  const anos = parseFloat(document.getElementById('est-anos').value) || 0;
+  if (anos <= 0) return;
+  const sem = Math.min(3500, Math.round(anos * 52));
+  document.getElementById('semanas_actuales').value = sem;
+  document.getElementById('semanas_julio25').value = sem;
+}
+
+// ════════════════════════════════════════════════
+//  PERSISTENCIA — sessionStorage (sobrevive recargas, no el cierre)
+// ════════════════════════════════════════════════
+function saveState() {
+  try { sessionStorage.setItem('pension_S', JSON.stringify(S)); } catch (e) {}
+}
+
+function applyStateToUI() {
+  if (S.edad) document.getElementById('edad').value = S.edad;
+  if (S.semanas_actuales) document.getElementById('semanas_actuales').value = S.semanas_actuales;
+  if (S.semanas_julio25) document.getElementById('semanas_julio25').value = S.semanas_julio25;
+  if (S.saldo_afp > 0) document.getElementById('saldo_afp').value = Math.round(S.saldo_afp * SMMLV);
+
+  ['sexo', 'fondo_actual', 'ha_trasladado', 'salario', 'anos_lab', 'densidad', 'hijos'].forEach(f => {
+    if (S[f] == null) return;
+    const el = document.querySelector(`[onclick="pick('${f}','${S[f]}',this)"]`);
+    if (el) el.classList.add('selected');
+  });
+  (S.especiales || []).forEach(v => {
+    const el = document.querySelector(`[onclick="checkToggle('${v}',this)"]`);
+    if (el) el.classList.add('selected');
+  });
+  (S.preferencias || []).forEach(v => {
+    const el = document.querySelector(`[onclick="prefToggle('${v}',this)"]`);
+    if (el) el.classList.add('selected');
+  });
+
+  // Efectos secundarios que normalmente disparan los handlers
+  if (S.fondo_actual && S.fondo_actual !== 'Colpensiones' && S.fondo_actual !== 'ninguno')
+    document.getElementById('campo-saldo').style.display = 'block';
+  if (S.salario && salMid(S.salario) <= 2.3)
+    document.getElementById('reform-notice').classList.add('visible');
+  const hintInd = document.getElementById('hint-independiente');
+  if (hintInd && (S.especiales || []).includes('independiente_actual')) hintInd.style.display = 'block';
+  refreshAria();
+}
+
+function restoreState() {
+  let saved;
+  try { saved = JSON.parse(sessionStorage.getItem('pension_S')); } catch (e) { return; }
+  if (!saved) return;
+  const fields = ['edad','sexo','fondo_actual','semanas_actuales','semanas_julio25','saldo_afp','ha_trasladado','especiales','salario','anos_lab','densidad','hijos','preferencias'];
+  for (const f of fields) if (saved[f] !== undefined) S[f] = saved[f];
+  if (!S.edad && !S.sexo && !S.fondo_actual) return; // nada útil que restaurar
+  applyStateToUI();
+  dismissTrust(); // había progreso: saltamos la intro y mostramos el formulario con los datos
 }
 
 // ════════════════════════════════════════════════
@@ -1955,7 +2050,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
-document.addEventListener('DOMContentLoaded', initA11y);
+document.addEventListener('DOMContentLoaded', () => { initA11y(); restoreState(); });
 </script>
 </body>
 </html>
