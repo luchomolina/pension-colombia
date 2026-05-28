@@ -164,6 +164,7 @@ input[type="number"]:focus { outline: none; border-color: #003893; box-shadow: 0
 }
 .verdict-eyebrow { font-size: 0.8rem; opacity: 0.75; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
 .verdict-name { font-size: 1.55rem; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.3px; }
+.verdict-action { font-size: 0.95rem; font-weight: 600; margin-bottom: 8px; background: rgba(255,255,255,0.14); border-radius: 9px; padding: 7px 12px; display: inline-block; }
 .verdict-sub { font-size: 0.9rem; opacity: 0.88; }
 .conf-badge {
   display: inline-block; padding: 5px 14px; border-radius: 20px;
@@ -288,6 +289,37 @@ input[type="number"]:focus { outline: none; border-color: #003893; box-shadow: 0
 .trust-flow-step .tf-icon { font-size: 1.35rem; }
 .trust-flow-step .tf-label { font-size: 0.7rem; font-weight: 700; color: #374151; text-align: center; line-height: 1.25; }
 .trust-flow-arrow { font-size: 1rem; color: #6b7280; flex-shrink: 0; padding: 0 4px; }
+
+/* ── Preguntas de seguimiento (IA) ── */
+#ai-thread:not(:empty) { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.fu-q {
+  align-self: flex-end; max-width: 85%; background: #003893; color: #fff;
+  padding: 9px 13px; border-radius: 13px 13px 4px 13px; font-size: 0.86rem; line-height: 1.45;
+}
+.fu-a {
+  align-self: flex-start; max-width: 92%; background: #f0f4ff; color: #333;
+  padding: 10px 14px; border-radius: 13px 13px 13px 4px; font-size: 0.86rem; line-height: 1.6;
+}
+#ai-followup { margin-top: 16px; border-top: 1px solid #e4eaf7; padding-top: 14px; }
+.fu-title { font-size: 0.82rem; font-weight: 700; color: #1a1a2e; margin: 0 0 8px; }
+.fu-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
+.fu-chip {
+  background: #eef3ff; border: 1px solid #c5d0f0; color: #003893;
+  border-radius: 16px; padding: 6px 12px; font-size: 0.78rem; font-weight: 600;
+  cursor: pointer; transition: background 0.15s;
+}
+.fu-chip:hover { background: #dde6fb; }
+.fu-row { display: flex; gap: 8px; }
+#fu-input {
+  flex: 1; padding: 10px 13px; border: 2px solid #e0e4ed; border-radius: 9px;
+  font-size: 0.88rem; color: #1a1a2e; min-width: 0;
+}
+#fu-input:focus { outline: none; border-color: #003893; box-shadow: 0 0 0 3px rgba(0,56,147,0.15); }
+#fu-send {
+  padding: 10px 16px; background: #003893; color: #fff; border: none; border-radius: 9px;
+  font-size: 0.85rem; font-weight: 700; cursor: pointer; white-space: nowrap;
+}
+#fu-send:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* ── Cómo calculamos (desplegable) ── */
 .calc-details { background: white; border-radius: 16px; margin: 12px 0; box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden; }
@@ -765,6 +797,8 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
         🔓 Obtener mi análisis personalizado
       </button>
       <div class="ai-text" id="ai-text" style="display:none;margin-top:16px;"></div>
+      <div id="ai-thread"></div>
+      <div id="ai-followup" style="display:none;"></div>
     </div>
 
     <div class="cta-card">
@@ -1520,6 +1554,16 @@ function buildPrompt(result) {
     `  ¿Está en régimen de transición (Ley 2381)?: ${result.transicion ? 'SÍ — protegido/a por reglas de Ley 100' : 'NO — sujeto/a a reglas nuevas'}`
   ].join('\n');
 
+  // Acción recomendada según el FONDO ACTUAL (para usar el verbo correcto)
+  const enColp = S.fondo_actual === 'Colpensiones';
+  const sinFondo = S.fondo_actual === 'ninguno' || !S.fondo_actual;
+  const recColp = result.mejor.regimen.includes('Colpensiones');
+  const mismoRegimen = (enColp && recColp) || (!enColp && !sinFondo && !recColp);
+  let accion;
+  if (sinFondo) accion = `La persona aún no cotiza. Recomiéndale AFILIARSE a ${result.mejor.regimen}.`;
+  else if (mismoRegimen) accion = `La persona YA está en el régimen recomendado (su fondo actual es ${S.fondo_actual}). Recomiéndale PERMANECER ahí. Prohibido usar "trasládate" o "cámbiate".`;
+  else accion = `La persona está en ${S.fondo_actual}, que es un régimen DISTINTO al recomendado. Recomiéndale TRASLADARSE a ${result.mejor.regimen}. Prohibido usar "permanece" o "quédate".${result.puede ? '' : ' ADVERTENCIA: el traslado NO es posible ahora (faltan menos de 10 años para la pensión); acláralo.'}`;
+
   return `Eres un asesor experto en el sistema pensional colombiano con dominio de la Reforma Pensional 2024 (Ley 2381) y sus decretos reglamentarios de 2025.
 
 REGLAS DE FORMATO (obligatorias):
@@ -1530,6 +1574,9 @@ REGLAS DE FORMATO (obligatorias):
 ALINEACIÓN CON EL ALGORITMO:
 La herramienta recomienda "${result.mejor.regimen}" con confianza ${result.confianza}. Tu análisis DEBE ser coherente con esta recomendación. Solo puedes disentir si identificas un error concreto en los datos del usuario — en ese caso explícalo brevemente.
 
+ACCIÓN SEGÚN EL FONDO ACTUAL (clave para el verbo correcto):
+${accion}
+
 DATOS DE LA PERSONA:
 ${userInfo}
 
@@ -1538,7 +1585,7 @@ ${algoInfo}
 
 Responde ÚNICAMENTE con estas cinco secciones en este orden exacto:
 
-**RECOMENDACIÓN:** Una o dos oraciones directas. Si existe pensión anticipada, menciona primero la edad NORMAL (${result.afp.edad_pension} años) y la anticipada solo como opción secundaria con mesada menor.
+**RECOMENDACIÓN:** Una o dos oraciones directas, usando el verbo correcto según la ACCIÓN indicada arriba (permanecer / trasladarse / afiliarse) — nunca digas "permanece" si el régimen recomendado es distinto al fondo actual. Si existe pensión anticipada, menciona primero la edad NORMAL (${result.afp.edad_pension} años) y la anticipada solo como opción secundaria con mesada menor.
 
 **¿POR QUÉ?**
 Máximo 2 párrafos cortos explicando los 2-3 factores decisivos: semanas, mesada proyectada, prioridades declaradas.
@@ -1553,6 +1600,37 @@ Lista de 2-3 puntos concretos, una línea cada uno.
 Lista de 3-4 acciones concretas para los próximos 3-6 meses.`;
 }
 
+// Conversación con la IA (para preguntas de seguimiento)
+let aiConversation = [];
+
+// Llama a la IA con { prompt } o { messages }; normaliza la respuesta a texto.
+async function llamarIA(payload) {
+  // Cowork runtime (artefacto en Cowork): solo acepta texto plano
+  if (window.cowork?.askClaude) {
+    const texto = payload.messages
+      ? payload.messages.map(m => (m.role === 'user' ? 'Usuario' : 'Asistente') + ': ' + m.content).join('\n\n')
+      : payload.prompt;
+    const aiResp = await window.cowork.askClaude(texto);
+    if (typeof aiResp === 'string') return aiResp;
+    if (aiResp?.text) return aiResp.text;
+    if (Array.isArray(aiResp?.content)) return aiResp.content.filter(b => b.type === 'text').map(b => b.text).join('\n');
+    if (typeof aiResp === 'object') return Object.values(aiResp).find(v => typeof v === 'string') || JSON.stringify(aiResp);
+    return String(aiResp);
+  }
+  // Netlify Function (versión hospedada)
+  const resp = await fetch('/api/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
+    throw new Error(err.error || `HTTP ${resp.status}`);
+  }
+  const data = await resp.json();
+  return data.text;
+}
+
 // ── Called when user clicks "Obtener análisis" button ──
 async function pedirAnalisisIA() {
   const btn = document.getElementById('ai-btn');
@@ -1565,42 +1643,63 @@ async function pedirAnalisisIA() {
   try {
     const result = decidir(S);
     const prompt = buildPrompt(result);
+    const aiText = await llamarIA({ prompt });
 
-    let aiText;
-
-    // Cowork runtime (artefacto en Cowork)
-    if (window.cowork?.askClaude) {
-      const aiResp = await window.cowork.askClaude(prompt);
-      if (typeof aiResp === 'string') { aiText = aiResp; }
-      else if (aiResp?.text) { aiText = aiResp.text; }
-      else if (Array.isArray(aiResp?.content)) { aiText = aiResp.content.filter(b => b.type === 'text').map(b => b.text).join('\n'); }
-      else if (typeof aiResp === 'object') { aiText = Object.values(aiResp).find(v => typeof v === 'string') || JSON.stringify(aiResp); }
-      else { aiText = String(aiResp); }
-    }
-    // Netlify Function (versión hospedada)
-    else {
-      const resp = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-      });
-      if (!resp.ok) {
-        const err = await resp.json().catch(() => ({ error: `HTTP ${resp.status}` }));
-        throw new Error(err.error || `HTTP ${resp.status}`);
-      }
-      const data = await resp.json();
-      aiText = data.text;
-    }
+    aiConversation = [{ role: 'user', content: prompt }, { role: 'assistant', content: aiText }];
 
     btn.style.display = 'none';
     document.getElementById('ai-preview').style.display = 'none';
     aiDiv.style.display = 'block';
     aiDiv.innerHTML = renderMd(aiText);
+    mostrarSeguimiento();
   } catch (e) {
     btn.disabled = false;
-    btn.innerHTML = '🤖 Obtener análisis personalizado';
+    btn.innerHTML = '🔓 Obtener mi análisis personalizado';
     aiDiv.style.display = 'block';
     aiDiv.innerHTML = '<span style="color:#c62828;">⚠️ No se pudo obtener el análisis IA. Intenta de nuevo.<br><small>' + (e && (e.message || e.toString()) || 'Error desconocido') + '</small></span>';
+  }
+}
+
+// ── Preguntas de seguimiento (#18) ──
+const SUGERENCIAS = ['¿Y si cotizo 5 años más?', '¿Y si me cambio de fondo?', '¿Cómo me afecta la inflación?'];
+
+function mostrarSeguimiento() {
+  const el = document.getElementById('ai-followup');
+  if (!el) return;
+  const chips = SUGERENCIAS.map(q => `<button type="button" class="fu-chip" onclick="enviarPregunta(this.textContent)">${q}</button>`).join('');
+  el.innerHTML = `
+    <p class="fu-title">¿Tienes una duda sobre tu resultado? Pregúntale a la IA:</p>
+    <div class="fu-chips">${chips}</div>
+    <div class="fu-row">
+      <input type="text" id="fu-input" placeholder="Escribe tu pregunta…" onkeydown="if(event.key==='Enter')enviarPregunta()">
+      <button type="button" id="fu-send" onclick="enviarPregunta()">Enviar</button>
+    </div>`;
+  el.style.display = 'block';
+}
+
+async function enviarPregunta(texto) {
+  const input = document.getElementById('fu-input');
+  const q = (texto || (input && input.value) || '').trim();
+  if (!q || aiConversation.length === 0) return;
+  const thread = document.getElementById('ai-thread');
+  const send = document.getElementById('fu-send');
+  if (input) input.value = '';
+  if (send) send.disabled = true;
+
+  const qEl = document.createElement('div'); qEl.className = 'fu-q'; qEl.textContent = q;
+  const aEl = document.createElement('div'); aEl.className = 'fu-a'; aEl.innerHTML = '<span class="ai-spinner"></span>';
+  thread.appendChild(qEl); thread.appendChild(aEl);
+  aEl.scrollIntoView({ block: 'nearest' });
+
+  try {
+    const messages = aiConversation.concat([{ role: 'user', content: q }]);
+    const ans = await llamarIA({ messages });
+    aiConversation.push({ role: 'user', content: q }, { role: 'assistant', content: ans });
+    aEl.innerHTML = renderMd(ans);
+  } catch (e) {
+    aEl.innerHTML = '<span style="color:#c62828;">⚠️ No se pudo responder. Intenta de nuevo.</span>';
+  } finally {
+    if (send) send.disabled = false;
   }
 }
 
@@ -1655,10 +1754,21 @@ function renderResults(res) {
   const cmap = { alta:'conf-alta', media:'conf-media', baja:'conf-baja' };
   const ctxt = { alta:'✅ Recomendación firme', media:'⚠️ Recomendación con matices', baja:'❓ Caso complejo – consulta un experto' };
 
+  // Acción según el fondo actual (permanecer / trasladarse / afiliarse)
+  const _enColp = S.fondo_actual === 'Colpensiones';
+  const _sinFondo = S.fondo_actual === 'ninguno' || !S.fondo_actual;
+  const _recColp = res.mejor.regimen.includes('Colpensiones');
+  const _mismo = (_enColp && _recColp) || (!_enColp && !_sinFondo && !_recColp);
+  let accionUI;
+  if (_sinFondo) accionUI = `↪️ Te conviene <strong>afiliarte a ${res.mejor.regimen}</strong>`;
+  else if (_mismo) accionUI = `✅ Te conviene <strong>quedarte donde estás</strong> (${S.fondo_actual})`;
+  else accionUI = `↪️ Te conviene <strong>trasladarte de ${S.fondo_actual}</strong> a ${res.mejor.regimen}`;
+
   document.getElementById('verdict-area').innerHTML = `
     <div class="verdict-card">
       <div class="verdict-eyebrow">Tu mejor opción según tu situación</div>
       <div class="verdict-name">${res.mejor.regimen}</div>
+      <div class="verdict-action">${accionUI}</div>
       <div class="verdict-sub">${res.mejor.logra_pension
         ? `📌 Proyección: pensión de ~${res.mejor.mesada} SMMLV/mes (≈ ${fmtPesos(res.mejor.mesada)}/mes en pesos de hoy)`
         : `⚠️ Con tu situación actual no alcanzarías pensión completa`}</div>
@@ -1778,6 +1888,12 @@ function renderResults(res) {
   aiPreview.style.display = 'flex';
   aiDiv.style.display = 'none';
   aiDiv.innerHTML = '';
+  // Reset del hilo de preguntas de seguimiento
+  aiConversation = [];
+  const aiThread = document.getElementById('ai-thread');
+  const aiFollowup = document.getElementById('ai-followup');
+  if (aiThread) aiThread.innerHTML = '';
+  if (aiFollowup) { aiFollowup.style.display = 'none'; aiFollowup.innerHTML = ''; }
 
   // Hacer accesibles los info-icon recién creados
   initA11y();
