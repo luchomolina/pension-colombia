@@ -85,7 +85,7 @@ Todo el algoritmo corre en el navegador sin necesidad de servidor. El código es
 
 ### Constantes y supuestos
 
-El algoritmo parte de las siguientes constantes fijas: la edad legal de pensión (62 años para hombres, 57 para mujeres), las 1.300 semanas mínimas de cotización, el umbral de la Reforma 2024 de 2,3 SMMLV, una tasa de aporte del 11,5% del salario a la cuenta individual en AFP, un rendimiento conservador del 8% anual para el capital en AFP, el SMMLV 2025 de $1.423.500 COP como unidad de todos los valores monetarios, y una esperanza de vida de 80 años para hombres y 85 para mujeres.
+El algoritmo parte de las siguientes constantes fijas: la edad legal de pensión (62 años para hombres, 57 para mujeres), las 1.300 semanas mínimas de cotización, el umbral de la Reforma 2024 de 2,3 SMMLV, una tasa de aporte del 11,5% del salario a la cuenta individual en AFP, un rendimiento **real** (sobre el SMMLV) del 3% anual para el capital en AFP —con un rango de 1,5% a 4,5% para los escenarios pesimista y optimista—, el SMMLV 2026 de $1.750.905 COP como unidad de todos los valores monetarios, y una esperanza de vida de 80 años para hombres y 85 para mujeres. Todas las cifras se expresan en pesos de hoy (poder de compra actual).
 
 El salario declarado en bandas se convierte al punto medio de la banda (por ejemplo, "2–3 SMMLV" se trata como 2,5 SMMLV). La frecuencia de cotización declarada cualitativamente se convierte en un factor numérico: 0,92 para quien cotiza siempre, 0,75 para frecuentemente, 0,55 para la mitad del tiempo y 0,35 para irregular.
 
@@ -93,9 +93,11 @@ El salario declarado en bandas se convierte al punto medio de la banda (por ejem
 
 Antes de calcular escenarios, el algoritmo evalúa tres condiciones que pueden restringir o contextualizar la decisión.
 
-**Régimen de transición:** Una persona está protegida si al 1 de julio de 2025 tenía 750 o más semanas cotizadas, o si en esa fecha tenía al menos 47 años (mujeres) o 52 años (hombres). Quienes cumplen esta condición quedan sujetos a las reglas de la Ley 100 de 1993, sin la obligación de cotizar en Colpensiones por nivel de ingresos que introduce la Reforma 2024.
+> **Nota normativa:** La Reforma Pensional 2024 (Ley 2381 de 2024) está **suspendida** por la Corte Constitucional (Auto 841 de 2025), que la devolvió a la Cámara por un vicio de trámite. Hoy rige la Ley 100 de 1993. Las verificaciones de transición y obligatoriedad que siguen son **condicionales**: aplicarían solo si la reforma entra en vigencia. La herramienta las muestra como contexto, no como derecho vigente.
 
-**Obligatoriedad por reforma:** Si la persona no está en transición y su salario es igual o menor a 2,3 SMMLV, la Reforma 2024 la obliga a cotizar en Colpensiones. La herramienta lo informa pero sigue mostrando ambos escenarios para que entienda los pros y contras.
+**Régimen de transición:** El criterio es por semanas y diferenciado por sexo (Ley 2381 art. 75): una persona quedaría en transición si al 1 de julio de 2025 tenía al menos 900 semanas (hombres) o 750 semanas (mujeres). La edad por sí sola no otorga transición. Quienes cumplan esta condición conservarían las reglas de la Ley 100 de 1993, sin la obligación de cotizar en Colpensiones por nivel de ingresos que introduce la Reforma 2024.
+
+**Obligatoriedad por reforma:** Si la persona no está en transición y su salario es igual o menor a 2,3 SMMLV, la Reforma 2024 —de entrar en vigencia— la obligaría a cotizar en Colpensiones. La herramienta lo informa pero sigue mostrando ambos escenarios para que entienda los pros y contras.
 
 **Posibilidad de traslado:** Solo es posible cambiar de régimen si faltan más de 10 años para la edad legal de pensión. Si la persona ya se ha trasladado antes, se genera una advertencia sobre el bloqueo de 5 años entre traslados. Cuando el traslado no es posible, el algoritmo evalúa únicamente el escenario del fondo actual del usuario.
 
@@ -172,8 +174,8 @@ flowchart TD
 El algoritmo toma en cuenta:
 
 - **Ley 100 de 1993** — requisitos base de semanas (1.300) y edades de pensión (62H / 57M)
-- **Reforma Pensional 2024 (Ley 2381 de 2023)** — obligatoriedad de cotizar en Colpensiones para ingresos ≤ 2.3 SMMLV y sistema de pilares
-- **Régimen de transición** — protección para personas con ≥ 750 semanas o ≥ 47/52 años al 1 de julio de 2025
+- **Reforma Pensional 2024 (Ley 2381 de 2024)** — hoy **suspendida** (Corte Constitucional, Auto 841 de 2025); de entrar en vigencia: obligatoriedad de cotizar en Colpensiones para ingresos ≤ 2.3 SMMLV y sistema de pilares
+- **Régimen de transición** — protección para hombres con ≥ 900 semanas o mujeres con ≥ 750 semanas al 1 de julio de 2025 (criterio por semanas y sexo, no por edad)
 - **Pensión anticipada (Art. 64, Ley 100)** — posibilidad de retiro antes de la edad legal cuando el capital AFP financia una mesada ≥ 1.1 SMMLV
 
 > **Aviso:** Esta herramienta es orientativa. Los cálculos son aproximaciones y no reemplazan la consulta oficial con Colpensiones, la AFP, ni un asesor pensional certificado.

@@ -544,7 +544,7 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
 
     <div class="field">
       <label>De esas, ¿cuántas tenías cotizadas al 1 de julio de 2025?</label>
-      <p class="hint">Fecha clave para las reglas de transición de la Reforma Pensional. Si no sabes, pon el mismo número de arriba.</p>
+      <p class="hint">Fecha clave para las reglas de transición de la Reforma Pensional (si llega a entrar en vigencia). Si no sabes, pon el mismo número de arriba.</p>
       <input type="number" inputmode="numeric" id="semanas_julio25" min="0" max="3500" placeholder="Ej: 760">
     </div>
 
@@ -599,7 +599,7 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
 
     <div class="field">
       <label>¿Cuánto ganas aproximadamente? (en salarios mínimos)</label>
-      <p class="hint"><strong>SMMLV</strong> = un salario mínimo ($1.750.905 en 2026). Así que "2–3 SMMLV" es ganar entre 2 y 3 salarios mínimos. La reforma 2024 obliga a cotizar en Colpensiones si ganas ≤ 2.3 SMMLV.</p>
+      <p class="hint"><strong>SMMLV</strong> = un salario mínimo ($1.750.905 en 2026). Así que "2–3 SMMLV" es ganar entre 2 y 3 salarios mínimos. La Reforma 2024 (hoy suspendida) obligaría a cotizar en Colpensiones si ganas ≤ 2.3 SMMLV.</p>
       <div class="radio-group" style="margin-top:8px;">
         <div class="radio-item" onclick="pick('salario','lt1',this)">
           <input type="radio" name="salario" value="lt1"> Menos de 1 SMMLV (menos de $1.4M)
@@ -622,7 +622,7 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
         </div>
       </div>
       <div class="reform-notice" id="reform-notice">
-        ⚡ <strong>Reforma Pensional 2024:</strong> Con ingresos ≤ 2.3 SMMLV la ley te obliga a cotizar en Colpensiones. Aun así, analicemos tu situación completa para que entiendas los pros y contras.
+        ⚡ <strong>Reforma Pensional 2024 (suspendida):</strong> Si entra en vigencia, con ingresos ≤ 2.3 SMMLV tendrías que cotizar en Colpensiones. Hoy está suspendida por la Corte Constitucional y rige la Ley 100, pero conviene que conozcas tu situación completa.
       </div>
     </div>
 
@@ -772,7 +772,7 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
           <span class="ai-preview-icon">📋</span>
           <div class="ai-preview-label">
             <div class="ai-preview-title">Impacto de la Reforma 2024</div>
-            <div class="ai-preview-desc">Cómo te afecta la nueva ley específicamente a ti</div>
+            <div class="ai-preview-desc">Qué pasaría contigo si la reforma (hoy suspendida) entra en vigencia</div>
           </div>
           <span class="ai-lock">🔒</span>
         </div>
@@ -832,9 +832,9 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
         <p>Te pensionas a los <strong>62 años (hombres)</strong> o <strong>57 (mujeres)</strong> con mínimo <strong>1.300 semanas</strong>. Si tienes las semanas pero aún no la edad, esperas a cumplirla. Si llegas a la edad sin las semanas, recibes una indemnización sustitutiva (un solo pago).</p>
         <p class="law">Base legal: Ley 100 de 1993, arts. 33 y 37. Reducción de semanas para mujeres con 3+ hijos.</p>
 
-        <h5>⚖️ Reforma 2024</h5>
-        <p>Si ganas <strong>≤ 2.3 SMMLV</strong>, la ley te obliga a cotizar en Colpensiones, salvo que estés en régimen de transición (protegido por las reglas anteriores).</p>
-        <p class="law">Base legal: Ley 2381 de 2024 (Reforma Pensional) y su régimen de transición.</p>
+        <h5>⚖️ Reforma 2024 (suspendida)</h5>
+        <p>La Ley 2381 de 2024 está <strong>suspendida</strong> por la Corte Constitucional (Auto 841 de 2025) y hoy rige la Ley 100. <em>Si</em> llega a entrar en vigencia, quienes ganen <strong>≤ 2.3 SMMLV</strong> tendrían que cotizar en Colpensiones, salvo el régimen de transición (que conservaría las reglas anteriores).</p>
+        <p class="law">Base legal: Ley 2381 de 2024, hoy suspendida; rige la Ley 100 de 1993.</p>
 
         <h5>📌 Supuestos clave</h5>
         <ul>
@@ -848,7 +848,7 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
     </details>
 
     <div class="disclaimer">
-      ⚠️ <strong>Aviso importante:</strong> Esta herramienta es orientativa y no constituye asesoría pensional profesional. Los cálculos son aproximaciones con supuestos simplificados y <em>no reemplazan</em> la consulta oficial con Colpensiones y tu AFP. El sistema pensional colombiano está en transición bajo la Reforma 2024 y algunas reglas aún se están reglamentando. Consulta siempre un asesor certificado antes de tomar decisiones definitivas.
+      ⚠️ <strong>Aviso importante:</strong> Esta herramienta es orientativa y no constituye asesoría pensional profesional. Los cálculos son aproximaciones con supuestos simplificados y <em>no reemplazan</em> la consulta oficial con Colpensiones y tu AFP. La Reforma Pensional 2024 (Ley 2381) está suspendida por la Corte Constitucional y hoy rige la Ley 100; las reglas podrían cambiar según la decisión final. Consulta siempre un asesor certificado antes de tomar decisiones definitivas.
     </div>
 
     <div class="save-card">
@@ -1547,8 +1547,9 @@ function buildPrompt(result) {
     `  Mejor opción según preferencias: ${result.mejor.regimen}`,
     `  Confianza en la recomendación: ${result.confianza}`,
     `  ¿Puede trasladarse de régimen?: ${result.puede ? 'SÍ (más de 10 años a la pensión)' : 'NO (menos de 10 años a la pensión)'}`,
-    `  ¿Aplica cotización obligatoria a Colpensiones por reforma?: ${result.refOblig && !result.transicion ? 'SÍ (salario ≤ 2.3 SMMLV)' : 'NO'}`,
-    `  ¿Está en régimen de transición (Ley 2381)?: ${result.transicion ? 'SÍ — protegido/a por reglas de Ley 100' : 'NO — sujeto/a a reglas nuevas'}`
+    `  ¿Aplicaría cotización obligatoria a Colpensiones SI la reforma entra en vigencia?: ${result.refOblig && !result.transicion ? 'SÍ (salario ≤ 2.3 SMMLV)' : 'NO'}`,
+    `  ¿Estaría en régimen de transición (Ley 2381) SI la reforma entra en vigencia?: ${result.transicion ? 'SÍ — conservaría reglas de Ley 100' : 'NO — quedaría sujeto/a a reglas nuevas'}`,
+    `  NOTA NORMATIVA: la Ley 2381 de 2024 está SUSPENDIDA por la Corte Constitucional (Auto 841/2025). Hoy rige la Ley 100 de 1993. No afirmes que la reforma ya está vigente.`
   ].join('\n');
 
   // Acción recomendada según el FONDO ACTUAL (para usar el verbo correcto)
@@ -1561,7 +1562,7 @@ function buildPrompt(result) {
   else if (mismoRegimen) accion = `La persona YA está en el régimen recomendado (su fondo actual es ${S.fondo_actual}). Recomiéndale PERMANECER ahí. Prohibido usar "trasládate" o "cámbiate".`;
   else accion = `La persona está en ${S.fondo_actual}, que es un régimen DISTINTO al recomendado. Recomiéndale TRASLADARSE a ${result.mejor.regimen}. Prohibido usar "permanece" o "quédate".${result.puede ? '' : ' ADVERTENCIA: el traslado NO es posible ahora (faltan menos de 10 años para la pensión); acláralo.'}`;
 
-  return `Eres un asesor experto en el sistema pensional colombiano con dominio de la Reforma Pensional 2024 (Ley 2381) y sus decretos reglamentarios de 2025.
+  return `Eres un asesor experto en el sistema pensional colombiano. Dominas la Ley 100 de 1993 (vigente) y la Reforma Pensional 2024 (Ley 2381), que está SUSPENDIDA por la Corte Constitucional (Auto 841 de 2025): hoy NO está vigente y rige la Ley 100. Nunca afirmes que la reforma ya aplica; cuando la menciones, hazlo en condicional ("si entra en vigencia").
 
 REGLAS DE FORMATO (obligatorias):
 - NO uses headers markdown (#, ##, ###). Usa ÚNICAMENTE los cinco títulos en negrita exactos indicados abajo.
@@ -1588,7 +1589,7 @@ Responde ÚNICAMENTE con estas cinco secciones en este orden exacto:
 Máximo 2 párrafos cortos explicando los 2-3 factores decisivos: semanas, mesada proyectada, prioridades declaradas.
 
 **IMPACTO DE LA REFORMA 2024:**
-Máximo 2 oraciones sobre cómo la Ley 2381 afecta específicamente a esta persona.
+Máximo 2 oraciones. Aclara que la Ley 2381 está suspendida y que hoy rige la Ley 100; explica en condicional cómo afectaría a esta persona SI llegara a entrar en vigencia.
 
 **FACTORES DE RIESGO:**
 Lista de 2-3 puntos concretos, una línea cada uno.
@@ -1863,11 +1864,12 @@ function renderResults(res) {
   const ri = document.getElementById('reform-impact');
   const notices = [];
 
-  // Régimen de transición — mensaje prioritario, suprime la obligatoriedad Colpensiones
+  // Régimen de transición — mensaje prioritario, suprime la obligatoriedad Colpensiones.
+  // La Ley 2381 está suspendida (Auto 841/2025): estos avisos son condicionales.
   if (res.transicion) {
-    notices.push('🛡️ <strong>Régimen de transición (Ley 2381):</strong> Tu situación está protegida por las reglas anteriores a la reforma. Las condiciones que aplican a tu pensión son las de la Ley 100 — no estás sujeto/a a la cotización obligatoria en Colpensiones por nivel de ingresos.');
+    notices.push('🛡️ <strong>Régimen de transición (Ley 2381):</strong> Por tus semanas, <em>si</em> la reforma entra en vigencia quedarías protegido/a por las reglas de la Ley 100 y no estarías sujeto/a a la cotización obligatoria en Colpensiones por nivel de ingresos. Por ahora la reforma está suspendida y rige la Ley 100.');
   } else if (res.refOblig) {
-    notices.push('⚡ <strong>Reforma 2024:</strong> Con tu nivel de ingresos (≤ 2.3 SMMLV) la ley te obliga a cotizar en Colpensiones. Tu libertad de elección aplica principalmente al excedente de ese umbral.');
+    notices.push('⚡ <strong>Reforma 2024 (suspendida):</strong> Está suspendida por la Corte Constitucional. <em>Si</em> entra en vigencia, con tu nivel de ingresos (≤ 2.3 SMMLV) tendrías que cotizar en Colpensiones y tu libertad de elección aplicaría sobre todo al excedente de ese umbral.');
   }
 
   if (!res.puede) notices.push('⏰ <strong>Traslado bloqueado:</strong> Estás a menos de 10 años de la edad de pensión, por lo que no puedes cambiar de régimen en este momento.');
@@ -2185,8 +2187,9 @@ function construirTextoResultados() {
 
   // ── Situación normativa ──
   L.push('SITUACIÓN NORMATIVA');
-  L.push(`  Régimen de transición (Ley 2381): ${r.transicion ? 'SÍ — protegido por reglas de la Ley 100' : 'No — sujeto a las reglas nuevas'}`);
-  L.push(`  Cotización obligatoria en Colpensiones por reforma: ${r.refOblig && !r.transicion ? 'SÍ (salario ≤ 2.3 SMMLV)' : 'No'}`);
+  L.push('  (La Reforma 2024 / Ley 2381 está suspendida por la Corte Constitucional. Hoy rige la Ley 100; lo siguiente aplicaría si la reforma entra en vigencia.)');
+  L.push(`  Régimen de transición (Ley 2381): ${r.transicion ? 'SÍ — conservaría las reglas de la Ley 100' : 'No — quedaría sujeto a las reglas nuevas'}`);
+  L.push(`  Cotización obligatoria en Colpensiones por reforma: ${r.refOblig && !r.transicion ? 'SÍ aplicaría (salario ≤ 2.3 SMMLV)' : 'No'}`);
   L.push(`  ¿Puede trasladarse de régimen?: ${r.puede ? 'Sí (más de 10 años a la pensión)' : 'No (a menos de 10 años de la pensión)'}`);
   if (r.advertenciaTraslado) L.push('  Aviso: solo puede trasladarse una vez cada 5 años — verifique la fecha de su último traslado.');
   L.push('', sub, '');
@@ -2240,8 +2243,9 @@ function construirTextoResultados() {
   L.push('AVISO IMPORTANTE: Esta herramienta es orientativa y no constituye');
   L.push('asesoría pensional profesional. Los cálculos son aproximaciones con');
   L.push('supuestos simplificados y no reemplazan la consulta oficial con');
-  L.push('Colpensiones y tu AFP. El sistema pensional colombiano está en');
-  L.push('transición bajo la Reforma 2024 y algunas reglas aún se reglamentan.');
+  L.push('Colpensiones y tu AFP. La Reforma 2024 (Ley 2381) está suspendida por');
+  L.push('la Corte Constitucional y hoy rige la Ley 100; las reglas podrían');
+  L.push('cambiar según la decisión final.');
 
   return L.join('\n');
 }
