@@ -271,6 +271,23 @@ input[type="number"]:focus { outline: none; border-color: #003893; box-shadow: 0
 .trust-flow-step .tf-label { font-size: 0.7rem; font-weight: 700; color: #374151; text-align: center; line-height: 1.25; }
 .trust-flow-arrow { font-size: 1rem; color: #6b7280; flex-shrink: 0; padding: 0 4px; }
 
+/* ── Cómo calculamos (desplegable) ── */
+.calc-details { background: white; border-radius: 16px; margin: 12px 0; box-shadow: 0 2px 12px rgba(0,0,0,0.06); overflow: hidden; }
+.calc-details > summary {
+  list-style: none; cursor: pointer; padding: 18px 22px;
+  font-size: 1rem; font-weight: 800; color: #003893;
+  display: flex; align-items: center; gap: 8px;
+}
+.calc-details > summary::-webkit-details-marker { display: none; }
+.calc-details > summary::after { content: '▾'; margin-left: auto; transition: transform 0.2s; color: #6b7280; }
+.calc-details[open] > summary::after { transform: rotate(180deg); }
+.calc-body { padding: 0 22px 20px; font-size: 0.85rem; line-height: 1.6; color: #333; }
+.calc-body h5 { font-size: 0.85rem; font-weight: 800; color: #1a1a2e; margin: 16px 0 4px; }
+.calc-body p { margin: 0 0 6px; }
+.calc-body .law { font-size: 0.78rem; color: #5c6470; }
+.calc-body ul { padding-left: 18px; margin: 4px 0; }
+.calc-body li { margin: 2px 0; }
+
 /* ── Guardar resultados ── */
 .save-card { background: #f4f7ff; border: 2px solid #dce6ff; border-radius: 14px; padding: 16px; margin: 12px 0; }
 .save-card h4 { font-weight: 800; color: #003893; font-size: 0.95rem; margin-bottom: 12px; }
@@ -730,6 +747,41 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
         <li>Considera consultar con un <strong>abogado o asesor pensional certificado</strong> para casos complejos.</li>
       </ul>
     </div>
+
+    <details class="calc-details">
+      <summary>🔍 Cómo calculamos esto</summary>
+      <div class="calc-body">
+        <p>Todo es una estimación con supuestos simplificados. Aquí está cada cuenta en palabras simples y la norma en que se basa.</p>
+
+        <h5>📅 Semanas proyectadas</h5>
+        <p>Sumamos tus semanas de hoy más las que acumularías cotizando los años que indicaste (cada año ≈ 52 semanas), ajustado por qué tan seguido cotizas.</p>
+
+        <h5>🏛️ Colpensiones (RPM)</h5>
+        <p>La mesada es un porcentaje de tu salario (la <em>tasa de reemplazo</em>). Empieza en <strong>65.5% − 0.5 × (tu salario en SMMLV)</strong> —queda entre 55% y 65%— y sube <strong>1.5% por cada 50 semanas</strong> sobre las 1.300, hasta un máximo de <strong>80%</strong>. Por eso quien gana más recibe un porcentaje menor.</p>
+        <p class="law">Base legal: Ley 100 de 1993, art. 34 (modificado por Ley 797 de 2003). El IBL real es el promedio de los 10 años antes de pensionarte; aquí usamos tu salario actual, asumiendo que se mantiene estable en términos reales.</p>
+
+        <h5>📈 Fondo privado (AFP / RAIS)</h5>
+        <p>Proyectamos tu ahorro: tu saldo de hoy más tus aportes futuros (11.5% del salario), creciendo a un <strong>rendimiento real del 3% anual</strong> (mostramos un rango de 1.5% a 4.5% por la incertidumbre del mercado). Ese capital se reparte entre los años de vida esperada para estimar la mesada mensual.</p>
+        <p class="law">Es rendimiento <em>real</em> (sobre la inflación), porque medimos todo en pesos de hoy / SMMLV. La pensión anticipada se basa en el Art. 64 de la Ley 100.</p>
+
+        <h5>🎂 Edad y semanas mínimas</h5>
+        <p>Te pensionas a los <strong>62 años (hombres)</strong> o <strong>57 (mujeres)</strong> con mínimo <strong>1.300 semanas</strong>. Si tienes las semanas pero aún no la edad, esperas a cumplirla. Si llegas a la edad sin las semanas, recibes una indemnización sustitutiva (un solo pago).</p>
+        <p class="law">Base legal: Ley 100 de 1993, arts. 33 y 37. Reducción de semanas para mujeres con 3+ hijos.</p>
+
+        <h5>⚖️ Reforma 2024</h5>
+        <p>Si ganas <strong>≤ 2.3 SMMLV</strong>, la ley te obliga a cotizar en Colpensiones, salvo que estés en régimen de transición (protegido por las reglas anteriores).</p>
+        <p class="law">Base legal: Ley 2381 de 2024 (Reforma Pensional) y su régimen de transición.</p>
+
+        <h5>📌 Supuestos clave</h5>
+        <ul>
+          <li>SMMLV 2026 = <strong>$1.750.905</strong> (Decreto 1469 de 2025).</li>
+          <li>Rendimiento real de la AFP: <strong>3%</strong> (rango 1.5% – 4.5%).</li>
+          <li>Esperanza de vida: <strong>80 años</strong> (hombres) / <strong>85</strong> (mujeres).</li>
+          <li>Todas las cifras están en <strong>pesos de hoy</strong> (poder de compra actual).</li>
+        </ul>
+        <p class="law">Son supuestos gruesos; tu resultado real puede variar. Esto no reemplaza la consulta oficial con Colpensiones y tu AFP.</p>
+      </div>
+    </details>
 
     <div class="disclaimer">
       ⚠️ <strong>Aviso importante:</strong> Esta herramienta es orientativa y no constituye asesoría pensional profesional. Los cálculos son aproximaciones con supuestos simplificados y <em>no reemplazan</em> la consulta oficial con Colpensiones y tu AFP. El sistema pensional colombiano está en transición bajo la Reforma 2024 y algunas reglas aún se están reglamentando. Consulta siempre un asesor certificado antes de tomar decisiones definitivas.
