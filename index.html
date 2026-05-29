@@ -1316,6 +1316,9 @@ function evalColp(data) {
     } else {
       nota = `Si paras a los ${Math.round(stopAge)}: las semanas ya cotizadas se conservan y la pensión empieza igual a los ${pensionAge}. Seguir aportando sube la mesada, no adelanta la fecha.`;
     }
+  } else if (pensionAge > ret + 2) {
+    // User reaches 1300 weeks after legal retirement age — note the assumption
+    nota = `Con tu trayectoria declarada completas las semanas mínimas a los ${pensionAge} años, asumiendo que sigues cotizando hasta entonces. A los ${ret} años, si aún no completaste 1300 semanas, podrías optar por indemnización sustitutiva en lugar de seguir cotizando.`;
   }
 
   return {
@@ -1360,15 +1363,18 @@ function evalAFP(data) {
   const balance = data.saldo_afp > 0 ? data.saldo_afp : estBalance;
   const bono = data.especiales.includes('bono_pensional') ? Math.min(sem * 0.04, 60) : 0;
 
-  // Compound projection — use full declared working years (can work past ret age)
+  // Compound projection — cap contributions at legal retirement age.
+  // AFP pension starts at ret regardless of how long the user plans to work.
+  // Working past ret is common but the pension can still start at 62/57.
   // Independientes tienden a declarar IBC menor al ingreso real → factor 0.85 sobre la tasa
   const afpRate = data.especiales.includes('independiente_actual') ? AFP_RATE * 0.85 : AFP_RATE;
   const mc = efSal * afpRate * df;
 
-  const stopAge = data.edad + alab;
-  const retireAge = Math.max(ret, stopAge);
-  const months = alab * 12;
-  const gapMonths = Math.max(0, Math.round((retireAge - stopAge) * 12));
+  const stopAge = data.edad + alab;          // age when user plans to stop cotizing
+  const retireAge = ret;                     // AFP pension always starts at legal age
+  const contribYrs = Math.min(alab, ytr);   // contribution years capped at years-to-retirement
+  const months = contribYrs * 12;
+  const gapMonths = Math.max(0, Math.round((ytr - contribYrs) * 12)); // gap if stopped early
 
   // Proyecta el capital (en SMMLV) para una tasa REAL anual dada.
   const proyectar = (annualReal) => {
