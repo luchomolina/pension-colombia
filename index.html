@@ -316,6 +316,14 @@ input[type="number"]:focus { outline: none; border-color: #003893; box-shadow: 0
   padding: 14px 16px; margin: 12px 0; font-size: 0.8rem; color: #6d4c00; line-height: 1.5;
 }
 
+.ccc-notice {
+  background: #fff3e0; border-left: 4px solid #e65100; border-radius: 9px;
+  padding: 13px 16px; margin-bottom: 14px;
+  font-size: 0.82rem; color: #4e2500; line-height: 1.55;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.ccc-notice-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+
 .reform-impact {
   background: #fff3cd; border: 1.5px solid #ffc107; border-radius: 9px;
   padding: 10px 14px; margin-top: 12px; font-size: 0.81rem; color: #856404; line-height: 1.4; display: none;
@@ -456,6 +464,16 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
     <h1>Calcula tu pensión<br>en Colombia</h1>
     <p class="subtitle">Colpensiones vs. AFP · Orientación gratuita · Colombia</p>
     <div class="flag"></div>
+  </div>
+
+  <!-- CCC — aviso previo al formulario -->
+  <div class="ccc-notice">
+    <span class="ccc-notice-icon">⚖️</span>
+    <div>
+      <strong>Esta herramienta no es asesoría pensional</strong> ni criterio formal de decisión.
+      Úsala para orientarte, con reservas. Antes de trasladarte o afiliarte,
+      tienes derecho a una <strong>asesoría gratuita</strong> con Colpensiones y con tu AFP.
+    </div>
   </div>
 
   <!-- Trust Intro -->
