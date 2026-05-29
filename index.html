@@ -186,14 +186,18 @@ input.field-error {
 .verdict-name { font-size: 1.55rem; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.3px; }
 .verdict-action { font-size: 0.95rem; font-weight: 600; margin-bottom: 8px; background: rgba(255,255,255,0.18); border-radius: 9px; padding: 7px 12px; display: inline-block; }
 .verdict-sub { font-size: 0.9rem; color: rgba(255,255,255,0.92); }
-.conf-badge {
-  display: inline-block; padding: 5px 14px; border-radius: 20px;
-  font-size: 0.78rem; font-weight: 700; margin-top: 12px;
-}
 /* Solid dark backgrounds + white text — contraste WCAG AA garantizado sobre el gradient oscuro */
-.conf-alta  { background: rgba(27,94,32,0.80);  color: #fff; }
-.conf-media { background: rgba(120,53,15,0.85); color: #fff; }
-.conf-baja  { background: rgba(127,29,29,0.85); color: #fff; }
+.conf-alta  { background: rgba(27,94,32,0.85);  color: #fff; }
+.conf-media { background: rgba(120,53,15,0.90); color: #fff; }
+.conf-baja  { background: rgba(127,29,29,0.90); color: #fff; }
+/* Escala de certeza — tres pills, solo la activa tiene color completo */
+.conf-scale { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+.conf-scale-item {
+  font-size: 0.72rem; font-weight: 600; padding: 4px 12px; border-radius: 20px;
+  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.38);
+  border: 1px solid rgba(255,255,255,0.14);
+}
+.conf-scale-item.active { font-weight: 800; border-color: transparent; color: #fff; }
 
 .scenarios-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
 .sc-card {
@@ -2083,6 +2087,17 @@ function renderResults(res) {
   // Verdict
   const cmap = { alta:'conf-alta', media:'conf-media', baja:'conf-baja' };
   const ctxt = { alta:'Alta certeza', media:'Con matices', baja:'Consulta un experto' };
+  const confLevels = [
+    { key: 'baja',  label: 'Consulta un experto' },
+    { key: 'media', label: 'Con matices' },
+    { key: 'alta',  label: 'Alta certeza' },
+  ];
+  const confScaleHtml = `<div class="conf-scale">${
+    confLevels.map(l => {
+      const act = l.key === res.confianza;
+      return `<span class="conf-scale-item${act ? ' active ' + cmap[l.key] : ''}">${l.label}</span>`;
+    }).join('')
+  }</div>`;
 
   // Acción según el fondo actual (permanecer / trasladarse / afiliarse)
   const _enColp = S.fondo_actual === 'Colpensiones';
@@ -2117,7 +2132,7 @@ function renderResults(res) {
       <div class="verdict-name">${res.mejor.regimen}</div>
       <div class="verdict-action">${accionUI}</div>
       <div class="verdict-sub">${verdictSub}</div>
-      <span class="conf-badge ${cmap[res.confianza]}">${ctxt[res.confianza]}</span>
+      ${confScaleHtml}
     </div>`;
 
   // Shared weeks row (same value for both scenarios)
