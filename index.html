@@ -139,6 +139,26 @@ input[type="number"]:focus { outline: none; border-color: #003893; box-shadow: 0
 .error-msg { color: #c62828; font-size: 0.8rem; margin-top: 8px; display: none; font-weight: 600; }
 .error-msg.show { display: block; }
 
+/* ── Field error affordance ── */
+@keyframes field-shake {
+  0%,100% { transform: translateX(0); }
+  20%,60% { transform: translateX(-4px); }
+  40%,80% { transform: translateX(4px); }
+}
+input.field-error {
+  border-color: #dc2626 !important;
+  background: #fff5f5;
+  box-shadow: 0 0 0 3px rgba(220,38,38,0.15);
+  animation: field-shake 0.3s ease;
+}
+.group-error {
+  outline: 2px solid #ef4444;
+  border-radius: 10px;
+  padding: 6px;
+  background: rgba(220,38,38,0.03);
+  animation: field-shake 0.3s ease;
+}
+
 /* ── Loading ── */
 .loading-card { text-align: center; padding: 44px 20px; }
 .spinner {
@@ -596,7 +616,7 @@ body.has-ejemplo-banner { padding-top: 46px; }
     <div class="field">
       <label>Sexo biológico</label>
       <p class="hint">Determina la edad de pensión: hombres 62 años, mujeres 57 años</p>
-      <div class="radio-grid" style="margin-top:8px;">
+      <div id="sexo-group" class="radio-grid" style="margin-top:8px;">
         <div class="radio-item" onclick="pick('sexo','M',this)">
           <input type="radio" name="sexo" value="M"> 👨 Hombre
         </div>
@@ -608,7 +628,7 @@ body.has-ejemplo-banner { padding-top: 46px; }
 
     <div class="field">
       <label>¿En qué fondo cotizas actualmente?</label>
-      <div class="radio-group">
+      <div id="fondo-group" class="radio-group">
         <div class="radio-item" onclick="pick('fondo_actual','Colpensiones',this)">
           <input type="radio" name="fondo" value="Colpensiones"> 🏛️ Colpensiones (RPM)
         </div>
@@ -675,7 +695,7 @@ body.has-ejemplo-banner { padding-top: 46px; }
 
     <div class="field">
       <label>¿Has trasladado de fondo alguna vez?</label>
-      <div class="radio-grid" style="margin-top:8px;">
+      <div id="traslado-group" class="radio-grid" style="margin-top:8px;">
         <div class="radio-item" onclick="pick('ha_trasladado','si',this)">
           <input type="radio" name="traslado" value="si"> ✅ Sí
         </div>
@@ -718,7 +738,7 @@ body.has-ejemplo-banner { padding-top: 46px; }
     <div class="field">
       <label>¿Cuánto ganas aproximadamente? (en salarios mínimos)</label>
       <p class="hint"><strong>SMMLV</strong> = un salario mínimo ($1.750.905 en 2026). Así que "2–3 SMMLV" es ganar entre 2 y 3 salarios mínimos. La Reforma 2024 (hoy suspendida) obligaría a cotizar en Colpensiones si ganas ≤ 2.3 SMMLV.</p>
-      <div class="radio-group" style="margin-top:8px;">
+      <div id="salario-group" class="radio-group" style="margin-top:8px;">
         <div class="radio-item" onclick="pick('salario','lt1',this)">
           <input type="radio" name="salario" value="lt1"> Menos de 1 SMMLV (menos de $1,75M)
         </div>
@@ -747,7 +767,7 @@ body.has-ejemplo-banner { padding-top: 46px; }
     <div class="field">
       <label>¿Cuántos años más planeas cotizar activamente?</label>
       <p class="hint">Piensa en cuánto tiempo más estarás activo/a en el sistema pensional — ya sea como empleado o independiente. </p>
-      <div class="radio-grid" style="margin-top:8px;">
+      <div id="anos-group" class="radio-grid" style="margin-top:8px;">
         <div class="radio-item" onclick="pick('anos_lab','<5',this)">
           <input type="radio" name="alab" value="<5"> Menos de 5 años
         </div>
@@ -771,7 +791,7 @@ body.has-ejemplo-banner { padding-top: 46px; }
       <div id="hint-independiente" style="display:none;margin-bottom:8px;padding:8px 12px;background:#fff3e0;border-left:3px solid #fb8c00;border-radius:0 6px 6px 0;font-size:0.82rem;color:#e65100;">
         💼 Como independiente, considera que los períodos sin contrato y las cotizaciones sobre IBC reducido son la norma — elige <strong>Moderando</strong> o <strong>Bajando</strong> según tu situación real.
       </div>
-      <div class="radio-group" style="margin-top:8px;">
+      <div id="tray-group" class="radio-group" style="margin-top:8px;">
         <div class="radio-item" onclick="pick('trayectoria','pleno',this)">
           <input type="radio" name="tray" value="pleno"> <strong>A pleno</strong> — cotizaré igual o más que ahora
         </div>
@@ -799,7 +819,7 @@ body.has-ejemplo-banner { padding-top: 46px; }
     <div class="field">
       <label>¿Cuántos hijos tienes?</label>
       <p class="hint">Las mujeres con 3+ hijos necesitan menos semanas para pensionarse.</p>
-      <div class="radio-grid" style="margin-top:8px;">
+      <div id="hijos-group" class="radio-grid" style="margin-top:8px;">
         <div class="radio-item" onclick="pick('hijos','0',this)">
           <input type="radio" name="hijos" value="0"> 0 hijos
         </div>
@@ -817,7 +837,7 @@ body.has-ejemplo-banner { padding-top: 46px; }
 
     <div class="field">
       <label>¿Qué es lo más importante para ti? (puedes seleccionar varias)</label>
-      <div class="check-group" style="margin-top:8px;">
+      <div id="pref-group" class="check-group" style="margin-top:8px;">
         <div class="check-item" onclick="prefToggle('maximizar_mesada',this)">
           <input type="checkbox" value="maximizar_mesada">
           💰 Maximizar la mesada mensual que voy a recibir
@@ -1036,6 +1056,7 @@ function pick(field, val, el) {
   S[field] = val;
   el.parentElement.querySelectorAll('.radio-item').forEach(x => x.classList.remove('selected'));
   el.classList.add('selected');
+  el.parentElement.classList.remove('group-error');
 
   // Show AFP balance field
   if (field === 'fondo_actual') {
@@ -1104,6 +1125,7 @@ function prefToggle(val, el) {
   el.classList.toggle('selected');
   const i = S.preferencias.indexOf(val);
   if (i > -1) S.preferencias.splice(i, 1); else S.preferencias.push(val);
+  el.closest('.check-group')?.classList.remove('group-error');
 
   // Detect contradictory combinations and show a soft hint
   const p = S.preferencias;
@@ -1187,7 +1209,22 @@ function prev(cur) {
 // ════════════════════════════════════════════════
 //  VALIDATION
 // ════════════════════════════════════════════════
+function clearFieldErrors(step) {
+  const card = document.getElementById('step-' + step);
+  if (!card) return;
+  card.querySelectorAll('.field-error').forEach(el => el.classList.remove('field-error'));
+  card.querySelectorAll('.group-error').forEach(el => el.classList.remove('group-error'));
+}
+
+function markError(idOrEl, isGroup) {
+  const el = typeof idOrEl === 'string' ? document.getElementById(idOrEl) : idOrEl;
+  if (!el) return;
+  el.classList.add(isGroup ? 'group-error' : 'field-error');
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 function validate(step) {
+  clearFieldErrors(step);
   const err = document.getElementById('err'+step);
   err.classList.remove('show');
   let ok = true;
@@ -1195,10 +1232,10 @@ function validate(step) {
 
   if (step === 1) {
     S.edad = parseInt(document.getElementById('edad').value);
-    if (isNaN(S.edad)) { ok = false; msg = 'Ingresa tu edad.'; }
-    else if (S.edad < 18 || S.edad > 75) { ok = false; msg = 'La edad debe estar entre 18 y 75 años.'; }
-    else if (!S.sexo) { ok = false; msg = 'Selecciona tu sexo biológico.'; }
-    else if (!S.fondo_actual) { ok = false; msg = 'Selecciona en qué fondo cotizas actualmente.'; }
+    if (isNaN(S.edad)) { ok = false; msg = 'Ingresa tu edad.'; markError('edad'); }
+    else if (S.edad < 18 || S.edad > 75) { ok = false; msg = 'La edad debe estar entre 18 y 75 años.'; markError('edad'); }
+    else if (!S.sexo) { ok = false; msg = 'Selecciona tu sexo biológico.'; markError('sexo-group', true); }
+    else if (!S.fondo_actual) { ok = false; msg = 'Selecciona en qué fondo cotizas actualmente.'; markError('fondo-group', true); }
   }
 
   if (step === 2) {
@@ -1208,19 +1245,19 @@ function validate(step) {
     const maxPlausible = S.edad ? Math.max(0, S.edad - 15) * 52 : 3500;
 
     if (isNaN(sa) || sa < 0) {
-      ok = false; msg = 'Ingresa el total de semanas cotizadas (0 o más).';
+      ok = false; msg = 'Ingresa el total de semanas cotizadas (0 o más).'; markError('semanas_actuales');
     } else if (sa > 3500) {
-      ok = false; msg = 'El total de semanas no parece válido (máximo 3.500).';
+      ok = false; msg = 'El total de semanas no parece válido (máximo 3.500).'; markError('semanas_actuales');
     } else if (S.edad && sa > maxPlausible) {
-      ok = false; msg = `Con ${S.edad} años no es posible tener ${sa} semanas (máximo ~${maxPlausible}). Revisa el dato.`;
+      ok = false; msg = `Con ${S.edad} años no es posible tener ${sa} semanas (máximo ~${maxPlausible}). Revisa el dato.`; markError('semanas_actuales');
     } else if (!isNaN(sj) && sj < 0) {
-      ok = false; msg = 'Las semanas al 1-jul-2025 no pueden ser negativas.';
+      ok = false; msg = 'Las semanas al 1-jul-2025 no pueden ser negativas.'; markError('semanas_julio25');
     } else if (!isNaN(sj) && sj > sa) {
-      ok = false; msg = 'Las semanas al 1-jul-2025 no pueden ser más que tu total actual — solo acumulas semanas con el tiempo.';
+      ok = false; msg = 'Las semanas al 1-jul-2025 no pueden ser más que tu total actual — solo acumulas semanas con el tiempo.'; markError('semanas_julio25');
     } else if (!isNaN(sj) && (sa - sj) > 52) {
-      ok = false; msg = 'Entre jul-2025 y hoy ha pasado menos de un año: la diferencia no puede superar ~52 semanas.';
+      ok = false; msg = 'Entre jul-2025 y hoy ha pasado menos de un año: la diferencia no puede superar ~52 semanas.'; markError('semanas_julio25');
     } else if (!S.ha_trasladado) {
-      ok = false; msg = 'Indica si te has trasladado de fondo alguna vez.';
+      ok = false; msg = 'Indica si te has trasladado de fondo alguna vez.'; markError('traslado-group', true);
     } else {
       S.semanas_actuales = sa;
       S.semanas_julio25 = isNaN(sj) ? sa : sj;
@@ -1230,14 +1267,14 @@ function validate(step) {
   }
 
   if (step === 3) {
-    if (!S.salario) { ok = false; msg = 'Selecciona tu rango salarial.'; }
-    else if (!S.anos_lab) { ok = false; msg = 'Indica cuántos años más planeas cotizar.'; }
-    else if (!S.trayectoria) { ok = false; msg = 'Indica tu trayectoria laboral futura.'; }
+    if (!S.salario) { ok = false; msg = 'Selecciona tu rango salarial.'; markError('salario-group', true); }
+    else if (!S.anos_lab) { ok = false; msg = 'Indica cuántos años más planeas cotizar.'; markError('anos-group', true); }
+    else if (!S.trayectoria) { ok = false; msg = 'Indica tu trayectoria laboral futura.'; markError('tray-group', true); }
   }
 
   if (step === 4) {
-    if (S.hijos === null) { ok = false; msg = 'Indica cuántos hijos tienes.'; }
-    else if (S.preferencias.length === 0) { ok = false; msg = 'Selecciona al menos una prioridad.'; }
+    if (S.hijos === null) { ok = false; msg = 'Indica cuántos hijos tienes.'; markError('hijos-group', true); }
+    else if (S.preferencias.length === 0) { ok = false; msg = 'Selecciona al menos una prioridad.'; markError('pref-group', true); }
   }
 
   if (!ok) {
@@ -2669,7 +2706,15 @@ document.addEventListener('keydown', e => {
   }
 });
 
-document.addEventListener('DOMContentLoaded', () => { initA11y(); if (!leerHash()) restoreState(); });
+document.addEventListener('DOMContentLoaded', () => {
+  initA11y();
+  if (!leerHash()) restoreState();
+  // Clear field-error on text inputs as soon as the user types
+  ['edad', 'semanas_actuales', 'semanas_julio25'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => el.classList.remove('field-error'));
+  });
+});
 </script>
 </body>
 </html>
