@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>¿Colpensiones o AFP? · Herramienta de orientación pensional</title>
+<title>Calcula tu pensión en Colombia · Colpensiones o AFP</title>
 <meta name="description" content="Compara en segundos si te conviene Colpensiones o un fondo privado (AFP) para tu pensión. Gratis, sin registro y 100% en tu navegador.">
 
 <!-- Vista previa al compartir (Open Graph / Twitter) -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="¿Colpensiones o AFP? · Orientación pensional">
+<meta property="og:title" content="Calcula tu pensión en Colombia · Colpensiones o AFP">
 <meta property="og:description" content="Compara en segundos qué régimen te conviene para tu pensión. Gratis, sin registro y 100% en tu navegador.">
 <meta property="og:locale" content="es_CO">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="¿Colpensiones o AFP? · Orientación pensional">
+<meta name="twitter:title" content="Calcula tu pensión en Colombia · Colpensiones o AFP">
 <meta name="twitter:description" content="Compara en segundos qué régimen te conviene para tu pensión. Gratis y sin registro.">
 <!-- TODO: para una preview con imagen, hospedar un PNG 1200×630 y añadir <meta property="og:image"> -->
 
@@ -38,8 +38,8 @@ body {
 
 /* ── Header ── */
 .header { text-align: center; padding: 24px 16px 8px; }
-.header h1 { font-size: 1.65rem; font-weight: 800; color: #003893; letter-spacing: -0.5px; }
-.header .subtitle { color: #666; font-size: 0.88rem; margin-top: 4px; }
+.header h1 { font-size: 2.1rem; font-weight: 900; color: #003893; letter-spacing: -1px; line-height: 1.15; }
+.header .subtitle { color: #666; font-size: 0.88rem; margin-top: 6px; }
 .flag { height: 5px; border-radius: 3px; margin: 14px auto 4px; max-width: 200px;
   background: linear-gradient(to right, #FCD116 33.33%, #003893 33.33% 66.66%, #CE1126 66.66%); }
 
@@ -177,18 +177,60 @@ input[type="number"]:focus { outline: none; border-color: #003893; box-shadow: 0
 
 .scenarios-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
 .sc-card {
-  border-radius: 13px; padding: 16px; border: 2px solid #e0e4ed; background: white;
+  border-radius: 14px; padding: 18px 16px; border: 2px solid #e0e4ed; background: white;
 }
 .sc-card.winner { border-color: #003893; background: #f7f9ff; }
-.sc-best-tag { font-size: 0.7rem; font-weight: 800; color: #003893; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-.sc-regime { font-size: 0.78rem; font-weight: 700; color: #555; margin-bottom: 8px; }
-.sc-pension { font-size: 1.4rem; font-weight: 900; color: #1a1a2e; }
-.sc-pension-label { font-size: 0.72rem; color: #5c6470; margin-bottom: 10px; }
-.sc-rows { border-top: 1px solid #f0f0f0; padding-top: 8px; }
+
+/* Pill "Recomendada" — componente reutilizable */
+.sc-best-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #16a34a; color: white;
+  font-size: 0.67rem; font-weight: 800;
+  padding: 4px 12px; border-radius: 20px; margin-bottom: 10px;
+  text-transform: uppercase; letter-spacing: 0.6px;
+}
+
+.sc-regime { font-size: 1rem; font-weight: 800; color: #003893; margin-bottom: 2px; }
+.sc-mesada-label { font-size: 0.72rem; color: #6b7280; margin-bottom: 5px; font-weight: 500; }
+.sc-pension { font-size: 1.45rem; font-weight: 900; color: #1a1a2e; line-height: 1.1; }
+.sc-pension-label { font-size: 0.72rem; color: #6b7280; margin-bottom: 10px; }
+.sc-pesos { font-size: 0.86rem; font-weight: 700; color: #1a1a2e; margin: 3px 0 4px; }
+.sc-rango { font-size: 0.72rem; color: #4b5563; margin-bottom: 8px; line-height: 1.35; }
+
+/* Pros y contras semánticos */
+.sc-pro-con { display: flex; flex-direction: column; gap: 6px; margin: 10px 0 2px; }
+.sc-pro-item  { display: flex; gap: 7px; font-size: 0.76rem; color: #15803d; line-height: 1.45; font-weight: 500; }
+.sc-con-item  { display: flex; gap: 7px; font-size: 0.76rem; color: #dc2626; line-height: 1.45; font-weight: 500; }
+.sc-neu-item  { display: flex; gap: 7px; font-size: 0.76rem; color: #6b7280; line-height: 1.45; }
+.sc-pc-ico    { flex-shrink: 0; margin-top: 0.05em; }
+
+.sc-rows { border-top: 1px solid #eef0f6; padding-top: 8px; margin-top: 10px; }
 .sc-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; font-size: 0.78rem; }
 .sc-row .sc-k { color: #5c6470; }
 .sc-row .sc-v { font-weight: 600; color: #333; }
 .sc-nopension { font-size: 0.8rem; color: #c62828; font-weight: 700; margin-top: 8px; }
+
+/* Query data card — componente reutilizable */
+.query-card {
+  background: white; border-radius: 14px; padding: 14px 18px;
+  margin: 10px 0; border: 1px solid #e8eeff;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+}
+.query-card-title {
+  font-size: 0.7rem; font-weight: 800; color: #003893;
+  text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 9px;
+}
+.query-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.query-chip {
+  background: #f0f4ff; color: #1a1a2e; border: 1px solid #d0d8f0;
+  font-size: 0.74rem; font-weight: 600; padding: 4px 10px; border-radius: 20px;
+  white-space: nowrap;
+}
+.ejemplo-badge {
+  display: flex; align-items: flex-start; gap: 7px; padding: 8px 12px;
+  background: #fffbeb; border: 1px solid #fbbf24; border-radius: 8px;
+  font-size: 0.78rem; color: #92400e; margin-bottom: 10px; font-weight: 500; line-height: 1.4;
+}
 /* Notas al pie de tarjetas de escenario */
 .sc-nota-block {
   border-top: 1px solid #e8ecf0; margin-top: 10px; padding-top: 8px;
@@ -411,8 +453,8 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
 
   <!-- Header -->
   <div class="header">
-    <h1>¿Colpensiones o AFP?</h1>
-    <p class="subtitle">Herramienta de orientación pensional · Colombia</p>
+    <h1>Calcula tu pensión<br>en Colombia</h1>
+    <p class="subtitle">Colpensiones vs. AFP · Orientación gratuita · Colombia</p>
     <div class="flag"></div>
   </div>
 
@@ -765,6 +807,7 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
 
   <!-- ─────────────────── RESULTS ─────────────────── -->
   <div id="results" style="display:none">
+    <div id="query-data-card"></div>
     <div id="verdict-area"></div>
 
     <div class="section-card">
@@ -1594,6 +1637,7 @@ function analizar() {
   document.getElementById('progress').style.display = 'none';
   window.scrollTo(0,0);
 
+  S._isEjemplo = false;
   const result = decidir(S);
   renderResults(result);
 }
@@ -1856,11 +1900,90 @@ function bar(v, inv) {
 }
 
 // ════════════════════════════════════════════════
+//  PROS / CONTRAS — lógica por escenario
+// ════════════════════════════════════════════════
+function prosCons(sc) {
+  const isColp = sc.regimen.includes('Colpensiones');
+  const items = [];
+
+  if (isColp) {
+    if (sc.logra_pension) {
+      items.push({ type: 'pro', text: 'El Estado garantiza tu mesada — independientemente de los mercados' });
+      items.push({ type: 'pro', text: 'Mesada fija: no sube ni baja con los rendimientos financieros' });
+      if (sc.tasa >= 70) items.push({ type: 'pro', text: `Tasa de reemplazo alta: recibirías el ${sc.tasa}% de tu salario` });
+    } else {
+      items.push({ type: 'con', text: 'No alcanzas las semanas mínimas — sin pensión completa al retiro' });
+      items.push({ type: 'neu', text: 'Recibirías una indemnización sustitutiva con los aportes realizados' });
+    }
+    items.push({ type: 'con', text: 'Si falleces antes de pensionarte, tus aportes no pasan a tus herederos' });
+  } else {
+    // AFP
+    if (sc.logra_pension) {
+      items.push({ type: 'pro', text: 'Tu capital es tuyo — si falleces, tus beneficiarios lo heredan' });
+      if (sc.edad_anticipada != null) {
+        items.push({ type: 'pro', text: `Podrías pensionarte a los ${sc.edad_anticipada} años si el capital lo permite` });
+      }
+      if (sc.garantia_min) {
+        items.push({ type: 'pro', text: 'Aplica garantía de pensión mínima del Estado (tienes ≥ 1.150 semanas)' });
+      }
+      items.push({ type: 'neu', text: 'La mesada depende del rendimiento del mercado — puede ser mayor o menor' });
+    } else {
+      items.push({ type: 'pro', text: 'El saldo acumulado te pertenece y se devuelve si no hay pensión' });
+      items.push({ type: 'con', text: 'El capital proyectado no financia una pensión vitalicia completa' });
+    }
+  }
+
+  return items;
+}
+
+// ════════════════════════════════════════════════
+//  QUERY DATA CARD — muestra el perfil analizado
+// ════════════════════════════════════════════════
+function renderQueryCard() {
+  const TRAY_SHORT = { pleno: 'Cotización plena', moderando: 'Moderando actividad', reduciendo: 'Semi-retiro' };
+  const PREF_SHORT = {
+    maximizar_mesada: 'Maximizar mesada',
+    retirar_pronto:   'Retirarme pronto',
+    heredar:          'Dejar herencia',
+    menor_riesgo:     'Menor riesgo',
+    garantia_estado:  'Garantía del Estado'
+  };
+
+  const chips = [
+    `${S.edad} años`,
+    S.sexo === 'M' ? 'Hombre' : 'Mujer',
+    S.fondo_actual === 'ninguno' ? 'Sin fondo' : S.fondo_actual,
+    `${S.semanas_actuales} semanas`,
+    SAL_LBL[S.salario] || S.salario,
+    (ANOS_RANGE[S.anos_lab] ? ANOS_RANGE[S.anos_lab].label : S.anos_lab) + ' cotizando',
+    TRAY_SHORT[S.trayectoria] || S.trayectoria,
+    parseInt(S.hijos) > 0 ? `${S.hijos} hijo${parseInt(S.hijos) > 1 ? 's' : ''}` : 'Sin hijos',
+    ...(S.preferencias || []).map(p => PREF_SHORT[p] || p)
+  ].filter(Boolean);
+
+  const ejemploBadge = S._isEjemplo ? `
+    <div class="ejemplo-badge">
+      <span>📌</span>
+      <span>Esto es un <strong>caso simulado de ejemplo</strong> — no refleja una situación real. Responde las preguntas para analizar tu propio perfil.</span>
+    </div>` : '';
+
+  document.getElementById('query-data-card').innerHTML = `
+    <div class="query-card">
+      ${ejemploBadge}
+      <div class="query-card-title">📋 Perfil analizado</div>
+      <div class="query-chips">
+        ${chips.map(c => `<span class="query-chip">${c}</span>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════
 //  RENDER RESULTS
 // ════════════════════════════════════════════════
 function renderResults(res) {
   LAST = res;
   document.getElementById('results').style.display = 'block';
+  renderQueryCard();
 
   // Verdict
   const cmap = { alta:'conf-alta', media:'conf-media', baja:'conf-baja' };
@@ -1921,37 +2044,56 @@ function renderResults(res) {
   let html = '';
   both.forEach(sc => {
     const win = sc.regimen === res.mejor.regimen;
+    const pcItems = prosCons(sc);
+
+    // Pension amount block
+    const pensionBlock = sc.logra_pension
+      ? `<div class="sc-mesada-label">Al jubilarte recibirías</div>
+         <div class="sc-pension">${sc.mesada} <span style="font-size:0.65em;font-weight:700;">SMMLV/mes</span></div>
+         <div class="sc-pesos">≈ ${fmtPesos(sc.mesada)}/mes <span style="color:#4b5563;font-size:0.82em;font-weight:400;">en pesos de hoy</span></div>
+         ${sc.mesada_lo != null ? `<div class="sc-rango">Rango: <strong>${sc.mesada_lo}–${sc.mesada_hi}</strong> SMMLV · ${fmtPesos(sc.mesada_lo)}–${fmtPesos(sc.mesada_hi)}</div>` : ''}`
+      : `<div class="sc-mesada-label">Tu beneficio estimado</div>
+         <div class="sc-pension" style="color:#dc2626;">Sin pensión</div>
+         ${sc.beneficio ? `<div class="sc-pesos" style="color:#6b7280;">${sc.beneficio}</div>` : ''}`;
+
+    // Pros / contras
+    const pcHtml = pcItems.map(item => {
+      const cls = item.type === 'pro' ? 'sc-pro-item' : item.type === 'con' ? 'sc-con-item' : 'sc-neu-item';
+      const ico = item.type === 'pro' ? '✅' : item.type === 'con' ? '❌' : 'ℹ️';
+      return `<div class="${cls}"><span class="sc-pc-ico">${ico}</span><span>${item.text}</span></div>`;
+    }).join('');
+
+    // Technical detail rows (compactos, al pie)
+    const detailRows = `
+      <div class="sc-row" style="border-bottom:1px solid #eef0f6;padding-bottom:6px;margin-bottom:2px;">
+        <span class="sc-k" style="font-weight:600;color:#374151;">Te pensionas a los</span>
+        <span class="sc-v" style="color:${sc.edad_pension != null ? '#003893' : '#c62828'};">
+          ${sc.edad_pension != null ? '<strong>' + sc.edad_pension + ' años</strong>' : '—'}
+        </span>
+      </div>
+      ${sc.capital_pesos_m !== undefined ? `
+        <div class="sc-row">
+          <span class="sc-k">Capital proyectado</span>
+          <span class="sc-v" style="display:flex;align-items:center;gap:4px;">
+            ${fmtPesos(sc.capital)}
+            <span style="color:#6b7280;font-size:0.8em;">(${sc.capital} SMMLV)</span>
+            <i class="info-icon" onclick="this.classList.toggle('open')">i<span class="tooltip">saldo actual + aportes futuros + rendimiento real 3%/año (rango 1.5–4.5%)</span></i>
+          </span>
+        </div>` : ''}
+      ${sc.tasa !== undefined ? `
+        <div class="sc-row">
+          <span class="sc-k">Tasa de reemplazo <i class="info-icon" onclick="this.classList.toggle('open')">i<span class="tooltip" style="white-space:normal;width:220px;">Ley 100 art. 34: 65.5 − 0.5×(IBL en SMMLV), +1.5% por cada 50 semanas extra (tope 80%). El IBL real es el promedio de los 10 años anteriores al retiro.</span></i></span>
+          <span class="sc-v">${sc.tasa}%</span>
+        </div>` : ''}
+      ${sc.beneficio_desc ? `<div class="sc-row"><span style="font-size:0.75rem;color:#6b7280;line-height:1.4;">${sc.beneficio_desc}</span></div>` : ''}`;
+
     html += `
       <div class="sc-card ${win ? 'winner' : ''}">
-        ${win ? '<div class="sc-best-tag">⭐ Recomendada</div>' : ''}
+        ${win ? '<div class="sc-best-pill">✓ Recomendada</div>' : ''}
         <div class="sc-regime">${sc.regimen}</div>
-        <div class="sc-pension">${sc.logra_pension ? sc.mesada + ' SMMLV' : '—'}</div>
-        <div class="sc-pension-label">${sc.logra_pension ? 'mesada mensual estimada' : sc.beneficio}</div>
-        ${sc.logra_pension ? `<div style="font-size:0.86rem;font-weight:800;color:#1a1a2e;margin:2px 0 6px;">≈ ${fmtPesos(sc.mesada)}/mes <span style="font-weight:500;color:#4b5563;font-size:0.82em;">en pesos de hoy</span></div>` : ''}
-        ${(sc.logra_pension && sc.mesada_lo != null) ? `<div style="font-size:0.74rem;color:#4b5563;margin-bottom:8px;line-height:1.35;">Rango <strong>${sc.mesada_lo}–${sc.mesada_hi}</strong> SMMLV (${fmtPesos(sc.mesada_lo)}–${fmtPesos(sc.mesada_hi)}) según el rendimiento real</div>` : ''}
-        ${sc.beneficio_desc ? `<div style="font-size:0.76rem;color:#6b7280;margin-bottom:8px;line-height:1.4;">${sc.beneficio_desc}</div>` : ''}
-        <div class="sc-rows">
-          <div class="sc-row" style="border-bottom:1px solid #e8eeff;padding-bottom:7px;margin-bottom:4px;">
-            <span class="sc-k" style="font-weight:700;color:#333;">Edad de pensión</span>
-            <span class="sc-v" style="font-size:1rem;color:${sc.edad_pension != null ? '#003893' : '#c62828'}">
-              ${sc.edad_pension != null ? '<strong>' + sc.edad_pension + ' años</strong>' : '—'}
-            </span>
-          </div>
-          ${sc.capital_pesos_m !== undefined ? `
-            <div class="sc-row">
-              <span class="sc-k">Capital proyectado</span>
-              <span class="sc-v" style="display:flex;align-items:center;gap:4px;">
-                ${fmtPesos(sc.capital)}
-                <span style="font-weight:400;color:#6b7280;font-size:0.8em;white-space:nowrap;">(${sc.capital} SMMLV)</span>
-                <i class="info-icon" onclick="this.classList.toggle('open')">i<span class="tooltip">saldo actual + aportes futuros + rendimiento real 3%/año (rango 1.5–4.5%)</span></i>
-              </span>
-            </div>
-          ` : ''}
-          ${sc.tasa !== undefined ? `<div class="sc-row"><span class="sc-k">Tasa de reemplazo <i class="info-icon" onclick="this.classList.toggle('open')">i<span class="tooltip" style="white-space:normal;width:220px;">Ley 100 art. 34: 65.5 − 0.5×(IBL en SMMLV), +1.5% por cada 50 semanas extra (tope 80%). Usamos tu salario actual como IBL, asumiendo que se mantiene estable (en términos reales) hasta tu retiro. El IBL real es el promedio de los 10 años ANTES de pensionarte.</span></i></span><span class="sc-v">${sc.tasa}%</span></div>` : ''}
-          <div class="sc-row"><span class="sc-k">Estabilidad</span><span class="sc-v">${bar(sc.estab,false)}</span></div>
-          <div class="sc-row"><span class="sc-k">Herencia</span><span class="sc-v">${bar(sc.hereda,false)}</span></div>
-          <div class="sc-row"><span class="sc-k">Riesgo</span><span class="sc-v">${bar(sc.riesgo,true)}</span></div>
-        </div>
+        ${pensionBlock}
+        <div class="sc-pro-con">${pcHtml}</div>
+        <div class="sc-rows">${detailRows}</div>
         ${sc.razon_no_pension ? `<div class="sc-nopension" style="font-weight:400;font-size:0.76rem;margin-top:8px;">⚠️ ${sc.razon_no_pension}</div>` : ''}
         ${(sc.nota || sc.iblNota) ? `<div class="sc-nota-block">${sc.nota ? `<div class="sc-nota-line"><span class="nota-ico">ℹ️</span><span>${sc.nota}</span></div>` : ''}${sc.iblNota ? `<div class="sc-nota-line nota-warn"><span class="nota-ico">⚠️</span><span>${sc.iblNota}</span></div>` : ''}</div>` : ''}
       </div>`;
@@ -2086,7 +2228,8 @@ function verEjemplo() {
     semanas_actuales: 700, semanas_julio25: 660, saldo_afp: 0,
     ha_trasladado: 'no', especiales: [],
     salario: '2-3', anos_lab: '15-20', trayectoria: 'pleno',
-    hijos: '2', preferencias: ['maximizar_mesada', 'menor_riesgo']
+    hijos: '2', preferencias: ['maximizar_mesada', 'menor_riesgo'],
+    _isEjemplo: true
   });
   document.getElementById('trust-intro').style.display = 'none';
   document.getElementById('progress').style.display = 'none';
