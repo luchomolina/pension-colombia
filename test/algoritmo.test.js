@@ -294,8 +294,8 @@ test('Colpensiones: mesada ajustada con IBL parcial cuando gap ≥ 2 años', () 
   }));
   assert.ok(r.mesada >= 1.8 && r.mesada <= 2.5,
     `mesada ajustada por IBL parcial debe ser ~2.1 SMMLV (fue ${r.mesada})`);
-  assert.ok(r.nota && /IBL/i.test(r.nota),
-    'nota debe explicar el ajuste por IBL');
+  assert.ok(r.nota && /cotizar|promedio|años sin/i.test(r.nota),
+    'nota debe explicar el impacto de parar de cotizar antes del retiro');
   assert.ok(r.nota && /55/.test(r.nota) && /62/.test(r.nota),
     'nota debe mencionar edad de parada y edad de pensión');
   assert.strictEqual(r.iblNota, null, 'iblNota debe ser null (incorporado al cálculo)');
