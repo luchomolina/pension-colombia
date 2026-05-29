@@ -1283,9 +1283,20 @@ function evalColp(data) {
 
   // Si planea dejar de cotizar antes de la edad de pensión, la mesada igual
   // empieza a los 62/57 — las semanas no se pierden. Lo explicamos.
+  // Si el plan es dejar de cotizar antes de poder reclamar la pensión, calculamos
+  // cuántos de los 10 años previos al retiro tendrán cotización — el IBL (Ingreso
+  // Base de Liquidación, Ley 100 art. 21) promedia el salario cotizado en esa ventana.
+  const gapYears = Math.round(pensionAge - stopAge); // años entre stop y pensión
+  const iblCotizYears = Math.max(0, 10 - gapYears);  // años con cotización en la ventana IBL
+
   let nota = null;
   if (stopAge < pensionAge) {
-    nota = `Ya tendrías las semanas, pero en Colpensiones la pensión de vejez solo se puede reclamar a los ${pensionAge} años. Aunque dejes de cotizar a los ${Math.round(stopAge)}, tus semanas no se pierden: empezarías a recibir la mesada a los ${pensionAge}. Entre los ${Math.round(stopAge)} y los ${pensionAge} años no recibirías esta pensión — seguir cotizando aumentaría tu mesada, pero NO adelanta la edad de pensión.`;
+    const iblBase = `Ya tendrías las semanas, pero en Colpensiones la pensión de vejez solo se puede reclamar a los ${pensionAge} años. Aunque dejes de cotizar a los ${Math.round(stopAge)}, tus semanas no se pierden: empezarías a recibir la mesada a los ${pensionAge}. Entre los ${Math.round(stopAge)} y los ${pensionAge} años no recibirías esta pensión — seguir cotizando aumentaría tu mesada, pero NO adelanta la edad de pensión.`;
+    // Advertencia de IBL solo cuando la brecha es significativa (≥ 2 años sin cotizar)
+    const iblWarn = gapYears >= 2
+      ? ` ⚠️ **Impacto en el IBL:** la mesada se calcula sobre el promedio de tu salario cotizado en los 10 años antes de pensionarte (Ley 100 art. 21). Si cotizas solo ${iblCotizYears} de esos 10 años, el promedio se reduce y la mesada real podría ser notablemente menor a la estimada aquí (que asume cotización continua hasta los ${pensionAge}). Considera mantener aportes mientras puedas.`
+      : '';
+    nota = iblBase + iblWarn;
   }
 
   return {
@@ -1563,7 +1574,7 @@ function buildPrompt(result) {
     `  Mejor opción según preferencias: ${result.mejor.regimen}`,
     `  Confianza en la recomendación: ${result.confianza}`,
     `  ¿Puede trasladarse de régimen?: ${result.puede ? 'SÍ (más de 10 años a la pensión)' : 'NO (menos de 10 años a la pensión)'}`,
-    `  ¿Aplicaría cotización obligatoria a Colpensiones SI la reforma entra en vigencia?: ${result.refOblig && !result.transicion ? 'SÍ (salario ≤ 2.3 SMMLV)' : 'NO'}`,
+    ...(result.refOblig && !result.transicion ? [`  Si la reforma entra en vigencia, aplicaría cotización obligatoria en Colpensiones (salario ≤ 2.3 SMMLV).`] : []),
     `  ¿Estaría en régimen de transición (Ley 2381) SI la reforma entra en vigencia?: ${result.transicion ? 'SÍ — conservaría reglas de Ley 100' : 'NO — quedaría sujeto/a a reglas nuevas'}`,
     `  NOTA NORMATIVA: la Ley 2381 de 2024 está SUSPENDIDA por la Corte Constitucional (Auto 841/2025). Hoy rige la Ley 100 de 1993. No afirmes que la reforma ya está vigente.`
   ].join('\n');
@@ -2205,7 +2216,8 @@ function construirTextoResultados() {
   L.push('SITUACIÓN NORMATIVA');
   L.push('  (La Reforma 2024 / Ley 2381 está suspendida por la Corte Constitucional. Hoy rige la Ley 100; lo siguiente aplicaría si la reforma entra en vigencia.)');
   L.push(`  Régimen de transición (Ley 2381): ${r.transicion ? 'SÍ — conservaría las reglas de la Ley 100' : 'No — quedaría sujeto a las reglas nuevas'}`);
-  L.push(`  Cotización obligatoria en Colpensiones por reforma: ${r.refOblig && !r.transicion ? 'SÍ aplicaría (salario ≤ 2.3 SMMLV)' : 'No'}`);
+  if (r.refOblig && !r.transicion)
+    L.push('  Si la reforma entra en vigencia: cotización obligatoria en Colpensiones (salario ≤ 2.3 SMMLV).');
   L.push(`  ¿Puede trasladarse de régimen?: ${r.puede ? 'Sí (más de 10 años a la pensión)' : 'No (a menos de 10 años de la pensión)'}`);
   if (r.advertenciaTraslado) L.push('  Aviso: solo puede trasladarse una vez cada 5 años — verifique la fecha de su último traslado.');
   L.push('', sub, '');

@@ -247,6 +247,69 @@ test('AFP: sin garantía cuando las semanas proyectadas son < 1150', () => {
 });
 
 // ════════════════════════════════════════════════
+//  evalAFP — regresión capital y mesada (perfil gt8)
+// ════════════════════════════════════════════════
+test('AFP: capital e mesada plausibles para el caso gt8 auditado', () => {
+  // Perfil: 45, Porvenir, 842 sem, 183.3 SMMLV declarados, >8SMMLV, 10 años, siempre
+  // stopAge=55, retireAge=62, gapYears=7.
+  // Capital esperado (mid=3%): ≈ 500–520 SMMLV.
+  // Mesada esperada (mid): ≈ 2.2–2.5 SMMLV.
+  const r = T.evalAFP(mk({
+    edad: 45, semanas_actuales: 842, saldo_afp: 183.3,
+    salario: 'gt8', anos_lab: '5-10',
+    densidad: 'siempre', preferencias: ['maximizar_mesada'] // alab = hi = 10
+  }));
+  assert.ok(r.capital >= 480 && r.capital <= 550,
+    `capital ~500 SMMLV (fue ${r.capital})`);
+  assert.ok(r.mesada >= 2.0 && r.mesada <= 2.7,
+    `mesada ~2.3 SMMLV (fue ${r.mesada})`);
+  assert.ok(r.mesada_lo < r.mesada && r.mesada < r.mesada_hi,
+    'rango lo < mid < hi');
+});
+
+test('AFP: capital e mesada plausibles para un cotizante de 3-5 SMMLV', () => {
+  // 40 años, saldo declarado 0 (se estima internamente), 3-5 SMMLV, 17 años (mid 15-20), siempre.
+  // El modelo estima un saldo inicial razonable + acumula 17 años de aportes + 5 de gap.
+  // Capital esperado ~280–380 SMMLV; mesada mid ~1.3–2.0 SMMLV.
+  const r = T.evalAFP(mk({
+    edad: 40, semanas_actuales: 700, saldo_afp: 0,
+    salario: '3-5', anos_lab: '15-20',
+    densidad: 'siempre', preferencias: []
+  }));
+  assert.ok(Number.isFinite(r.mesada) && r.mesada > 0, 'mesada finita y positiva');
+  assert.ok(r.capital > 150 && r.capital < 500, `capital en rango plausible (fue ${r.capital})`);
+  assert.ok(r.mesada_lo <= r.mesada, 'lo ≤ mid');
+  assert.ok(r.mesada <= r.mesada_hi, 'mid ≤ hi');
+});
+
+// ════════════════════════════════════════════════
+//  evalColp — advertencia IBL cuando hay brecha pre-retiro
+// ════════════════════════════════════════════════
+test('Colpensiones: nota incluye advertencia IBL cuando gap ≥ 2 años', () => {
+  // stopAge = 45+10 = 55, pensionAge = 62 → gap = 7 años → aviso IBL obligatorio
+  const r = T.evalColp(mk({
+    edad: 45, semanas_actuales: 842, salario: 'gt8',
+    anos_lab: '5-10', preferencias: ['maximizar_mesada'] // alab = 10
+  }));
+  assert.ok(r.nota && /IBL/i.test(r.nota),
+    'nota debe mencionar el IBL cuando se deja de cotizar 7 años antes de la pensión');
+  assert.ok(/10 años/i.test(r.nota) || /10 de/.test(r.nota),
+    'nota debe mencionar la ventana de 10 años');
+});
+
+test('Colpensiones: nota NO incluye advertencia IBL cuando gap < 2 años', () => {
+  // stopAge = 60+2 = 62 → pensionAge = 62 → gap = 0 → sin aviso IBL
+  const r = T.evalColp(mk({
+    edad: 60, semanas_actuales: 1200, salario: '3-5',
+    anos_lab: '<5', preferencias: ['retirar_pronto'] // alab = lo = 2
+  }));
+  // Si tiene suficientes semanas y stopAge ≥ pensionAge, no hay nota
+  if (r.nota) {
+    assert.doesNotMatch(r.nota, /IBL/, 'no debe haber aviso IBL si gap < 2 años');
+  }
+});
+
+// ════════════════════════════════════════════════
 //  fmtPesos — formato amigable (estructural, sin depender de locale exacto)
 // ════════════════════════════════════════════════
 test('fmtPesos: usa "millones" para montos grandes y no para pequeños', () => {
