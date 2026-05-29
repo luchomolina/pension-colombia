@@ -1934,11 +1934,11 @@ function prosCons(sc) {
       items.push({ type: 'con', text: 'No alcanzas las semanas mínimas — sin pensión completa al retiro' });
       items.push({ type: 'neu', text: 'Recibirías una indemnización sustitutiva con los aportes realizados' });
     }
-    items.push({ type: 'con', text: 'Si falleces antes de pensionarte, tus aportes no pasan a tus herederos' });
+    items.push({ type: 'neu', text: 'Sin cuenta individual heredable; ciertos beneficiarios (cónyuge, hijos) pueden tener derecho a pensión de sobrevivientes (Ley 100, art. 46)' });
   } else {
     // AFP
     if (sc.logra_pension) {
-      items.push({ type: 'pro', text: 'Tu capital es tuyo — si falleces, tus beneficiarios lo heredan' });
+      items.push({ type: 'pro', text: 'Cuenta individual: beneficiarios acceden a pensión de sobrevivientes o, si no califica ninguno, heredan el saldo' });
       if (sc.edad_anticipada != null) {
         items.push({ type: 'pro', text: `Podrías pensionarte a los ${sc.edad_anticipada} años si el capital lo permite` });
       }
