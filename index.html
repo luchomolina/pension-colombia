@@ -1133,7 +1133,18 @@ function validate(step) {
 // ════════════════════════════════════════════════
 const RET_AGE = { M: 62, F: 57 };
 const BASE_WEEKS = 1300;
+const GPM_WEEKS = 1150; // garantía de pensión mínima en RAIS (Ley 100 art. 65)
+const YEAR = 2026;      // año de cálculo — actualizar junto con el SMMLV
 const REFORM_THRESH = 2.3; // SMMLV
+
+// Semanas mínimas de las mujeres en Colpensiones (Sentencia C-197/2023, VIGENTE
+// e independiente de la reforma suspendida). La reducción escalonada empieza el
+// 1-ene-2027 y baja 25 semanas/año hasta llegar a 1.000 en 2038.
+// En 2026 las mujeres siguen necesitando 1.300 (igual que los hombres).
+// Hombres: siempre 1.300 (Ley 100 art. 33).
+function womenBaseWeeks() {
+  return YEAR < 2027 ? BASE_WEEKS : Math.max(1000, 1300 - (YEAR - 2026) * 25);
+}
 const AFP_RATE = 0.115;    // fraction going to individual account
 // Rendimiento REAL anual de la AFP, neto del crecimiento del salario mínimo.
 // Todo el modelo está en SMMLV (pesos de hoy), así que NO se usa la tasa
@@ -1186,9 +1197,12 @@ function anosLab(data) { return resolverAnos(data).anos; }
 //  MINIMUM WEEKS
 // ════════════════════════════════════════════════
 function minWeeks(data) {
-  let w = BASE_WEEKS;
-  if (data.sexo === 'F' && data.hijos >= 3) w -= 25;
-  if (data.sexo === 'F' && data.hijos >= 4) w -= 50;
+  // Las mujeres tienen una reducción escalonada por C-197/2023 (desde 2027).
+  let w = data.sexo === 'F' ? womenBaseWeeks() : BASE_WEEKS;
+  // Reducción adicional por hijos (hijos puede llegar como string desde el form).
+  const h = parseInt(data.hijos, 10) || 0;
+  if (data.sexo === 'F' && h >= 3) w -= 25;
+  if (data.sexo === 'F' && h >= 4) w -= 50;
   return w;
 }
 
@@ -1343,8 +1357,10 @@ function evalAFP(data) {
 
   const futW = alab * 52 * df;
   const totalW = sem + futW;
-  const cumpleW = totalW >= minW;
-  const cumpleEdad = data.edad >= ret || stopAge >= ret;
+  // Garantía de Pensión Mínima (Ley 100 art. 65): requiere ≥1.150 semanas en
+  // RAIS + llegar a la edad de pensión. Umbral DISTINTO al de pensión completa.
+  const cumpleW = totalW >= GPM_WEEKS;
+  const cumpleEdad = retireAge >= ret; // siempre true por construcción (retireAge = max(ret, stopAge))
   const garantia = cumpleW && cumpleEdad;
 
   const logra = mesadaCap >= 1.0 || (garantia && cap > 0);

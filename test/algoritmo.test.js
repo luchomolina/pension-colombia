@@ -201,6 +201,52 @@ test('decidir: caso tipo "César" recomienda Colpensiones (corrige sesgo pro-AFP
 });
 
 // ════════════════════════════════════════════════
+//  minWeeks — hijos como string (coerción segura)
+// ════════════════════════════════════════════════
+test('minWeeks: hijos como string se parsea correctamente', () => {
+  // El formulario guarda hijos como string '0'–'3'; el parseInt debe funcionar igual.
+  assert.strictEqual(T.minWeeks(mk({ sexo: 'F', hijos: '3' })), 1275);
+  assert.strictEqual(T.minWeeks(mk({ sexo: 'F', hijos: '0' })), 1300);
+  assert.strictEqual(T.minWeeks(mk({ sexo: 'F', hijos: null })), 1300); // null → 0
+});
+
+// ════════════════════════════════════════════════
+//  womenBaseWeeks — Sentencia C-197/2023
+// ════════════════════════════════════════════════
+test('womenBaseWeeks: en 2026 sigue siendo 1300 (reducción empieza 2027)', () => {
+  // YEAR=2026 en el módulo producción — la reducción todavía no aplica
+  assert.strictEqual(T.minWeeks(mk({ sexo: 'F', hijos: '0' })), 1300);
+});
+
+// ════════════════════════════════════════════════
+//  evalAFP — Garantía de Pensión Mínima (GPM, 1150 semanas)
+// ════════════════════════════════════════════════
+test('AFP: garantía mínima se activa con 1150 semanas, no 1300', () => {
+  // Persona con 1200 semanas (< 1300 mínimo, pero > 1150 GPM) y salario bajo →
+  // el capital no alcanza 1 SMMLV pero el Estado garantiza 1 SMMLV de mesada.
+  const r = T.evalAFP(mk({
+    edad: 57, sexo: 'F', semanas_actuales: 1200, saldo_afp: 50,
+    salario: 'lt1', anos_lab: '<5', densidad: 'irregular'
+  }));
+  // Con tan poco capital e ingresos la mesada bruta sería < 1 SMMLV,
+  // pero la garantía estatal debe activarse (logra_pension = true, mesada = 1.0).
+  assert.ok(r.garantia_min, 'debe activar garantia_min con ≥1150 semanas');
+  assert.ok(r.logra_pension, 'logra_pension debe ser true por la garantía');
+  assert.ok(r.mesada >= 1.0, `mesada debe ser ≥ 1 SMMLV (fue ${r.mesada})`);
+});
+
+test('AFP: sin garantía cuando las semanas proyectadas son < 1150', () => {
+  // Con 1100 actuales, alab=2 (retirar_pronto en rango <5) y densidad irregular:
+  // futW = 2 × 52 × 0.35 = 36 → totalW = 1136 < 1150 → garantia debe ser false.
+  const r = T.evalAFP(mk({
+    edad: 57, sexo: 'F', semanas_actuales: 1100, saldo_afp: 50,
+    salario: 'lt1', anos_lab: '<5', densidad: 'irregular',
+    preferencias: ['retirar_pronto'] // fuerza alab = lo = 2
+  }));
+  assert.ok(!r.garantia_min, `sin garantia_min con totalW < 1150 (semanas=${r.semanas_proy})`);
+});
+
+// ════════════════════════════════════════════════
 //  fmtPesos — formato amigable (estructural, sin depender de locale exacto)
 // ════════════════════════════════════════════════
 test('fmtPesos: usa "millones" para montos grandes y no para pequeños', () => {
