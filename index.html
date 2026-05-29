@@ -46,8 +46,10 @@ body {
 /* ── Progress dots ── */
 .progress {
   display: flex; align-items: center; justify-content: center;
-  gap: 0; margin: 20px 0 4px; padding: 0 16px;
+  gap: 0; margin: 20px 0 26px; padding: 0 16px;
 }
+.dot-col { position: relative; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.dot-label { position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%); font-size: 0.7rem; color: #5c6470; white-space: nowrap; }
 .dot {
   width: 34px; height: 34px; border-radius: 50%; display: flex;
   align-items: center; justify-content: center;
@@ -59,8 +61,6 @@ body {
 .dot.done { background: #2e7d32; color: white; border-color: #2e7d32; }
 .line { flex: 1; height: 2.5px; background: #d8dde8; max-width: 72px; transition: background 0.25s; }
 .line.done { background: #2e7d32; }
-.step-labels { display: flex; justify-content: space-between; padding: 6px 2px 0; }
-.step-labels span { font-size: 0.7rem; color: #5c6470; flex: 1; text-align: center; }
 
 /* ── Card ── */
 .card {
@@ -464,16 +464,25 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
 
   <!-- Progress -->
   <div class="progress" id="progress" style="display:none">
-    <div class="dot active" id="dot-1">1</div>
+    <div class="dot-col">
+      <div class="dot active" id="dot-1">1</div>
+      <span class="dot-label">Datos</span>
+    </div>
     <div class="line" id="line-1"></div>
-    <div class="dot" id="dot-2">2</div>
+    <div class="dot-col">
+      <div class="dot" id="dot-2">2</div>
+      <span class="dot-label">Semanas</span>
+    </div>
     <div class="line" id="line-2"></div>
-    <div class="dot" id="dot-3">3</div>
+    <div class="dot-col">
+      <div class="dot" id="dot-3">3</div>
+      <span class="dot-label">Trabajo</span>
+    </div>
     <div class="line" id="line-3"></div>
-    <div class="dot" id="dot-4">4</div>
-  </div>
-  <div class="step-labels" id="step-labels" style="display:none">
-    <span>Datos</span><span>Semanas</span><span>Trabajo</span><span>Prioridades</span>
+    <div class="dot-col">
+      <div class="dot" id="dot-4">4</div>
+      <span class="dot-label">Prioridades</span>
+    </div>
   </div>
 
   <!-- ─────────────────── STEP 1 ─────────────────── -->
@@ -1040,7 +1049,6 @@ function prefToggle(val, el) {
 function dismissTrust() {
   document.getElementById('trust-intro').style.display = 'none';
   document.getElementById('progress').style.display = 'flex';
-  document.getElementById('step-labels').style.display = 'flex';
   document.getElementById('step-1').style.display = 'block';
   window.scrollTo(0, 0);
 }
@@ -1538,7 +1546,6 @@ function analizar() {
 
   document.getElementById('step-4').style.display = 'none';
   document.getElementById('progress').style.display = 'none';
-  document.getElementById('step-labels').style.display = 'none';
   window.scrollTo(0,0);
 
   const result = decidir(S);
@@ -1961,7 +1968,6 @@ function volverAEditar() {
   }
 
   document.getElementById('progress').style.display = 'flex';
-  document.getElementById('step-labels').style.display = 'flex';
   showStep(4);
 }
 
@@ -1991,7 +1997,6 @@ function reiniciar() {
   }
 
   document.getElementById('progress').style.display = 'flex';
-  document.getElementById('step-labels').style.display = 'flex';
   showStep(1);
   refreshAria();
   try { sessionStorage.removeItem('pension_S'); } catch (e) {}
@@ -2010,7 +2015,6 @@ function verEjemplo() {
   });
   document.getElementById('trust-intro').style.display = 'none';
   document.getElementById('progress').style.display = 'none';
-  document.getElementById('step-labels').style.display = 'none';
   for (let i = 1; i <= 4; i++) document.getElementById('step-' + i).style.display = 'none';
   window.scrollTo(0, 0);
   renderResults(decidir(S));
@@ -2178,7 +2182,6 @@ function leerHash() {
   }
   document.getElementById('trust-intro').style.display = 'none';
   document.getElementById('progress').style.display = 'none';
-  document.getElementById('step-labels').style.display = 'none';
   for (let i = 1; i <= 4; i++) document.getElementById('step-' + i).style.display = 'none';
   window.scrollTo(0, 0);
   renderResults(decidir(S));
