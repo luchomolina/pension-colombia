@@ -8,7 +8,7 @@ Guía al usuario en 4 pasos recolectando:
 
 1. **Datos personales** — edad, sexo biológico, fondo actual
 2. **Historial de cotización** — semanas cotizadas, saldo AFP, situaciones especiales
-3. **Situación laboral** — rango salarial, años laborales restantes, regularidad de cotización
+3. **Situación laboral** — rango salarial, años laborales restantes, trayectoria laboral futura
 4. **Factores personales** — número de hijos, prioridades (maximizar mesada, heredar, menor riesgo, etc.)
 
 Con esa información, el algoritmo local:
@@ -87,7 +87,17 @@ Todo el algoritmo corre en el navegador sin necesidad de servidor. El código es
 
 El algoritmo parte de las siguientes constantes fijas: la edad legal de pensión (62 años para hombres, 57 para mujeres), las 1.300 semanas mínimas de cotización, el umbral de la Reforma 2024 de 2,3 SMMLV, una tasa de aporte del 11,5% del salario a la cuenta individual en AFP, un rendimiento **real** (sobre el SMMLV) del 3% anual para el capital en AFP —con un rango de 1,5% a 4,5% para los escenarios pesimista y optimista—, el SMMLV 2026 de $1.750.905 COP como unidad de todos los valores monetarios, y una esperanza de vida de 80 años para hombres y 85 para mujeres. Todas las cifras se expresan en pesos de hoy (poder de compra actual).
 
-El salario declarado en bandas se convierte al punto medio de la banda (por ejemplo, "2–3 SMMLV" se trata como 2,5 SMMLV). La frecuencia de cotización declarada cualitativamente se convierte en un factor numérico: 0,92 para quien cotiza siempre, 0,75 para frecuentemente, 0,55 para la mitad del tiempo y 0,35 para irregular.
+El salario declarado en bandas se convierte al punto medio de la banda (por ejemplo, "2–3 SMMLV" se trata como 2,5 SMMLV).
+
+En lugar de capturar solo la frecuencia de cotización, el formulario recoge la **trayectoria laboral futura** del usuario, que combina dos dimensiones en un único parámetro:
+
+| Trayectoria | Factor de densidad `d` | Factor de IBC `ibc` |
+|---|---|---|
+| **A pleno** — cotizaré igual o más que ahora | 0,92 | 1,00 |
+| **Moderando** — trabajaré o ganaré menos | 0,65 | 0,70 |
+| **Bajando** — semi-retiro / ingresos de otras fuentes | 0,35 | 0,35 |
+
+El **factor de densidad** (`d`) pondera las semanas cotizadas futuras. El **factor de IBC** (`ibc`) escala el salario declarado para obtener el salario efectivo proyectado (`efSal = salario × ibc`), que se usa tanto para el IBL en Colpensiones como para los aportes mensuales en AFP.
 
 ### Verificaciones normativas previas
 
@@ -109,7 +119,11 @@ Las semanas mínimas parten de 1.300 y se reducen para mujeres con tres hijos o 
 
 Si no se cumplen ambas condiciones, el algoritmo reporta *indemnización sustitutiva* (devolución de lo cotizado en un único pago, sin mesada mensual) e indica con precisión si la restricción es de edad, de semanas, o de ambas.
 
-Si sí se cumplen, calcula la edad exacta de retiro tomando el máximo entre la edad legal y la edad en que se completarán las semanas necesarias. La mesada se expresa como porcentaje del salario — la *tasa de reemplazo* —: parte del 65% mínimo legal y sube 1,5 puntos porcentuales por cada 50 semanas cotizadas por encima de las 1.300, con un techo del 80%. La mesada nunca puede ser inferior a 1 SMMLV.
+Si sí se cumplen, calcula la edad exacta de retiro tomando el máximo entre la edad legal y la edad en que se completarán las semanas necesarias.
+
+**Tasa de reemplazo e IBL:** La mesada se expresa como porcentaje del *Ingreso Base de Liquidación* (IBL). La tasa base varía con el ingreso según la fórmula `65,5% − 0,5% × IBL` (donde IBL se mide en SMMLV), acotada entre 55% y 65%. A esa base se suman 1,5 puntos porcentuales por cada 50 semanas cotizadas sobre las 1.300, con un techo del 80%. La mesada nunca puede ser inferior a 1 SMMLV.
+
+**Ajuste de IBL por brecha pre-retiro (Ley 100 art. 21):** El IBL legal es el promedio salarial de los 10 años anteriores a la pensión. Si el usuario declara que dejará de cotizar antes de la edad de pensión con una brecha de 2 o más años, el algoritmo solo contabiliza los años con aportes dentro de esa ventana de 10 años (`iblCotizYears = 10 − gapYears`) y prorratea el IBL proporcionalmente (`IBL ajustado = efSal × iblCotizYears / 10`). En ese caso, la tarjeta de resultados muestra la mesada ajustada a la trayectoria declarada y también la mesada que obtendría si cotizara hasta la edad legal de pensión.
 
 ### Escenario AFP (RAIS)
 
@@ -117,7 +131,7 @@ El cálculo se basa en la acumulación compuesta de capital a lo largo del tiemp
 
 **Saldo inicial:** Si el usuario declaró su saldo real, se usa directamente. Si no, se estima a partir de las semanas cotizadas, el salario y la tasa de aporte, aplicando un factor que aproxima los rendimientos ya acumulados históricamente. Los independientes reciben un ajuste a la baja en la tasa de aporte efectiva, porque habitualmente cotizan sobre una base de ingreso menor a su ingreso real.
 
-**Fase 1 — años laborales activos:** Mes a mes se aplica el rendimiento compuesto sobre el capital acumulado y se suma el aporte mensual correspondiente al salario, la tasa de aporte y la densidad de cotización. Al finalizar esta fase se agrega el bono pensional cuando aplica (trabajó en entidad pública antes de 1994).
+**Fase 1 — años laborales activos:** Mes a mes se aplica el rendimiento compuesto sobre el capital acumulado y se suma el aporte mensual (`efSal × tasa_aporte × d`), donde `efSal` es el salario ajustado por la trayectoria declarada y `d` es su factor de densidad. Al finalizar esta fase se agrega el bono pensional cuando aplica (trabajó en entidad pública antes de 1994).
 
 **Fase 2 — brecha hasta la edad de pensión:** Si la persona deja de cotizar antes de la edad legal, el capital sigue rentando sin nuevos aportes hasta que llegue a esa edad.
 
