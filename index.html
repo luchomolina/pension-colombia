@@ -78,12 +78,12 @@ body {
 }
 .hint { font-size: 0.78rem; color: #5c6470; margin-top: -4px; margin-bottom: 8px; font-style: italic; line-height: 1.4; }
 
-input[type="number"] {
+input[type="number"], input[type="text"] {
   width: 100%; padding: 11px 14px; border: 2px solid #e0e4ed;
   border-radius: 9px; font-size: 0.95rem; color: #1a1a2e;
   transition: border-color 0.2s; background: white;
 }
-input[type="number"]:focus { outline: none; border-color: #003893; box-shadow: 0 0 0 3px rgba(0,56,147,0.18); }
+input[type="number"]:focus, input[type="text"]:focus { outline: none; border-color: #003893; box-shadow: 0 0 0 3px rgba(0,56,147,0.18); }
 
 /* ── Radio / Check items ── */
 .radio-group, .check-group { display: flex; flex-direction: column; gap: 8px; }
@@ -2312,7 +2312,7 @@ function reiniciar() {
 
   document.querySelectorAll('.radio-item').forEach(e => e.classList.remove('selected'));
   document.querySelectorAll('.check-item').forEach(e => e.classList.remove('selected'));
-  document.querySelectorAll('input[type="number"]').forEach(e => e.value = '');
+  document.querySelectorAll('input[type="number"], input[type="text"]').forEach(e => e.value = '');
   document.getElementById('campo-saldo').style.display = 'none';
   document.getElementById('reform-notice').classList.remove('visible');
   document.getElementById('reform-impact').classList.remove('show');
