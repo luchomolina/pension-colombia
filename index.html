@@ -454,9 +454,42 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
   .header h1 { font-size: 1.4rem; }
   .trust-grid { grid-template-columns: 1fr; }
 }
+
+/* ── Banner de modo ejemplo (sticky) ── */
+.ejemplo-banner {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: #f59e0b; color: #1c1917;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 10px 16px;
+  font-size: 0.82rem; font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.ejemplo-banner-left  { display: flex; align-items: center; gap: 7px; }
+.ejemplo-banner-label { font-size: 0.65rem; font-weight: 900; letter-spacing: 0.8px;
+  text-transform: uppercase; background: rgba(0,0,0,0.15);
+  padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+.ejemplo-banner-text  { color: #1c1917; line-height: 1.3; }
+.ejemplo-banner-btn {
+  flex-shrink: 0; background: #1c1917; color: #fef3c7;
+  border: none; border-radius: 8px; padding: 6px 14px;
+  font-size: 0.78rem; font-weight: 700; cursor: pointer;
+  white-space: nowrap; transition: background 0.15s;
+}
+.ejemplo-banner-btn:hover { background: #003893; color: #fff; }
+body.has-ejemplo-banner { padding-top: 46px; }
+@media print { .ejemplo-banner { display: none !important; } }
 </style>
 </head>
 <body>
+<!-- Banner de modo ejemplo — sólo visible al usar verEjemplo() -->
+<div id="ejemplo-banner" class="ejemplo-banner" style="display:none" role="banner" aria-label="Modo ejemplo">
+  <div class="ejemplo-banner-left">
+    <span class="ejemplo-banner-label">👀 Ejemplo</span>
+    <span class="ejemplo-banner-text">Estás viendo datos simulados — no son tu caso real</span>
+  </div>
+  <button class="ejemplo-banner-btn" onclick="iniciarMiCaso()">Analizar mi caso →</button>
+</div>
+
 <div id="app">
 
   <!-- Header -->
@@ -1094,6 +1127,27 @@ function prefToggle(val, el) {
 }
 
 // ════════════════════════════════════════════════
+//  MODO EJEMPLO — banner sticky
+// ════════════════════════════════════════════════
+function showEjemploBanner() {
+  const b = document.getElementById('ejemplo-banner');
+  b.style.display = 'flex';
+  document.body.classList.add('has-ejemplo-banner');
+}
+function hideEjemploBanner() {
+  const b = document.getElementById('ejemplo-banner');
+  b.style.display = 'none';
+  document.body.classList.remove('has-ejemplo-banner');
+}
+function iniciarMiCaso() {
+  hideEjemploBanner();
+  S._isEjemplo = false;
+  document.getElementById('results').style.display = 'none';
+  dismissTrust();
+  window.scrollTo(0, 0);
+}
+
+// ════════════════════════════════════════════════
 //  TRUST INTRO
 // ════════════════════════════════════════════════
 function dismissTrust() {
@@ -1657,6 +1711,7 @@ function analizar() {
   window.scrollTo(0,0);
 
   S._isEjemplo = false;
+  hideEjemploBanner();
   const result = decidir(S);
   renderResults(result);
 }
@@ -2003,6 +2058,7 @@ function renderResults(res) {
   LAST = res;
   document.getElementById('results').style.display = 'block';
   renderQueryCard();
+  if (S._isEjemplo) showEjemploBanner(); else hideEjemploBanner();
 
   // Verdict
   const cmap = { alta:'conf-alta', media:'conf-media', baja:'conf-baja' };
