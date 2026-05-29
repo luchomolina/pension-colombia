@@ -55,7 +55,7 @@ body {
   border: 2.5px solid #c2c9d6; background: white; color: #6b7280;
   transition: all 0.25s; flex-shrink: 0; position: relative;
 }
-.dot.active { background: #003893; color: white; border-color: #003893; box-shadow: 0 0 0 4px rgba(0,56,147,0.12); }
+.dot.active { background: #003893; color: white; border-color: #003893; }
 .dot.done { background: #2e7d32; color: white; border-color: #2e7d32; }
 .line { flex: 1; height: 2.5px; background: #d8dde8; max-width: 72px; transition: background 0.25s; }
 .line.done { background: #2e7d32; }
@@ -826,14 +826,14 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
         <p>Todo es una estimación con supuestos simplificados. Aquí está cada cuenta en palabras simples y la norma en que se basa.</p>
 
         <h5>📅 Semanas proyectadas</h5>
-        <p>Sumamos tus semanas de hoy más las que acumularías cotizando los años que indicaste (cada año ≈ 52 semanas), ajustado por qué tan seguido cotizas.</p>
+        <p>Sumamos tus semanas de hoy más las que acumularías cotizando los años que indicaste (cada año ≈ 52 semanas), ajustado por la <strong>trayectoria laboral</strong> que elegiste: "A pleno" asume que cotizas casi siempre al salario actual; "Moderando" y "Bajando" reducen tanto la frecuencia como el monto de los aportes.</p>
 
         <h5>🏛️ Colpensiones (RPM)</h5>
         <p>La mesada es un porcentaje de tu salario (la <em>tasa de reemplazo</em>). Empieza en <strong>65.5% − 0.5 × (tu salario en SMMLV)</strong> —queda entre 55% y 65%— y sube <strong>1.5% por cada 50 semanas</strong> sobre las 1.300, hasta un máximo de <strong>80%</strong>. Por eso quien gana más recibe un porcentaje menor.</p>
-        <p class="law">Base legal: Ley 100 de 1993, art. 34 (modificado por Ley 797 de 2003). El IBL real es el promedio de los 10 años antes de pensionarte; aquí usamos tu salario actual, asumiendo que se mantiene estable en términos reales.</p>
+        <p class="law">Base legal: Ley 100 de 1993, art. 34 (modificado por Ley 797 de 2003). El IBL real es el promedio de los 10 años antes de pensionarte; usamos tu salario actual ajustado por la trayectoria que declaraste como proxy de ese promedio futuro.</p>
 
         <h5>📈 Fondo privado (AFP / RAIS)</h5>
-        <p>Proyectamos tu ahorro: tu saldo de hoy más tus aportes futuros (11.5% del salario), creciendo a un <strong>rendimiento real del 3% anual</strong> (mostramos un rango de 1.5% a 4.5% por la incertidumbre del mercado). Ese capital se reparte entre los años de vida esperada para estimar la mesada mensual.</p>
+        <p>Proyectamos tu ahorro: tu saldo de hoy más tus aportes futuros (<strong>11.5% del salario ajustado por trayectoria</strong>), creciendo a un <strong>rendimiento real del 3% anual</strong> (mostramos un rango de 1.5% a 4.5% por la incertidumbre del mercado). Ese capital se reparte entre los años de vida esperada para estimar la mesada mensual.</p>
         <p class="law">Es rendimiento <em>real</em> (sobre la inflación), porque medimos todo en pesos de hoy / SMMLV. La pensión anticipada se basa en el Art. 64 de la Ley 100.</p>
 
         <h5>🎂 Edad y semanas mínimas</h5>
