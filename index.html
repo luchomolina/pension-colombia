@@ -688,8 +688,8 @@ body.has-ejemplo-banner { padding-top: 46px; }
 
     <div class="field" id="campo-saldo" style="display:none">
       <label>Saldo acumulado en tu AFP (en pesos colombianos)</label>
-      <p class="hint">Puedes consultarlo en el portal de tu AFP. Escribe el valor en pesos — por ejemplo: 45.000.000 si tienes $45 millones. Escribe 0 si no sabes.</p>
-      <input type="number" inputmode="numeric" id="saldo_afp" min="0" placeholder="Ej: 45.000.000">
+      <p class="hint">Puedes consultarlo en el portal de tu AFP. Escribe el valor en pesos — por ejemplo: <strong>$45.000.000</strong>. Escribe 0 si no sabes.</p>
+      <input type="text" inputmode="numeric" id="saldo_afp" placeholder="Ej: $45.000.000" autocomplete="off">
       <p class="hint" id="saldo-smmlv-hint" style="color:#003893; display:none;"></p>
     </div>
 
@@ -1070,7 +1070,12 @@ function pick(field, val, el) {
   if (saldoInput && !saldoInput._wired) {
     saldoInput._wired = true;
     saldoInput.addEventListener('input', () => {
-      const pesos = parseFloat(saldoInput.value) || 0;
+      // Format as Colombian pesos with $ and dot separators
+      const raw = saldoInput.value.replace(/[^\d]/g, '');
+      const pesos = parseInt(raw) || 0;
+      saldoInput.value = pesos > 0 ? '$' + pesos.toLocaleString('es-CO') : (raw ? '$0' : '');
+      saldoInput.classList.remove('field-error');
+      // Live SMMLV conversion hint
       const hint = document.getElementById('saldo-smmlv-hint');
       if (pesos > 0) {
         const smmlv = (pesos / SMMLV).toFixed(1);
@@ -1262,7 +1267,7 @@ function validate(step) {
     } else {
       S.semanas_actuales = sa;
       S.semanas_julio25 = isNaN(sj) ? sa : sj;
-      const saldoPesos = parseFloat(document.getElementById('saldo_afp').value) || 0;
+      const saldoPesos = parseInt(document.getElementById('saldo_afp').value.replace(/[^\d]/g, '')) || 0;
       S.saldo_afp = saldoPesos / SMMLV; // convert to SMMLV
     }
   }
@@ -2386,7 +2391,10 @@ function applyStateToUI() {
   if (S.edad) document.getElementById('edad').value = S.edad;
   if (S.semanas_actuales) document.getElementById('semanas_actuales').value = S.semanas_actuales;
   if (S.semanas_julio25) document.getElementById('semanas_julio25').value = S.semanas_julio25;
-  if (S.saldo_afp > 0) document.getElementById('saldo_afp').value = Math.round(S.saldo_afp * SMMLV);
+  if (S.saldo_afp > 0) {
+    const pesos = Math.round(S.saldo_afp * SMMLV);
+    document.getElementById('saldo_afp').value = '$' + pesos.toLocaleString('es-CO');
+  }
 
   ['sexo', 'fondo_actual', 'ha_trasladado', 'salario', 'anos_lab', 'trayectoria', 'hijos'].forEach(f => {
     if (S[f] == null) return;
