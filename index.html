@@ -2443,7 +2443,7 @@ function construirTextoResultados() {
   L.push(sep, '');
 
   // ── Recomendación ──
-  L.push('TU MEJOR OPCIÓN SEGÚN TU SITUACIÓN');
+  L.push('RESULTADO DE TU SIMULACIÓN');
   L.push('  ' + r.mejor.regimen);
   L.push('  ' + (r.mejor.logra_pension
     ? `Proyección: pensión de ~${r.mejor.mesada} SMMLV/mes (≈ ${fmtPesos(r.mejor.mesada)}/mes en pesos de hoy)`
@@ -2483,7 +2483,7 @@ function construirTextoResultados() {
   // ── Escenarios (todos los campos) ──
   L.push('COMPARACIÓN DE ESCENARIOS', '');
   [r.colp, r.afp].forEach(sc => {
-    const winner = sc.regimen === r.mejor.regimen ? '  ⭐ RECOMENDADA' : '';
+    const winner = sc.regimen === r.mejor.regimen ? '  ← mejor resultado simulado' : '';
     L.push('  ' + sc.regimen + winner);
     L.push('    ¿Logra pensión?: ' + (sc.logra_pension ? 'Sí' : 'No'));
     L.push('    Beneficio: ' + sc.beneficio);
