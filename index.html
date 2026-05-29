@@ -162,17 +162,18 @@ input[type="number"]:focus { outline: none; border-color: #003893; box-shadow: 0
   background: linear-gradient(135deg, #002776 0%, #0045c4 100%);
   color: white; margin: 14px 0; text-align: center;
 }
-.verdict-eyebrow { font-size: 0.8rem; opacity: 0.75; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
+.verdict-eyebrow { font-size: 0.8rem; color: rgba(255,255,255,0.82); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
 .verdict-name { font-size: 1.55rem; font-weight: 900; margin-bottom: 6px; letter-spacing: -0.3px; }
-.verdict-action { font-size: 0.95rem; font-weight: 600; margin-bottom: 8px; background: rgba(255,255,255,0.14); border-radius: 9px; padding: 7px 12px; display: inline-block; }
-.verdict-sub { font-size: 0.9rem; opacity: 0.88; }
+.verdict-action { font-size: 0.95rem; font-weight: 600; margin-bottom: 8px; background: rgba(255,255,255,0.18); border-radius: 9px; padding: 7px 12px; display: inline-block; }
+.verdict-sub { font-size: 0.9rem; color: rgba(255,255,255,0.92); }
 .conf-badge {
   display: inline-block; padding: 5px 14px; border-radius: 20px;
   font-size: 0.78rem; font-weight: 700; margin-top: 12px;
 }
-.conf-alta { background: rgba(76,175,80,0.3); color: #a5d6a7; }
-.conf-media { background: rgba(255,193,7,0.3); color: #fff176; }
-.conf-baja { background: rgba(255,82,82,0.3); color: #ef9a9a; }
+/* Solid dark backgrounds + white text — contraste WCAG AA garantizado sobre el gradient oscuro */
+.conf-alta  { background: rgba(27,94,32,0.80);  color: #fff; }
+.conf-media { background: rgba(120,53,15,0.85); color: #fff; }
+.conf-baja  { background: rgba(127,29,29,0.85); color: #fff; }
 
 .scenarios-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
 .sc-card {
@@ -224,7 +225,7 @@ input[type="number"]:focus { outline: none; border-color: #003893; box-shadow: 0
 .section-card h3 { font-size: 1rem; font-weight: 800; color: #003893; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 .smmlv-note { font-size: 0.76rem; color: #6b7280; line-height: 1.5; margin: 14px 0 0; }
 .sem-summary { font-size: 0.82rem; color: #444; margin-bottom: 12px; line-height: 1.5; }
-.sem-req { color: #888; margin-left: 4px; }
+.sem-req { color: #666; margin-left: 4px; }
 .sem-nota { color: #33415c; }
 .ai-text { font-size: 0.88rem; line-height: 1.7; color: #333; }
 .ai-section-header {
@@ -652,7 +653,7 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
 
     <div class="field">
       <label>¿Cuántos años más planeas cotizar activamente?</label>
-      <p class="hint">Piensa en cuánto tiempo más estarás activo/a en el sistema pensional — ya sea como empleado o independiente. Si cotizarás de forma irregular, ajústalo con la pregunta de frecuencia abajo.</p>
+      <p class="hint">Piensa en cuánto tiempo más estarás activo/a en el sistema pensional — ya sea como empleado o independiente. </p>
       <div class="radio-grid" style="margin-top:8px;">
         <div class="radio-item" onclick="pick('anos_lab','<5',this)">
           <input type="radio" name="alab" value="<5"> Menos de 5 años
@@ -1926,9 +1927,9 @@ function renderResults(res) {
         <div class="sc-regime">${sc.regimen}</div>
         <div class="sc-pension">${sc.logra_pension ? sc.mesada + ' SMMLV' : '—'}</div>
         <div class="sc-pension-label">${sc.logra_pension ? 'mesada mensual estimada' : sc.beneficio}</div>
-        ${sc.logra_pension ? `<div style="font-size:0.86rem;font-weight:800;color:#1a1a2e;margin:2px 0 6px;">≈ ${fmtPesos(sc.mesada)}/mes <span style="font-weight:500;color:#5c6470;font-size:0.82em;">en pesos de hoy</span></div>` : ''}
-        ${(sc.logra_pension && sc.mesada_lo != null) ? `<div style="font-size:0.74rem;color:#5c6470;margin-bottom:8px;line-height:1.35;">Rango <strong>${sc.mesada_lo}–${sc.mesada_hi}</strong> SMMLV (${fmtPesos(sc.mesada_lo)}–${fmtPesos(sc.mesada_hi)}) según el rendimiento real</div>` : ''}
-        ${sc.beneficio_desc ? `<div style="font-size:0.76rem;color:#888;margin-bottom:8px;line-height:1.4;">${sc.beneficio_desc}</div>` : ''}
+        ${sc.logra_pension ? `<div style="font-size:0.86rem;font-weight:800;color:#1a1a2e;margin:2px 0 6px;">≈ ${fmtPesos(sc.mesada)}/mes <span style="font-weight:500;color:#4b5563;font-size:0.82em;">en pesos de hoy</span></div>` : ''}
+        ${(sc.logra_pension && sc.mesada_lo != null) ? `<div style="font-size:0.74rem;color:#4b5563;margin-bottom:8px;line-height:1.35;">Rango <strong>${sc.mesada_lo}–${sc.mesada_hi}</strong> SMMLV (${fmtPesos(sc.mesada_lo)}–${fmtPesos(sc.mesada_hi)}) según el rendimiento real</div>` : ''}
+        ${sc.beneficio_desc ? `<div style="font-size:0.76rem;color:#6b7280;margin-bottom:8px;line-height:1.4;">${sc.beneficio_desc}</div>` : ''}
         <div class="sc-rows">
           <div class="sc-row" style="border-bottom:1px solid #e8eeff;padding-bottom:7px;margin-bottom:4px;">
             <span class="sc-k" style="font-weight:700;color:#333;">Edad de pensión</span>
@@ -1941,7 +1942,7 @@ function renderResults(res) {
               <span class="sc-k">Capital proyectado</span>
               <span class="sc-v" style="display:flex;align-items:center;gap:4px;">
                 ${fmtPesos(sc.capital)}
-                <span style="font-weight:400;color:#94a3b8;font-size:0.8em;white-space:nowrap;">(${sc.capital} SMMLV)</span>
+                <span style="font-weight:400;color:#6b7280;font-size:0.8em;white-space:nowrap;">(${sc.capital} SMMLV)</span>
                 <i class="info-icon" onclick="this.classList.toggle('open')">i<span class="tooltip">saldo actual + aportes futuros + rendimiento real 3%/año (rango 1.5–4.5%)</span></i>
               </span>
             </div>
@@ -1970,17 +1971,17 @@ function renderResults(res) {
         <div style="color:#374151;">Con tu capital proyectado podrías pensionarte a los <strong>${res.afp.edad_anticipada} años</strong> — <strong>${yearsDiff} año${yearsDiff !== 1 ? 's' : ''} antes</strong> de lo normal.</div>
         <div style="margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;">
           <div style="background:white;border-radius:7px;padding:8px 14px;border:1px solid #bbf7d0;">
-            <div style="font-size:0.75rem;color:#6b7280;">A los ${res.afp.edad_anticipada} años</div>
+            <div style="font-size:0.75rem;color:#4b5563;">A los ${res.afp.edad_anticipada} años</div>
             <div style="font-size:1.1rem;font-weight:800;color:#166534;">${mesadaAntic} SMMLV/mes</div>
-            <div style="font-size:0.72rem;color:#6b7280;">≈ ${fmtPesos(mesadaAntic)}/mes</div>
+            <div style="font-size:0.72rem;color:#4b5563;">≈ ${fmtPesos(mesadaAntic)}/mes</div>
           </div>
           <div style="background:white;border-radius:7px;padding:8px 14px;border:1px solid #e5e7eb;">
-            <div style="font-size:0.75rem;color:#6b7280;">A los ${res.afp.edad_pension} años</div>
+            <div style="font-size:0.75rem;color:#4b5563;">A los ${res.afp.edad_pension} años</div>
             <div style="font-size:1.1rem;font-weight:800;color:#374151;">${mesadaNormal} SMMLV/mes</div>
-            <div style="font-size:0.72rem;color:#6b7280;">≈ ${fmtPesos(mesadaNormal)}/mes</div>
+            <div style="font-size:0.72rem;color:#4b5563;">≈ ${fmtPesos(mesadaNormal)}/mes</div>
           </div>
         </div>
-        <div style="color:#6b7280;margin-top:8px;font-size:0.78rem;">Retirarte antes implica una mesada menor porque el capital se distribuye en más años de vida esperada. Requiere verificación con tu AFP (Art. 64, Ley 100).</div>
+        <div style="color:#4b5563;margin-top:8px;font-size:0.78rem;">Retirarte antes implica una mesada menor porque el capital se distribuye en más años de vida esperada. Requiere verificación con tu AFP (Art. 64, Ley 100).</div>
       </div>`;
   } else {
     anticipadaEl.style.display = 'none';
