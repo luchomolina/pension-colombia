@@ -1236,40 +1236,49 @@ function puedeTransladarse(data) {
 // ════════════════════════════════════════════════
 function evalColp(data) {
   const ret = RET_AGE[data.sexo];
+  const ytr = Math.max(0, ret - data.edad); // years to legal retirement age
   const alab = anosLab(data);
   const df = trayDens(data.trayectoria);
   const minW = minWeeks(data);
   const sal = salMid(data.salario);
   const efSal = sal * trayIbc(data.trayectoria); // IBC efectivo proyectado (trayectoria)
 
-  // Project weeks for the full working years declared — you CAN work and
-  // cotizar past the minimum retirement age in Colombia.
-  const future = alab * 52 * df;
-  const total = (data.semanas_actuales || 0) + future;
-
-  // En el RPM (Colpensiones) las SEMANAS son el requisito de elegibilidad.
-  // La edad solo define CUÁNDO empieza la mesada: si tienes las semanas pero
-  // aún no la edad, no pierdes nada — esperas hasta los 62/57 y te pensionas.
-  // La indemnización sustitutiva solo aplica si llegas a la edad de pensión
-  // SIN las semanas mínimas (Art. 37, Ley 100).
-  const cumpleW = total >= minW;
-  const logra = cumpleW;
+  // Weeks at legal retirement age — eligibility is checked at ret, not over a longer horizon.
+  // Working past ret to accumulate more weeks is an unusual personal decision; we default
+  // to indemnización sustitutiva if 1300 weeks aren't reached by ret, and show a secondary note.
   const stopAge = data.edad + alab; // edad a la que planea dejar de cotizar
+  const contribYrsColp = Math.min(alab, ytr); // contribution years up to legal age
+  const weeksAtRet = (data.semanas_actuales || 0) + contribYrsColp * 52 * df;
+  const future = alab * 52 * df;              // total future weeks over full horizon
+  const total  = (data.semanas_actuales || 0) + future;
 
-  // No logra pensión: no alcanzará las semanas mínimas → indemnización sustitutiva
+  const cumpleW = weeksAtRet >= minW; // meets minimum weeks BY legal retirement age
+  const logra = cumpleW;
+
+  // No logra pensión a la edad legal → indemnización sustitutiva
   if (!logra) {
-    const razon_no_pension = `No alcanzas las semanas mínimas: necesitas ${minW}, proyectas ${Math.round(total)} (faltan ${Math.round(minW - total)}). Al llegar a los ${ret} años sin completarlas, recibes una indemnización sustitutiva.`;
+    // Check if continuing to cotize PAST ret would eventually reach minW
+    const weeksToGo = Math.max(0, minW - (data.semanas_actuales || 0));
+    const yearsToWeeks = df > 0 ? weeksToGo / (52 * df) : 999;
+    const ageAtWeeksEver = Math.ceil(data.edad + yearsToWeeks);
+    const couldExtend = total >= minW && ageAtWeeksEver <= 80;
+
+    const razon_no_pension = `No alcanzas las semanas mínimas a los ${ret} años: necesitas ${minW}, proyectas ${Math.round(weeksAtRet)} (faltan ${Math.round(minW - weeksAtRet)}). Recibes una indemnización sustitutiva.`;
+    const nota_extension = couldExtend
+      ? `Alternativa: si continuaras cotizando más allá de los ${ret} años, completarías las ${minW} semanas a los ${ageAtWeeksEver} años y podrías acceder a pensión en Colpensiones — aunque implica seguir activo/a en el sistema más de lo planeado.`
+      : null;
     return {
       regimen: 'Colpensiones (RPM)',
       logra_pension: false,
       beneficio: 'Sin pensión mensual',
       beneficio_desc: 'Te devuelven lo cotizado en un solo pago (indemnización sustitutiva), sin mesada vitalicia.',
       razon_no_pension,
+      nota: nota_extension,
       edad_pension: null,
       mesada: 0,
       semanas_actuales: data.semanas_actuales,
-      semanas_proy: Math.round(total),
-      sem_faltantes: Math.max(0, Math.round(minW - total)),
+      semanas_proy: Math.round(weeksAtRet),
+      sem_faltantes: Math.max(0, Math.round(minW - weeksAtRet)),
       estab: 0.90, hereda: 0.15, riesgo: 0.65,
       iblNota: null
     };
@@ -1316,9 +1325,6 @@ function evalColp(data) {
     } else {
       nota = `Si paras a los ${Math.round(stopAge)}: las semanas ya cotizadas se conservan y la pensión empieza igual a los ${pensionAge}. Seguir aportando sube la mesada, no adelanta la fecha.`;
     }
-  } else if (pensionAge > ret + 2) {
-    // User reaches 1300 weeks after legal retirement age — note the assumption
-    nota = `Con tu trayectoria declarada completas las semanas mínimas a los ${pensionAge} años, asumiendo que sigues cotizando hasta entonces. A los ${ret} años, si aún no completaste 1300 semanas, podrías optar por indemnización sustitutiva en lugar de seguir cotizando.`;
   }
 
   return {
