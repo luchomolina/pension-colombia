@@ -1065,27 +1065,6 @@ function pick(field, val, el) {
     c.style.display = (val !== 'Colpensiones' && val !== 'ninguno') ? 'block' : 'none';
   }
 
-  // Live SMMLV conversion hint (wired once on first pick of fondo)
-  const saldoInput = document.getElementById('saldo_afp');
-  if (saldoInput && !saldoInput._wired) {
-    saldoInput._wired = true;
-    saldoInput.addEventListener('input', () => {
-      // Format as Colombian pesos with $ and dot separators
-      const raw = saldoInput.value.replace(/[^\d]/g, '');
-      const pesos = parseInt(raw) || 0;
-      saldoInput.value = pesos > 0 ? '$' + pesos.toLocaleString('es-CO') : (raw ? '$0' : '');
-      saldoInput.classList.remove('field-error');
-      // Live SMMLV conversion hint
-      const hint = document.getElementById('saldo-smmlv-hint');
-      if (pesos > 0) {
-        const smmlv = (pesos / SMMLV).toFixed(1);
-        hint.textContent = `≈ ${smmlv} SMMLV (SMMLV 2026 = $1.750.905)`;
-        hint.style.display = 'block';
-      } else {
-        hint.style.display = 'none';
-      }
-    });
-  }
   // Reform notice
   if (field === 'salario') {
     const mid = salMid(val);
@@ -2718,11 +2697,45 @@ document.addEventListener('keydown', e => {
 document.addEventListener('DOMContentLoaded', () => {
   initA11y();
   if (!leerHash()) restoreState();
+
   // Clear field-error on text inputs as soon as the user types
   ['edad', 'semanas_actuales', 'semanas_julio25'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener('input', () => el.classList.remove('field-error'));
   });
+
+  // Saldo AFP: digits only while typing → formatted on blur
+  const saldoEl = document.getElementById('saldo_afp');
+  const saldoHint = document.getElementById('saldo-smmlv-hint');
+  function updateSaldoHint(pesos) {
+    if (pesos > 0) {
+      saldoHint.textContent = `≈ ${(pesos / SMMLV).toFixed(1)} SMMLV (SMMLV 2026 = $1.750.905)`;
+      saldoHint.style.display = 'block';
+    } else {
+      saldoHint.style.display = 'none';
+    }
+  }
+  if (saldoEl) {
+    // While typing: show only digits (cursor stays where it is)
+    saldoEl.addEventListener('input', () => {
+      const raw = saldoEl.value.replace(/[^\d]/g, '');
+      saldoEl.value = raw;
+      saldoEl.classList.remove('field-error');
+      updateSaldoHint(parseInt(raw) || 0);
+    });
+    // On focus: strip formatting so the user can edit freely
+    saldoEl.addEventListener('focus', () => {
+      const raw = saldoEl.value.replace(/[^\d]/g, '');
+      saldoEl.value = raw;
+    });
+    // On blur: apply $X.XXX.XXX formatting
+    saldoEl.addEventListener('blur', () => {
+      const raw = saldoEl.value.replace(/[^\d]/g, '');
+      const pesos = parseInt(raw) || 0;
+      saldoEl.value = pesos > 0 ? '$' + pesos.toLocaleString('es-CO') : '';
+      updateSaldoHint(pesos);
+    });
+  }
 });
 </script>
 </body>
