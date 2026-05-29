@@ -30,7 +30,7 @@ vm.createContext(sandbox);
 
 // `var __T` se adhiere al global del contexto y puede ver consts del mismo script.
 const shim = `;var __T = { decidir, evalColp, evalAFP, pesos, score, enTransicion,
-  minWeeks, puedeTransladarse, resolverAnos, anosLab, salMid, dens, fmtPesos,
+  minWeeks, puedeTransladarse, resolverAnos, anosLab, salMid, trayDens, trayIbc, fmtPesos,
   ANOS_RANGE, AFP_RETURN_REAL, RET_AGE, BASE_WEEKS };`;
 vm.runInContext(m[1] + shim, sandbox);
 const T = sandbox.__T;
@@ -41,7 +41,7 @@ function mk(o = {}) {
     edad: 40, sexo: 'M', fondo_actual: 'Porvenir',
     semanas_actuales: 700, semanas_julio25: 650, saldo_afp: 0,
     ha_trasladado: 'no', especiales: [],
-    salario: '3-5', anos_lab: '10-15', densidad: 'siempre',
+    salario: '3-5', anos_lab: '10-15', trayectoria: 'pleno',
     hijos: '0', preferencias: []
   }, o);
 }
@@ -94,7 +94,7 @@ test('Colpensiones: sin semanas suficientes => indemnización sustitutiva', () =
 // ════════════════════════════════════════════════
 test('Colpensiones: la tasa de reemplazo baja cuando sube el salario', () => {
   // mismas semanas (mismo bonus), distinto salario → el ingreso es lo único que cambia
-  const comun = { edad: 55, semanas_actuales: 1300, anos_lab: '<5', densidad: 'siempre' };
+  const comun = { edad: 55, semanas_actuales: 1300, anos_lab: '<5', trayectoria: 'pleno' };
   const bajo = T.evalColp(mk({ ...comun, salario: '1-2' }));   // IBL ≈ 1.5 SMMLV
   const alto = T.evalColp(mk({ ...comun, salario: 'gt8' }));   // IBL ≈ 11 SMMLV
   assert.ok(bajo.tasa > alto.tasa, `tasa baja-renta (${bajo.tasa}%) > alta-renta (${alto.tasa}%)`);
@@ -226,7 +226,7 @@ test('AFP: garantía mínima se activa con 1150 semanas, no 1300', () => {
   // el capital no alcanza 1 SMMLV pero el Estado garantiza 1 SMMLV de mesada.
   const r = T.evalAFP(mk({
     edad: 57, sexo: 'F', semanas_actuales: 1200, saldo_afp: 50,
-    salario: 'lt1', anos_lab: '<5', densidad: 'irregular'
+    salario: 'lt1', anos_lab: '<5', trayectoria: 'reduciendo'
   }));
   // Con tan poco capital e ingresos la mesada bruta sería < 1 SMMLV,
   // pero la garantía estatal debe activarse (logra_pension = true, mesada = 1.0).
@@ -236,11 +236,11 @@ test('AFP: garantía mínima se activa con 1150 semanas, no 1300', () => {
 });
 
 test('AFP: sin garantía cuando las semanas proyectadas son < 1150', () => {
-  // Con 1100 actuales, alab=2 (retirar_pronto en rango <5) y densidad irregular:
+  // Con 1100 actuales, alab=2 (retirar_pronto en rango <5) y trayectoria reduciendo (d=0.35):
   // futW = 2 × 52 × 0.35 = 36 → totalW = 1136 < 1150 → garantia debe ser false.
   const r = T.evalAFP(mk({
     edad: 57, sexo: 'F', semanas_actuales: 1100, saldo_afp: 50,
-    salario: 'lt1', anos_lab: '<5', densidad: 'irregular',
+    salario: 'lt1', anos_lab: '<5', trayectoria: 'reduciendo',
     preferencias: ['retirar_pronto'] // fuerza alab = lo = 2
   }));
   assert.ok(!r.garantia_min, `sin garantia_min con totalW < 1150 (semanas=${r.semanas_proy})`);
@@ -257,7 +257,7 @@ test('AFP: capital e mesada plausibles para el caso gt8 auditado', () => {
   const r = T.evalAFP(mk({
     edad: 45, semanas_actuales: 842, saldo_afp: 183.3,
     salario: 'gt8', anos_lab: '5-10',
-    densidad: 'siempre', preferencias: ['maximizar_mesada'] // alab = hi = 10
+    trayectoria: 'pleno', preferencias: ['maximizar_mesada'] // alab = hi = 10
   }));
   assert.ok(r.capital >= 480 && r.capital <= 550,
     `capital ~500 SMMLV (fue ${r.capital})`);
@@ -274,7 +274,7 @@ test('AFP: capital e mesada plausibles para un cotizante de 3-5 SMMLV', () => {
   const r = T.evalAFP(mk({
     edad: 40, semanas_actuales: 700, saldo_afp: 0,
     salario: '3-5', anos_lab: '15-20',
-    densidad: 'siempre', preferencias: []
+    trayectoria: 'pleno', preferencias: []
   }));
   assert.ok(Number.isFinite(r.mesada) && r.mesada > 0, 'mesada finita y positiva');
   assert.ok(r.capital > 150 && r.capital < 500, `capital en rango plausible (fue ${r.capital})`);

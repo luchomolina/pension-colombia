@@ -188,21 +188,17 @@ input[type="number"]:focus { outline: none; border-color: #003893; box-shadow: 0
 .sc-row .sc-k { color: #5c6470; }
 .sc-row .sc-v { font-weight: 600; color: #333; }
 .sc-nopension { font-size: 0.8rem; color: #c62828; font-weight: 700; margin-top: 8px; }
-/* Callouts de nota en tarjetas de escenario */
-.sc-nota-info {
-  display: flex; gap: 7px; align-items: flex-start;
-  background: #f0f4ff; border-left: 3px solid #6b8cff;
-  border-radius: 0 7px 7px 0; padding: 8px 10px; margin-top: 10px;
-  font-size: 0.74rem; color: #2d3a5e; line-height: 1.45;
+/* Notas al pie de tarjetas de escenario */
+.sc-nota-block {
+  border-top: 1px solid #e8ecf0; margin-top: 10px; padding-top: 8px;
+  display: flex; flex-direction: column; gap: 5px;
 }
-.sc-nota-info .nota-icon { flex-shrink: 0; font-size: 0.85rem; margin-top: 1px; }
-.sc-nota-warn {
-  display: flex; gap: 7px; align-items: flex-start;
-  background: #fff8e6; border-left: 3px solid #f59e0b;
-  border-radius: 0 7px 7px 0; padding: 8px 10px; margin-top: 6px;
-  font-size: 0.74rem; color: #78350f; line-height: 1.45;
+.sc-nota-line {
+  display: flex; gap: 5px; align-items: baseline;
+  font-size: 0.79rem; color: #6b7280; line-height: 1.45;
 }
-.sc-nota-warn .nota-icon { flex-shrink: 0; font-size: 0.85rem; margin-top: 1px; }
+.sc-nota-line.nota-warn { color: #92400e; }
+.sc-nota-line .nota-ico { flex-shrink: 0; font-size: 0.72rem; line-height: 1.6; }
 .info-icon {
   display: inline-flex; align-items: center; justify-content: center;
   width: 14px; height: 14px; border-radius: 50%;
@@ -664,22 +660,19 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
     </div>
 
     <div class="field">
-      <label>¿Con qué regularidad cotizarás durante ese período? <span style="font-weight:400;color:#888;">(promedio sobre los años que declaraste arriba)</span></label>
+      <label>¿Cómo ves tu trayectoria laboral durante ese período?</label>
       <div id="hint-independiente" style="display:none;margin-bottom:8px;padding:8px 12px;background:#fff3e0;border-left:3px solid #fb8c00;border-radius:0 6px 6px 0;font-size:0.82rem;color:#e65100;">
-        💼 Como independiente, sé conservador/a aquí — los períodos sin contrato suelen traducirse en cotizaciones irregulares aunque los ingresos sean buenos.
+        💼 Como independiente, considera que los períodos sin contrato y las cotizaciones sobre IBC reducido son la norma — elige <strong>Moderando</strong> o <strong>Bajando</strong> según tu situación real.
       </div>
       <div class="radio-group" style="margin-top:8px;">
-        <div class="radio-item" onclick="pick('densidad','siempre',this)">
-          <input type="radio" name="dens" value="siempre"> Siempre o casi siempre (90%+ del tiempo)
+        <div class="radio-item" onclick="pick('trayectoria','pleno',this)">
+          <input type="radio" name="tray" value="pleno"> <strong>A pleno</strong> — cotizaré igual o más que ahora
         </div>
-        <div class="radio-item" onclick="pick('densidad','frecuente',this)">
-          <input type="radio" name="dens" value="frecuente"> Frecuentemente (70 – 80% del tiempo)
+        <div class="radio-item" onclick="pick('trayectoria','moderando',this)">
+          <input type="radio" name="tray" value="moderando"> <strong>Moderando</strong> — trabajaré o ganaré menos que ahora
         </div>
-        <div class="radio-item" onclick="pick('densidad','medio',this)">
-          <input type="radio" name="dens" value="medio"> Aproximadamente la mitad del tiempo
-        </div>
-        <div class="radio-item" onclick="pick('densidad','irregular',this)">
-          <input type="radio" name="dens" value="irregular"> Irregular o difícil de predecir
+        <div class="radio-item" onclick="pick('trayectoria','reduciendo',this)">
+          <input type="radio" name="tray" value="reduciendo"> <strong>Bajando</strong> — semi-retiro o ingresos de otras fuentes
         </div>
       </div>
     </div>
@@ -918,7 +911,7 @@ const S = {
   edad: null, sexo: null, fondo_actual: null,
   semanas_actuales: 0, semanas_julio25: 0, saldo_afp: 0,
   ha_trasladado: null, especiales: [],
-  salario: null, anos_lab: null, densidad: null,
+  salario: null, anos_lab: null, trayectoria: null,
   hijos: null, preferencias: []
 };
 
@@ -929,7 +922,7 @@ let LAST = null;
 //  ETIQUETAS LEGIBLES (compartidas: prompt IA + descarga)
 // ════════════════════════════════════════════════
 const SAL_LBL  = { lt1:'menos de 1 SMMLV', '1-2':'1–2 SMMLV', '2-3':'2–3 SMMLV', '3-5':'3–5 SMMLV', '5-8':'5–8 SMMLV', gt8:'más de 8 SMMLV' };
-const DENS_LBL = { siempre:'siempre o casi siempre', frecuente:'frecuentemente', medio:'la mitad del tiempo', irregular:'de forma irregular' };
+const TRAY_LBL = { pleno:'a pleno (igual o más que ahora)', moderando:'moderando (menos trabajo o ingresos)', reduciendo:'bajando (semi-retiro / otras fuentes)' };
 const CONF_LBL = { alta:'Alta (recomendación firme)', media:'Media (con matices)', baja:'Baja (caso complejo — consulta un experto)' };
 const PREF_LBL = {
   maximizar_mesada:'Maximizar la mesada mensual',
@@ -1008,7 +1001,7 @@ function checkToggle(val, el) {
     if (i > -1) S.especiales.splice(i, 1); else S.especiales.push(val);
   }
 
-  // Mostrar hint de densidad cuando el usuario marca que es independiente
+  // Mostrar hint de trayectoria cuando el usuario marca que es independiente
   const hint = document.getElementById('hint-independiente');
   if (hint) hint.style.display = S.especiales.includes('independiente_actual') ? 'block' : 'none';
   refreshAria();
@@ -1127,7 +1120,7 @@ function validate(step) {
   if (step === 3) {
     if (!S.salario) { ok = false; msg = 'Selecciona tu rango salarial.'; }
     else if (!S.anos_lab) { ok = false; msg = 'Indica cuántos años más planeas cotizar.'; }
-    else if (!S.densidad) { ok = false; msg = 'Indica con qué regularidad cotizarás.'; }
+    else if (!S.trayectoria) { ok = false; msg = 'Indica tu trayectoria laboral futura.'; }
   }
 
   if (step === 4) {
@@ -1169,7 +1162,14 @@ const AFP_RETURN_REAL = { lo: 0.015, mid: 0.03, hi: 0.045 };
 
 const SMMLV = 1750905; // SMMLV 2026 (Decreto 1469 de 2025) — actualizar cada año
 const SAL_MAP = { lt1: 0.85, '1-2': 1.5, '2-3': 2.5, '3-5': 4.0, '5-8': 6.5, gt8: 11.0 };
-const DENS_MAP = { siempre: 0.92, frecuente: 0.75, medio: 0.55, irregular: 0.35 };
+// Trayectoria laboral futura: captura tanto la densidad de cotización como la
+// magnitud del IBC relativo al salario actual. d = fracción del tiempo cotizando,
+// ibc = factor aplicado al salario declarado para proyectar aportes e IBL.
+const TRAY_MAP = {
+  pleno:      { d: 0.92, ibc: 1.00 }, // cotizaré igual o más que ahora
+  moderando:  { d: 0.65, ibc: 0.70 }, // trabajaré o ganaré menos
+  reduciendo: { d: 0.35, ibc: 0.35 }, // semi-retiro / otras fuentes de ingreso
+};
 
 // Rango de años de cotización. "mid" = valor neutral (sin preferencia de duración).
 const ANOS_RANGE = {
@@ -1181,7 +1181,8 @@ const ANOS_RANGE = {
 };
 
 function salMid(r) { return SAL_MAP[r] || 2.0; }
-function dens(d) { return DENS_MAP[d] || 0.70; }
+function trayDens(t) { return (TRAY_MAP[t] || TRAY_MAP.pleno).d; }
+function trayIbc(t)  { return (TRAY_MAP[t] || TRAY_MAP.pleno).ibc; }
 
 // Convierte un monto en SMMLV (pesos de hoy) a un texto en pesos legible.
 // Ej: 5.1 → "$7,3 millones" · 537.9 → "$766 millones" · 0.6 → "$854.000"
@@ -1241,9 +1242,10 @@ function puedeTransladarse(data) {
 function evalColp(data) {
   const ret = RET_AGE[data.sexo];
   const alab = anosLab(data);
-  const df = dens(data.densidad);
+  const df = trayDens(data.trayectoria);
   const minW = minWeeks(data);
   const sal = salMid(data.salario);
+  const efSal = sal * trayIbc(data.trayectoria); // IBC efectivo proyectado (trayectoria)
 
   // Project weeks for the full working years declared — you CAN work and
   // cotizar past the minimum retirement age in Colombia.
@@ -1289,12 +1291,13 @@ function evalColp(data) {
   // IBL: usamos el salario actual, asumiendo salario ~estable en términos
   // reales hasta el retiro. El IBL legal es el promedio de los 10 años
   // ANTERIORES a la pensión (Ley 100 art. 21), no los últimos 10 desde hoy.
-  const ibl = sal; // en SMMLV
+  // Usamos efSal (salario × factor trayectoria) como proxy del IBL futuro.
+  const ibl = efSal; // en SMMLV
   const rBase = Math.max(0.55, Math.min(0.65, 0.655 - 0.005 * ibl));
   const extra = Math.max(0, total - BASE_WEEKS);
   const bonus = Math.floor(extra / 50) * 0.015;
   const tasa = Math.min(0.80, rBase + bonus);
-  const mesada = Math.max(sal * tasa, 1.0);
+  const mesada = Math.max(efSal * tasa, 1.0);
 
   // Si planea dejar de cotizar antes de la edad de pensión, la mesada igual
   // empieza a los 62/57 — las semanas no se pierden. Lo explicamos.
@@ -1333,9 +1336,10 @@ function evalColp(data) {
 function evalAFP(data) {
   const ret = RET_AGE[data.sexo];
   const ytr = Math.max(0, ret - data.edad);
-  const df = dens(data.densidad);
+  const df = trayDens(data.trayectoria);
   const minW = minWeeks(data);
   const sal = salMid(data.salario);
+  const efSal = sal * trayIbc(data.trayectoria); // IBC efectivo proyectado (trayectoria)
   const alab = anosLab(data);
 
   // Current balance
@@ -1349,7 +1353,7 @@ function evalAFP(data) {
   // Compound projection — use full declared working years (can work past ret age)
   // Independientes tienden a declarar IBC menor al ingreso real → factor 0.85 sobre la tasa
   const afpRate = data.especiales.includes('independiente_actual') ? AFP_RATE * 0.85 : AFP_RATE;
-  const mc = sal * afpRate * df;
+  const mc = efSal * afpRate * df;
 
   const stopAge = data.edad + alab;
   const retireAge = Math.max(ret, stopAge);
@@ -1554,7 +1558,7 @@ function buildPrompt(result) {
     `Situaciones especiales: ${S.especiales.length ? S.especiales.join(', ') : 'ninguna'}`,
     `Salario: ${SAL_LBL[S.salario]}`,
     `Años que planea cotizar (resuelto según prioridades): ~${anosLab(S)} (rango elegido: ${ANOS_RANGE[S.anos_lab]?.label || S.anos_lab})`,
-    `Frecuencia cotización futura: ${DENS_LBL[S.densidad]}`,
+    `Trayectoria laboral futura: ${TRAY_LBL[S.trayectoria]}`,
     `Número de hijos: ${S.hijos}`,
     `Prioridades: ${S.preferencias.join(', ')}`
   ].join('\n');
@@ -1867,8 +1871,7 @@ function renderResults(res) {
           <div class="sc-row"><span class="sc-k">Riesgo</span><span class="sc-v">${bar(sc.riesgo,true)}</span></div>
         </div>
         ${sc.razon_no_pension ? `<div class="sc-nopension" style="font-weight:400;font-size:0.76rem;margin-top:8px;">⚠️ ${sc.razon_no_pension}</div>` : ''}
-        ${sc.nota ? `<div class="sc-nota-info"><span class="nota-icon">ℹ️</span><span>${sc.nota}</span></div>` : ''}
-        ${sc.iblNota ? `<div class="sc-nota-warn"><span class="nota-icon">⚠️</span><span><strong>Estimación asume cotización continua.</strong> ${sc.iblNota}</span></div>` : ''}
+        ${(sc.nota || sc.iblNota) ? `<div class="sc-nota-block">${sc.nota ? `<div class="sc-nota-line"><span class="nota-ico">ℹ️</span><span>${sc.nota}</span></div>` : ''}${sc.iblNota ? `<div class="sc-nota-line nota-warn"><span class="nota-ico">⚠️</span><span>${sc.iblNota}</span></div>` : ''}</div>` : ''}
       </div>`;
   });
   document.getElementById('scenarios-grid').innerHTML = html;
@@ -1970,7 +1973,7 @@ function reiniciar() {
     edad:null,sexo:null,fondo_actual:null,
     semanas_actuales:0,semanas_julio25:0,saldo_afp:0,
     ha_trasladado:null,especiales:[],
-    salario:null,anos_lab:null,densidad:null,
+    salario:null,anos_lab:null,trayectoria:null,
     hijos:null,preferencias:[]
   });
 
@@ -2002,7 +2005,7 @@ function verEjemplo() {
     edad: 38, sexo: 'M', fondo_actual: 'Porvenir',
     semanas_actuales: 700, semanas_julio25: 660, saldo_afp: 0,
     ha_trasladado: 'no', especiales: [],
-    salario: '2-3', anos_lab: '15-20', densidad: 'frecuente',
+    salario: '2-3', anos_lab: '15-20', trayectoria: 'pleno',
     hijos: '2', preferencias: ['maximizar_mesada', 'menor_riesgo']
   });
   document.getElementById('trust-intro').style.display = 'none';
@@ -2037,7 +2040,7 @@ function applyStateToUI() {
   if (S.semanas_julio25) document.getElementById('semanas_julio25').value = S.semanas_julio25;
   if (S.saldo_afp > 0) document.getElementById('saldo_afp').value = Math.round(S.saldo_afp * SMMLV);
 
-  ['sexo', 'fondo_actual', 'ha_trasladado', 'salario', 'anos_lab', 'densidad', 'hijos'].forEach(f => {
+  ['sexo', 'fondo_actual', 'ha_trasladado', 'salario', 'anos_lab', 'trayectoria', 'hijos'].forEach(f => {
     if (S[f] == null) return;
     const el = document.querySelector(`[onclick="pick('${f}','${S[f]}',this)"]`);
     if (el) el.classList.add('selected');
@@ -2065,7 +2068,7 @@ function restoreState() {
   let saved;
   try { saved = JSON.parse(sessionStorage.getItem('pension_S')); } catch (e) { return; }
   if (!saved) return;
-  const fields = ['edad','sexo','fondo_actual','semanas_actuales','semanas_julio25','saldo_afp','ha_trasladado','especiales','salario','anos_lab','densidad','hijos','preferencias'];
+  const fields = ['edad','sexo','fondo_actual','semanas_actuales','semanas_julio25','saldo_afp','ha_trasladado','especiales','salario','anos_lab','trayectoria','hijos','preferencias'];
   for (const f of fields) if (saved[f] !== undefined) S[f] = saved[f];
   if (!S.edad && !S.sexo && !S.fondo_actual) return; // nada útil que restaurar
   applyStateToUI();
@@ -2075,7 +2078,7 @@ function restoreState() {
 // ════════════════════════════════════════════════
 //  COMPARTIR — enlace con los datos en el hash (100% cliente)
 // ════════════════════════════════════════════════
-const SHARE_FIELDS = ['edad','sexo','fondo_actual','semanas_actuales','semanas_julio25','saldo_afp','ha_trasladado','especiales','salario','anos_lab','densidad','hijos','preferencias'];
+const SHARE_FIELDS = ['edad','sexo','fondo_actual','semanas_actuales','semanas_julio25','saldo_afp','ha_trasladado','especiales','salario','anos_lab','trayectoria','hijos','preferencias'];
 
 // Diccionarios para el codec posicional (#s=). El ORDEN es el contrato del
 // enlace: no reordenar sin romper compatibilidad de links ya compartidos.
@@ -2083,7 +2086,7 @@ const COD = {
   fondo: ['Colpensiones','Porvenir','Proteccion','Colfondos','Skandia','ninguno'],
   sal:   ['lt1','1-2','2-3','3-5','5-8','gt8'],
   anos:  ['<5','5-10','10-15','15-20','>20'],
-  dens:  ['siempre','frecuente','medio','irregular'],
+  tray:  ['pleno','moderando','reduciendo'],
   esp:   ['bono_pensional','independiente_actual','ninguna'],
   pref:  ['maximizar_mesada','retirar_pronto','heredar','menor_riesgo','garantia_estado']
 };
@@ -2092,7 +2095,7 @@ const maskOf = (arr, list) => (list || []).reduce((m, v) => { const i = arr.inde
 const fromMask = (arr, mask) => arr.filter((_, i) => (mask & (1 << i)) !== 0);
 
 // Codifica el estado en una cadena posicional corta separada por '.'.
-// v1: version.edad.sexo.fondo.semA.semJ.saldo×100.traslado.espMask.sal.anos.dens.hijos.prefMask
+// v1: version.edad.sexo.fondo.semA.semJ.saldo×100.traslado.espMask.sal.anos.tray.hijos.prefMask
 function codShort() {
   return [
     '1',
@@ -2106,7 +2109,7 @@ function codShort() {
     maskOf(COD.esp, S.especiales),
     idxOf(COD.sal, S.salario),
     idxOf(COD.anos, S.anos_lab),
-    idxOf(COD.dens, S.densidad),
+    idxOf(COD.tray, S.trayectoria),
     S.hijos ?? '',
     maskOf(COD.pref, S.preferencias)
   ].join('.');
@@ -2129,7 +2132,7 @@ function decShort(code) {
   S.especiales = fromMask(COD.esp, num(p[8]) || 0);
   S.salario = COD.sal[num(p[9])] ?? null;
   S.anos_lab = COD.anos[num(p[10])] ?? null;
-  S.densidad = COD.dens[num(p[11])] ?? null;
+  S.trayectoria = COD.tray[num(p[11])] ?? null;
   S.hijos = p[12] === '' ? null : String(num(p[12]) ?? '');
   S.preferencias = fromMask(COD.pref, num(p[13]) || 0);
   return true;
@@ -2222,7 +2225,7 @@ function construirTextoResultados() {
   L.push(`  Salario: ${SAL_LBL[S.salario] || '—'}`);
   L.push(`  Años que planea seguir cotizando: ~${anosLab(S)} (rango elegido: ${ANOS_RANGE[S.anos_lab]?.label || S.anos_lab})`);
   if (r.anosNota) L.push(`    ${r.anosNota}`);
-  L.push(`  Regularidad de cotización futura: ${DENS_LBL[S.densidad] || '—'}`);
+  L.push(`  Trayectoria laboral futura: ${TRAY_LBL[S.trayectoria] || '—'}`);
   L.push(`  Número de hijos: ${S.hijos}`);
   L.push(`  Prioridades: ${S.preferencias.length ? S.preferencias.map(p => PREF_LBL[p] || p).join('; ') : '—'}`);
   L.push('', sub, '');
