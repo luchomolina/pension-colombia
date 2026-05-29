@@ -2025,10 +2025,10 @@ function renderResults(res) {
 
   let verdictEyebrow, verdictSub;
   if (_highlightEarly) {
-    verdictEyebrow = 'Para tu situación y tu meta de retirarte pronto, lo mejor es';
+    verdictEyebrow = 'Para tu meta de retirarte pronto, la simulación apunta a';
     verdictSub = `Retiro anticipado posible a los <strong>${res.afp.edad_anticipada} años</strong>: ~${res.afp.mesada_anticipada} SMMLV/mes · ${fmtPesos(res.afp.mesada_anticipada)}/mes`;
   } else {
-    verdictEyebrow = 'Para tu situación, lo mejor es';
+    verdictEyebrow = 'Según tu perfil simulado,';
     verdictSub = res.mejor.logra_pension
       ? `Pensión estimada: ~${res.mejor.mesada} SMMLV/mes · ${fmtPesos(res.mejor.mesada)}/mes en pesos de hoy`
       : 'Con tu situación actual no alcanzarías pensión completa';
@@ -2107,7 +2107,7 @@ function renderResults(res) {
 
     html += `
       <div class="sc-card ${win ? 'winner' : ''}">
-        ${win ? '<div class="sc-best-pill">✓ Recomendada</div>' : ''}
+        ${win ? '<div class="sc-best-pill">Mejor resultado simulado</div>' : ''}
         <div class="sc-regime">${sc.regimen}</div>
         ${pensionBlock}
         <div class="sc-pro-con">${pcHtml}</div>
