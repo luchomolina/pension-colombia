@@ -40,8 +40,20 @@ RECOMENDACIÓN — puntaje ponderado sobre 5 dimensiones:
 "garantía estado" +15% estab +5% riesgo −10% mesada.
 • Confianza: alta si diferencia de scores >0.15, media 0.07–0.15, baja <0.07.
 
+RÉGIMEN DE TRANSICIÓN (Ley 2381 art. 75) — REGLA ESTRICTA:
+• Califica SOLO si al 1-jul-2025 tenía ≥900 semanas (hombre) o ≥750 semanas (mujer).
+• Si el prompt dice "Régimen de transición: No", NO menciones la posibilidad de transición \
+  en ninguna sección. Decir "podrías optar por régimen de transición" cuando no califica es incorrecto.
+• Si el prompt dice "Régimen de transición: Sí", explica el beneficio (reglas Ley 100, \
+  sin cotización forzada en Colpensiones).
+
+PENSIÓN ANTICIPADA — cuando AFP gana y el usuario quiere retirarse pronto:
+• Si el prompt incluye "Pensión anticipada posible: X años con Y SMMLV" y la prioridad \
+  del usuario es retirarse pronto, destaca esa opción como la recomendación concreta, \
+  no solo la pensión regular a los 62/57 años.
+
 Ley 2381/2024 está SUSPENDIDA (Auto 841/2025 de la Corte Constitucional). \
-Hoy rige la Ley 100. Menciona la reforma solo en condicional.`;
+Hoy rige la Ley 100. Menciona la reforma solo en condicional, y SOLO si aplica al perfil.`;
 
 const WINDOW_MS = 60_000;      // ventana de 1 minuto
 const MAX_HITS = 8;            // máx. peticiones por IP por ventana

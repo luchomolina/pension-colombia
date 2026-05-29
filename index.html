@@ -1836,14 +1836,29 @@ function renderResults(res) {
   else if (_mismo) accionUI = `Quédate en <strong>${S.fondo_actual}</strong>`;
   else accionUI = `Pásate de ${S.fondo_actual} a <strong>${res.mejor.regimen}</strong>`;
 
+  // Detect early-retirement highlight: AFP wins + early option available + user wants to retire early
+  const _afpWins = !res.mejor.regimen.includes('Colpensiones');
+  const _earlyOpt = res.afp && res.afp.edad_anticipada != null && res.afp.mesada_anticipada != null;
+  const _prioEarly = Array.isArray(S.preferencias) && S.preferencias.includes('retirar_pronto');
+  const _highlightEarly = _afpWins && _earlyOpt && _prioEarly;
+
+  let verdictEyebrow, verdictSub;
+  if (_highlightEarly) {
+    verdictEyebrow = 'Para tu situación y tu meta de retirarte pronto, lo mejor es';
+    verdictSub = `Retiro anticipado posible a los <strong>${res.afp.edad_anticipada} años</strong>: ~${res.afp.mesada_anticipada} SMMLV/mes · ${fmtPesos(res.afp.mesada_anticipada)}/mes`;
+  } else {
+    verdictEyebrow = 'Para tu situación, lo mejor es';
+    verdictSub = res.mejor.logra_pension
+      ? `Pensión estimada: ~${res.mejor.mesada} SMMLV/mes · ${fmtPesos(res.mejor.mesada)}/mes en pesos de hoy`
+      : 'Con tu situación actual no alcanzarías pensión completa';
+  }
+
   document.getElementById('verdict-area').innerHTML = `
     <div class="verdict-card">
-      <div class="verdict-eyebrow">Para tu situación, lo mejor es</div>
+      <div class="verdict-eyebrow">${verdictEyebrow}</div>
       <div class="verdict-name">${res.mejor.regimen}</div>
       <div class="verdict-action">${accionUI}</div>
-      <div class="verdict-sub">${res.mejor.logra_pension
-        ? `Pensión estimada: ~${res.mejor.mesada} SMMLV/mes · ${fmtPesos(res.mejor.mesada)}/mes en pesos de hoy`
-        : `Con tu situación actual no alcanzarías pensión completa`}</div>
+      <div class="verdict-sub">${verdictSub}</div>
       <span class="conf-badge ${cmap[res.confianza]}">${ctxt[res.confianza]}</span>
     </div>`;
 
