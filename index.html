@@ -2063,6 +2063,7 @@ function renderResults(res) {
   let html = '';
   both.forEach(sc => {
     const win = sc.regimen === res.mejor.regimen;
+    const isColp = sc.regimen.includes('Colpensiones');
     const pcItems = prosCons(sc);
 
     // Pension amount block
@@ -2104,7 +2105,19 @@ function renderResults(res) {
           <span class="sc-k">Tasa de reemplazo <i class="info-icon" onclick="this.classList.toggle('open')">i<span class="tooltip" style="white-space:normal;width:220px;">Ley 100 art. 34: 65.5 − 0.5×(IBL en SMMLV), +1.5% por cada 50 semanas extra (tope 80%). El IBL real es el promedio de los 10 años anteriores al retiro.</span></i></span>
           <span class="sc-v">${sc.tasa}%</span>
         </div>` : ''}
-      ${sc.beneficio_desc ? `<div class="sc-row"><span style="font-size:0.75rem;color:#6b7280;line-height:1.4;">${sc.beneficio_desc}</span></div>` : ''}`;
+      ${sc.beneficio_desc ? `<div class="sc-row"><span style="font-size:0.75rem;color:#6b7280;line-height:1.4;">${sc.beneficio_desc}</span></div>` : ''}
+      <div class="sc-row">
+        <span class="sc-k">Estabilidad <i class="info-icon" onclick="this.classList.toggle('open')">i<span class="tooltip" style="white-space:normal;width:230px;">${isColp ? 'Colpensiones es un régimen de beneficio definido: la mesada es fija y garantizada por el Estado, sin importar los mercados.' : 'AFP es un régimen de capitalización individual: la mesada depende del capital acumulado y del rendimiento real del fondo.'}</span></i></span>
+        <span class="sc-v">${bar(sc.estab, false)}</span>
+      </div>
+      <div class="sc-row">
+        <span class="sc-k">Herencia <i class="info-icon" onclick="this.classList.toggle('open')">i<span class="tooltip" style="white-space:normal;width:230px;">${isColp ? 'No hay cuenta individual heredable. Los beneficiarios pueden acceder a pensión de sobrevivientes (Ley 100, art. 46).' : 'El saldo es tuyo. Los beneficiarios acceden a pensión de sobrevivientes o, si nadie califica, heredan el saldo.'}</span></i></span>
+        <span class="sc-v">${bar(sc.hereda, false)}</span>
+      </div>
+      <div class="sc-row">
+        <span class="sc-k">Riesgo <i class="info-icon" onclick="this.classList.toggle('open')">i<span class="tooltip" style="white-space:normal;width:230px;">${isColp ? 'Riesgo político/normativo: las reglas del sistema pueden cambiar (reforma pensional). La garantía del Estado reduce el riesgo financiero.' : 'Riesgo de mercado: el capital depende del rendimiento real del fondo. La Ley 100 (Art. 101) exige una rentabilidad mínima garantizada.'} Más barras = más riesgo.</span></i></span>
+        <span class="sc-v">${bar(sc.riesgo, true)}</span>
+      </div>`;
 
     html += `
       <div class="sc-card ${win ? 'winner' : ''}">
