@@ -222,6 +222,10 @@ input[type="number"]:focus { outline: none; border-color: #003893; box-shadow: 0
 
 .section-card { background: white; border-radius: 16px; padding: 22px; margin: 12px 0; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
 .section-card h3 { font-size: 1rem; font-weight: 800; color: #003893; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.smmlv-note { font-size: 0.76rem; color: #6b7280; line-height: 1.5; margin: 14px 0 0; }
+.sem-summary { font-size: 0.82rem; color: #444; margin-bottom: 12px; line-height: 1.5; }
+.sem-req { color: #888; margin-left: 4px; }
+.sem-nota { color: #33415c; }
 .ai-text { font-size: 0.88rem; line-height: 1.7; color: #333; }
 .ai-section-header {
   font-size: 0.75rem; font-weight: 800; color: #003893;
@@ -763,74 +767,61 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
     <div id="verdict-area"></div>
 
     <div class="section-card">
-      <h3>📊 Comparación de escenarios</h3>
+      <h3>Las dos opciones</h3>
       <div id="semanas-shared"></div>
       <div class="scenarios-grid" id="scenarios-grid"></div>
-      <div style="background:#eef4ff;border-radius:9px;padding:11px 14px;margin-top:12px;font-size:0.78rem;color:#33415c;line-height:1.5;">
-        💡 <strong>¿Pesos de hoy o de cuando me pensione?</strong> Las cifras están en <strong>pesos de hoy</strong> (lo que comprarían hoy). Recibirás esa cantidad de <strong>salarios mínimos</strong> al pensionarte: el número en pesos será mayor por la inflación, pero su poder de compra será parecido. Por eso medimos todo en SMMLV.
-      </div>
       <div id="anticipada-callout" style="display:none;"></div>
       <div class="reform-impact" id="reform-impact"></div>
+      <p class="smmlv-note">Las cifras están en <strong>pesos de hoy</strong> (poder de compra actual, en salarios mínimos). En el futuro el monto en pesos será mayor por inflación, pero comprará algo similar.</p>
     </div>
 
     <div class="section-card ai-cta-card" id="ai-section">
-      <h3>🤖 Tu análisis personalizado</h3>
-      <p class="ai-cta-tagline">Explicación adaptada a tus datos exactos · generado en ~10 segundos</p>
+      <h3>¿Qué hago ahora?</h3>
+      <p class="ai-cta-tagline">Análisis personalizado con IA · ~10 segundos</p>
       <div class="ai-preview" id="ai-preview">
         <div class="ai-preview-item">
           <span class="ai-preview-icon">🎯</span>
           <div class="ai-preview-label">
-            <div class="ai-preview-title">Recomendación clara</div>
-            <div class="ai-preview-desc">Qué deberías hacer con tu fondo y por qué</div>
-          </div>
-          <span class="ai-lock">🔒</span>
-        </div>
-        <div class="ai-preview-item">
-          <span class="ai-preview-icon">📋</span>
-          <div class="ai-preview-label">
-            <div class="ai-preview-title">Impacto de la Reforma 2024</div>
-            <div class="ai-preview-desc">Qué pasaría contigo si la reforma (hoy suspendida) entra en vigencia</div>
+            <div class="ai-preview-title">Por qué te conviene esta opción</div>
+            <div class="ai-preview-desc">Explicación con tus números exactos</div>
           </div>
           <span class="ai-lock">🔒</span>
         </div>
         <div class="ai-preview-item">
           <span class="ai-preview-icon">⚠️</span>
           <div class="ai-preview-label">
-            <div class="ai-preview-title">Factores de riesgo</div>
-            <div class="ai-preview-desc">Las 2–3 cosas que más podrían afectar tu pensión</div>
+            <div class="ai-preview-title">Riesgos a tener en cuenta</div>
+            <div class="ai-preview-desc">Las 2–3 cosas que más podrían cambiar el resultado</div>
           </div>
           <span class="ai-lock">🔒</span>
         </div>
         <div class="ai-preview-item">
           <span class="ai-preview-icon">✅</span>
           <div class="ai-preview-label">
-            <div class="ai-preview-title">Pasos concretos</div>
-            <div class="ai-preview-desc">Qué hacer en los próximos 3–6 meses</div>
+            <div class="ai-preview-title">Qué hacer en los próximos meses</div>
+            <div class="ai-preview-desc">Pasos concretos adaptados a tu caso</div>
+          </div>
+          <span class="ai-lock">🔒</span>
+        </div>
+        <div class="ai-preview-item">
+          <span class="ai-preview-icon">📋</span>
+          <div class="ai-preview-label">
+            <div class="ai-preview-title">Reforma 2024: cómo te afecta</div>
+            <div class="ai-preview-desc">Hoy está suspendida; esto pasaría si entra en vigencia</div>
           </div>
           <span class="ai-lock">🔒</span>
         </div>
       </div>
       <button id="ai-btn" onclick="pedirAnalisisIA()" class="ai-unlock-btn">
-        🔓 Obtener mi análisis personalizado
+        Pedir mi análisis personalizado
       </button>
       <div class="ai-text" id="ai-text" style="display:none;margin-top:16px;"></div>
       <div id="ai-thread"></div>
       <div id="ai-followup" style="display:none;"></div>
     </div>
 
-    <div class="cta-card">
-      <h4>✅ Próximos pasos concretos</h4>
-      <ul>
-        <li>Solicita una <strong>asesoría oficial en Colpensiones</strong> (colpensiones.gov.co) — es gratuita y te dan tu historia laboral completa.</li>
-        <li>Pide una <strong>proyección oficial a tu AFP</strong> — tienen obligación de dártela.</li>
-        <li>Compara las proyecciones oficiales con estos resultados antes de decidir.</li>
-        <li>Si vas a trasladarte de régimen, inicia el proceso con al menos 6 meses de anticipación.</li>
-        <li>Considera consultar con un <strong>abogado o asesor pensional certificado</strong> para casos complejos.</li>
-      </ul>
-    </div>
-
     <details class="calc-details">
-      <summary>🔍 Cómo calculamos esto</summary>
+      <summary>Cómo calculamos esto</summary>
       <div class="calc-body">
         <p>Todo es una estimación con supuestos simplificados. Aquí está cada cuenta en palabras simples y la norma en que se basa.</p>
 
@@ -865,41 +856,37 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
     </details>
 
     <div class="disclaimer">
-      ⚠️ <strong>Aviso importante:</strong> Esta herramienta es orientativa y no constituye asesoría pensional profesional. Los cálculos son aproximaciones con supuestos simplificados y <em>no reemplazan</em> la consulta oficial con Colpensiones y tu AFP. La Reforma Pensional 2024 (Ley 2381) está suspendida por la Corte Constitucional y hoy rige la Ley 100; las reglas podrían cambiar según la decisión final. Consulta siempre un asesor certificado antes de tomar decisiones definitivas.
+      Herramienta orientativa — no reemplaza asesoría profesional. Los cálculos son aproximaciones; confirma con Colpensiones y tu AFP antes de decidir. Ley 2381/2024 suspendida por la Corte Constitucional; hoy rige la Ley 100.
     </div>
 
     <div class="save-card">
-      <h4>📲 Compártelo</h4>
+      <h4>Guarda y comparte</h4>
       <button class="save-btn" onclick="compartirWhatsApp()">
         <span class="save-btn-icon">💬</span>
         <span class="save-btn-text">
           <span class="save-btn-title">Compartir por WhatsApp</span>
-          <span class="save-btn-desc">Envía tu resultado. Quien lo abra verá lo mismo y podrá hacer el suyo.</span>
+          <span class="save-btn-desc">Quien lo abra verá tu resultado y podrá hacer el suyo.</span>
         </span>
       </button>
       <button class="save-btn" id="copy-btn" onclick="copiarEnlace()">
         <span class="save-btn-icon">🔗</span>
         <span class="save-btn-text">
           <span class="save-btn-title" id="copy-title">Copiar enlace</span>
-          <span class="save-btn-desc">El enlace incluye tus respuestas (no tu nombre).</span>
+          <span class="save-btn-desc">Incluye tus respuestas, no tu nombre.</span>
         </span>
       </button>
-    </div>
-
-    <div class="save-card">
-      <h4>💾 Guarda tus resultados</h4>
       <button class="save-btn" onclick="descargarResultados()">
         <span class="save-btn-icon">⬇️</span>
         <span class="save-btn-text">
           <span class="save-btn-title">Descargar archivo</span>
-          <span class="save-btn-desc">Se guarda en tu teléfono o computador. Nada se envía a internet.</span>
+          <span class="save-btn-desc">Se guarda en tu dispositivo. Nada se envía a internet.</span>
         </span>
       </button>
       <button class="save-btn" onclick="imprimirResultados()">
         <span class="save-btn-icon">🖨️</span>
         <span class="save-btn-text">
           <span class="save-btn-title">Imprimir o guardar como PDF</span>
-          <span class="save-btn-desc">Abre la ventana de impresión. Para tener un PDF, elige la opción “Guardar como PDF”.</span>
+          <span class="save-btn-desc">Abre impresión — elige "Guardar como PDF" para el archivo.</span>
         </span>
       </button>
     </div>
@@ -1325,9 +1312,9 @@ function evalColp(data) {
   const iblNota = null; // incorporado al cálculo — ya no se usa como aviso aparte
   if (stopAge < pensionAge) {
     if (gapYears >= 2) {
-      nota = `Proyección ajustada: paras a los ${Math.round(stopAge)}, pensión a los ${pensionAge} — solo ${iblCotizYears} de los 10 años del IBL (Ley 100 art. 21) tendrán aportes. Si cotizaras hasta los ${pensionAge}, la mesada subiría a ${mesadaPlena} SMMLV/mes.`;
+      nota = `Si paras a los ${Math.round(stopAge)}: los ${gapYears} años sin cotizar reducen el salario promedio que se usa para calcular la mesada. Cotizando hasta los ${pensionAge} recibirías ${mesadaPlena} SMMLV/mes.`;
     } else {
-      nota = `Las semanas no caducan: aunque pares de cotizar a los ${Math.round(stopAge)}, tu pensión arranca igual a los ${pensionAge}. Seguir aportando aumenta la mesada, pero no adelanta esa fecha.`;
+      nota = `Si paras a los ${Math.round(stopAge)}: las semanas ya cotizadas se conservan y la pensión empieza igual a los ${pensionAge}. Seguir aportando sube la mesada, no adelanta la fecha.`;
     }
   }
 
@@ -1722,7 +1709,7 @@ async function pedirAnalisisIA() {
   const aiDiv = document.getElementById('ai-text');
 
   btn.disabled = true;
-  btn.innerHTML = '<span class="ai-spinner"></span> Analizando con IA...';
+  btn.innerHTML = '<span class="ai-spinner"></span> Generando análisis...';
   aiDiv.style.display = 'none';
 
   try {
@@ -1837,7 +1824,7 @@ function renderResults(res) {
 
   // Verdict
   const cmap = { alta:'conf-alta', media:'conf-media', baja:'conf-baja' };
-  const ctxt = { alta:'✅ Recomendación firme', media:'⚠️ Recomendación con matices', baja:'❓ Caso complejo – consulta un experto' };
+  const ctxt = { alta:'Alta certeza', media:'Con matices', baja:'Consulta un experto' };
 
   // Acción según el fondo actual (permanecer / trasladarse / afiliarse)
   const _enColp = S.fondo_actual === 'Colpensiones';
@@ -1845,18 +1832,18 @@ function renderResults(res) {
   const _recColp = res.mejor.regimen.includes('Colpensiones');
   const _mismo = (_enColp && _recColp) || (!_enColp && !_sinFondo && !_recColp);
   let accionUI;
-  if (_sinFondo) accionUI = `↪️ Te conviene <strong>afiliarte a ${res.mejor.regimen}</strong>`;
-  else if (_mismo) accionUI = `✅ Te conviene <strong>quedarte donde estás</strong> (${S.fondo_actual})`;
-  else accionUI = `↪️ Te conviene <strong>trasladarte de ${S.fondo_actual}</strong> a ${res.mejor.regimen}`;
+  if (_sinFondo) accionUI = `Afíliate a <strong>${res.mejor.regimen}</strong>`;
+  else if (_mismo) accionUI = `Quédate en <strong>${S.fondo_actual}</strong>`;
+  else accionUI = `Pásate de ${S.fondo_actual} a <strong>${res.mejor.regimen}</strong>`;
 
   document.getElementById('verdict-area').innerHTML = `
     <div class="verdict-card">
-      <div class="verdict-eyebrow">Tu mejor opción según tu situación</div>
+      <div class="verdict-eyebrow">Para tu situación, lo mejor es</div>
       <div class="verdict-name">${res.mejor.regimen}</div>
       <div class="verdict-action">${accionUI}</div>
       <div class="verdict-sub">${res.mejor.logra_pension
-        ? `📌 Proyección: pensión de ~${res.mejor.mesada} SMMLV/mes (≈ ${fmtPesos(res.mejor.mesada)}/mes en pesos de hoy)`
-        : `⚠️ Con tu situación actual no alcanzarías pensión completa`}</div>
+        ? `Pensión estimada: ~${res.mejor.mesada} SMMLV/mes · ${fmtPesos(res.mejor.mesada)}/mes en pesos de hoy`
+        : `Con tu situación actual no alcanzarías pensión completa`}</div>
       <span class="conf-badge ${cmap[res.confianza]}">${ctxt[res.confianza]}</span>
     </div>`;
 
@@ -1865,13 +1852,11 @@ function renderResults(res) {
   const sharedFut = res.colp.semanas_proy - res.colp.semanas_actuales;
   const sharedTot = res.colp.semanas_proy;
   const semHtml = `
-    <div style="background:#f4f6fb;border-radius:9px;padding:10px 14px;margin-bottom:14px;font-size:0.84rem;color:#444;">
-      📅 <strong>Semanas cotizadas:</strong> ${sharedSem} actuales
-      · proyectas <strong>${Math.round(sharedFut)} más</strong>
-      · total estimado al retiro: <strong>${sharedTot}</strong>
-      <span style="color:#888;margin-left:4px;">(Colpensiones requiere mínimo 1.300)</span>
-      ${res.anosNota ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid #e2e8f5;color:#33415c;font-size:0.8rem;">ℹ️ ${res.anosNota}</div>` : ''}
-    </div>`;
+    <p class="sem-summary">
+      Semanas cotizadas: <strong>${sharedSem}</strong> hoy + <strong>${Math.round(sharedFut)}</strong> proyectadas = <strong>${sharedTot}</strong> al retiro
+      <span class="sem-req">(mínimo Colpensiones: 1.300)</span>
+      ${res.anosNota ? `<span class="sem-nota"> · ${res.anosNota}</span>` : ''}
+    </p>`;
 
   // Inject shared semanas row above the grid
   document.getElementById('semanas-shared').innerHTML = semHtml;
@@ -1970,7 +1955,7 @@ function renderResults(res) {
   const aiPreview = document.getElementById('ai-preview');
   aiBtn.disabled = false;
   aiBtn.style.display = 'flex';
-  aiBtn.innerHTML = '🔓 Obtener mi análisis personalizado';
+  aiBtn.innerHTML = 'Pedir mi análisis personalizado';
   aiPreview.style.display = 'flex';
   aiDiv.style.display = 'none';
   aiDiv.innerHTML = '';
