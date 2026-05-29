@@ -616,7 +616,7 @@ body.has-ejemplo-banner { padding-top: 46px; }
 
     <div class="field">
       <label>Sexo biológico</label>
-      <p class="hint">Determina la edad de pensión: hombres 62 años, mujeres 57 años</p>
+      <p class="hint">Hombres se jubilan a 62, mujeres a 57.</p>
       <div id="sexo-group" class="radio-grid" style="margin-top:8px;">
         <div class="radio-item" onclick="pick('sexo','M',this)">
           <input type="radio" name="sexo" value="M"> 👨 Hombre
@@ -665,7 +665,7 @@ body.has-ejemplo-banner { padding-top: 46px; }
 
     <div class="field">
       <label>Total de semanas cotizadas hasta hoy</label>
-      <p class="hint">Si no sabes exactamente, estima: cada año trabajado = ~52 semanas</p>
+      <p class="hint">Cada año trabajado son ~52 semanas.</p>
       <input type="number" inputmode="numeric" id="semanas_actuales" min="0" max="3500" placeholder="Ej: 820">
       <details style="margin-top:8px;">
         <summary style="cursor:pointer;font-size:0.8rem;color:#003893;font-weight:600;list-style:none;">🧮 ¿No sabes tus semanas? Estímalas</summary>
@@ -676,19 +676,19 @@ body.has-ejemplo-banner { padding-top: 46px; }
           </div>
           <button type="button" onclick="estimarSemanas()" style="padding:11px 16px;background:#003893;color:#fff;border:none;border-radius:9px;font-size:0.85rem;font-weight:700;cursor:pointer;white-space:nowrap;">Estimar</button>
         </div>
-        <p class="hint" style="margin-top:6px;">Multiplicamos por ~52 semanas/año y llenamos los campos. Es solo un estimado — tu historia laboral en <a href="https://www.colpensiones.gov.co" target="_blank" rel="noopener">colpensiones.gov.co</a> tiene el dato exacto.</p>
+        <p class="hint" style="margin-top:6px;">Estimado — dato exacto en <a href="https://www.colpensiones.gov.co" target="_blank" rel="noopener">colpensiones.gov.co</a>.</p>
       </details>
     </div>
 
     <div class="field">
       <label>De esas, ¿cuántas tenías cotizadas al 1 de julio de 2025?</label>
-      <p class="hint">Fecha clave para las reglas de transición de la Reforma Pensional (si llega a entrar en vigencia). Si no sabes, pon el mismo número de arriba.</p>
+      <p class="hint">Si no sabes, pon el mismo número de arriba.</p>
       <input type="number" inputmode="numeric" id="semanas_julio25" min="0" max="3500" placeholder="Ej: 760">
     </div>
 
     <div class="field" id="campo-saldo" style="display:none">
       <label>Saldo acumulado en tu AFP (en pesos colombianos)</label>
-      <p class="hint">Puedes consultarlo en el portal de tu AFP. Escribe el valor en pesos — por ejemplo: <strong>$45.000.000</strong>. Escribe 0 si no sabes.</p>
+      <p class="hint">Consúltalo en tu AFP. Escribe 0 si no sabes.</p>
       <input type="text" inputmode="numeric" id="saldo_afp" placeholder="Ej: $45.000.000" autocomplete="off">
       <p class="hint" id="saldo-smmlv-hint" style="color:#003893; display:none; margin-top:6px;"></p>
     </div>
@@ -736,7 +736,7 @@ body.has-ejemplo-banner { padding-top: 46px; }
 
     <div class="field">
       <label>¿Cuánto ganas aproximadamente? (en salarios mínimos)</label>
-      <p class="hint"><strong>SMMLV</strong> = un salario mínimo ($1.750.905 en 2026). Así que "2–3 SMMLV" es ganar entre 2 y 3 salarios mínimos. La Reforma 2024 (hoy suspendida) obligaría a cotizar en Colpensiones si ganas ≤ 2.3 SMMLV.</p>
+      <p class="hint">Un salario mínimo son $1.750.905 (2026).</p>
       <div id="salario-group" class="radio-group" style="margin-top:8px;">
         <div class="radio-item" onclick="pick('salario','lt1',this)">
           <input type="radio" name="salario" value="lt1"> Menos de 1 SMMLV (menos de $1,75M)
@@ -765,7 +765,7 @@ body.has-ejemplo-banner { padding-top: 46px; }
 
     <div class="field">
       <label>¿Cuántos años más planeas cotizar activamente?</label>
-      <p class="hint">Piensa en cuánto tiempo más estarás activo/a en el sistema pensional — ya sea como empleado o independiente. </p>
+      <p class="hint">Como empleado o independiente.</p>
       <div id="anos-group" class="radio-grid" style="margin-top:8px;">
         <div class="radio-item" onclick="pick('anos_lab','<5',this)">
           <input type="radio" name="alab" value="<5"> Menos de 5 años
@@ -787,7 +787,7 @@ body.has-ejemplo-banner { padding-top: 46px; }
 
     <div class="field">
       <label>¿Cómo esperas que sea tu ritmo de trabajo en ese tiempo?</label>
-      <p class="hint">No tiene que ser exacto — elige lo que mejor describe tu situación más probable.</p>
+      <p class="hint">Elige lo que mejor describe tu situación.</p>
       <div id="hint-independiente" style="display:none;margin-bottom:8px;padding:8px 12px;background:#fff3e0;border-left:3px solid #fb8c00;border-radius:0 6px 6px 0;font-size:0.82rem;color:#e65100;">
         💼 Como independiente, los períodos sin contrato y las cotizaciones sobre IBC reducido son comunes — elige <strong>Igual o más</strong> solo si esperas cotizar de forma continua.
       </div>
@@ -817,7 +817,7 @@ body.has-ejemplo-banner { padding-top: 46px; }
 
     <div class="field">
       <label>¿Cuántos hijos tienes?</label>
-      <p class="hint">Las mujeres con 3+ hijos necesitan menos semanas para pensionarse.</p>
+      <p class="hint">Mujeres con 3+ hijos necesitan menos semanas.</p>
       <div id="hijos-group" class="radio-grid" style="margin-top:8px;">
         <div class="radio-item" onclick="pick('hijos','0',this)">
           <input type="radio" name="hijos" value="0"> 0 hijos
