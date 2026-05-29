@@ -285,28 +285,27 @@ test('AFP: capital e mesada plausibles para un cotizante de 3-5 SMMLV', () => {
 // ════════════════════════════════════════════════
 //  evalColp — advertencia IBL cuando hay brecha pre-retiro
 // ════════════════════════════════════════════════
-test('Colpensiones: nota incluye advertencia IBL cuando gap ≥ 2 años', () => {
-  // stopAge = 45+10 = 55, pensionAge = 62 → gap = 7 años → aviso IBL obligatorio
+test('Colpensiones: iblNota presente cuando gap ≥ 2 años', () => {
+  // stopAge = 45+10 = 55, pensionAge = 62 → gap = 7 años → iblNota obligatorio
   const r = T.evalColp(mk({
     edad: 45, semanas_actuales: 842, salario: 'gt8',
     anos_lab: '5-10', preferencias: ['maximizar_mesada'] // alab = 10
   }));
-  assert.ok(r.nota && /IBL/i.test(r.nota),
-    'nota debe mencionar el IBL cuando se deja de cotizar 7 años antes de la pensión');
-  assert.ok(/10 años/i.test(r.nota) || /10 de/.test(r.nota),
-    'nota debe mencionar la ventana de 10 años');
+  assert.ok(r.iblNota && /IBL/i.test(r.iblNota),
+    'iblNota debe mencionar IBL cuando se deja de cotizar 7 años antes');
+  assert.ok(/10 años/i.test(r.iblNota) || /10 de/.test(r.iblNota),
+    'iblNota debe mencionar la ventana de 10 años');
+  // la nota de timing no debe contener el aviso IBL (están separadas)
+  assert.doesNotMatch(r.nota || '', /IBL/i, 'nota timing no debe mezclar el aviso IBL');
 });
 
-test('Colpensiones: nota NO incluye advertencia IBL cuando gap < 2 años', () => {
-  // stopAge = 60+2 = 62 → pensionAge = 62 → gap = 0 → sin aviso IBL
+test('Colpensiones: iblNota ausente cuando gap < 2 años', () => {
+  // stopAge = 60+2 = 62 → pensionAge = 62 → gap = 0 → sin iblNota
   const r = T.evalColp(mk({
     edad: 60, semanas_actuales: 1200, salario: '3-5',
     anos_lab: '<5', preferencias: ['retirar_pronto'] // alab = lo = 2
   }));
-  // Si tiene suficientes semanas y stopAge ≥ pensionAge, no hay nota
-  if (r.nota) {
-    assert.doesNotMatch(r.nota, /IBL/, 'no debe haber aviso IBL si gap < 2 años');
-  }
+  assert.ok(!r.iblNota, 'iblNota debe ser null cuando gap < 2 años');
 });
 
 // ════════════════════════════════════════════════

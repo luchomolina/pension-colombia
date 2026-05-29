@@ -188,6 +188,21 @@ input[type="number"]:focus { outline: none; border-color: #003893; box-shadow: 0
 .sc-row .sc-k { color: #5c6470; }
 .sc-row .sc-v { font-weight: 600; color: #333; }
 .sc-nopension { font-size: 0.8rem; color: #c62828; font-weight: 700; margin-top: 8px; }
+/* Callouts de nota en tarjetas de escenario */
+.sc-nota-info {
+  display: flex; gap: 7px; align-items: flex-start;
+  background: #f0f4ff; border-left: 3px solid #6b8cff;
+  border-radius: 0 7px 7px 0; padding: 8px 10px; margin-top: 10px;
+  font-size: 0.74rem; color: #2d3a5e; line-height: 1.45;
+}
+.sc-nota-info .nota-icon { flex-shrink: 0; font-size: 0.85rem; margin-top: 1px; }
+.sc-nota-warn {
+  display: flex; gap: 7px; align-items: flex-start;
+  background: #fff8e6; border-left: 3px solid #f59e0b;
+  border-radius: 0 7px 7px 0; padding: 8px 10px; margin-top: 6px;
+  font-size: 0.74rem; color: #78350f; line-height: 1.45;
+}
+.sc-nota-warn .nota-icon { flex-shrink: 0; font-size: 0.85rem; margin-top: 1px; }
 .info-icon {
   display: inline-flex; align-items: center; justify-content: center;
   width: 14px; height: 14px; border-radius: 50%;
@@ -1283,20 +1298,17 @@ function evalColp(data) {
 
   // Si planea dejar de cotizar antes de la edad de pensión, la mesada igual
   // empieza a los 62/57 — las semanas no se pierden. Lo explicamos.
-  // Si el plan es dejar de cotizar antes de poder reclamar la pensión, calculamos
-  // cuántos de los 10 años previos al retiro tendrán cotización — el IBL (Ingreso
-  // Base de Liquidación, Ley 100 art. 21) promedia el salario cotizado en esa ventana.
-  const gapYears = Math.round(pensionAge - stopAge); // años entre stop y pensión
-  const iblCotizYears = Math.max(0, 10 - gapYears);  // años con cotización en la ventana IBL
+  // Cuántos de los 10 años del IBL tendrán cotización si se para en stopAge.
+  const gapYears = Math.round(pensionAge - stopAge);
+  const iblCotizYears = Math.max(0, 10 - gapYears);
 
   let nota = null;
+  let iblNota = null;
   if (stopAge < pensionAge) {
-    const iblBase = `Ya tendrías las semanas, pero en Colpensiones la pensión de vejez solo se puede reclamar a los ${pensionAge} años. Aunque dejes de cotizar a los ${Math.round(stopAge)}, tus semanas no se pierden: empezarías a recibir la mesada a los ${pensionAge}. Entre los ${Math.round(stopAge)} y los ${pensionAge} años no recibirías esta pensión — seguir cotizando aumentaría tu mesada, pero NO adelanta la edad de pensión.`;
-    // Advertencia de IBL solo cuando la brecha es significativa (≥ 2 años sin cotizar)
-    const iblWarn = gapYears >= 2
-      ? ` ⚠️ **Impacto en el IBL:** la mesada se calcula sobre el promedio de tu salario cotizado en los 10 años antes de pensionarte (Ley 100 art. 21). Si cotizas solo ${iblCotizYears} de esos 10 años, el promedio se reduce y la mesada real podría ser notablemente menor a la estimada aquí (que asume cotización continua hasta los ${pensionAge}). Considera mantener aportes mientras puedas.`
-      : '';
-    nota = iblBase + iblWarn;
+    nota = `Las semanas no caducan: aunque pares de cotizar a los ${Math.round(stopAge)}, tu pensión arranca igual a los ${pensionAge}. Seguir aportando aumenta la mesada, pero no adelanta esa fecha.`;
+    if (gapYears >= 2) {
+      iblNota = `Esta cifra asume que cotizas hasta los ${pensionAge}. Si paras a los ${Math.round(stopAge)}, solo ${iblCotizYears} de los 10 años del IBL (Ley 100 art. 21) tendrán aportes — la mesada real podría ser notablemente menor.`;
+    }
   }
 
   return {
@@ -1306,6 +1318,7 @@ function evalColp(data) {
     edad_pension: pensionAge,
     edad_stop: Math.round(stopAge),
     nota,
+    iblNota,
     mesada: Math.round(mesada * 10) / 10,
     tasa: Math.round(tasa * 100),
     semanas_actuales: data.semanas_actuales,
@@ -1556,7 +1569,8 @@ function buildPrompt(result) {
     `  Semanas actuales: ${result.colp.semanas_actuales}`,
     `  Semanas proyectadas al retiro: ${result.colp.semanas_proy}`,
     result.colp.tasa ? `  Tasa de reemplazo: ${result.colp.tasa}% (Ley 100 art. 34, decreciente con el ingreso; IBL≈salario actual)` : `  Semanas faltantes para requisito mínimo: ${result.colp.sem_faltantes}`,
-    result.colp.nota ? `  IMPORTANTE (no es indemnización): ${result.colp.nota}` : '',
+    result.colp.nota ? `  Aviso timing: ${result.colp.nota}` : '',
+    result.colp.iblNota ? `  Aviso IBL: ${result.colp.iblNota}` : '',
     ``,
     `ESCENARIO AFP (RAIS):`,
     `  ¿Logra pensión?: ${result.afp.logra_pension ? 'SÍ' : 'NO'}`,
@@ -1853,7 +1867,8 @@ function renderResults(res) {
           <div class="sc-row"><span class="sc-k">Riesgo</span><span class="sc-v">${bar(sc.riesgo,true)}</span></div>
         </div>
         ${sc.razon_no_pension ? `<div class="sc-nopension" style="font-weight:400;font-size:0.76rem;margin-top:8px;">⚠️ ${sc.razon_no_pension}</div>` : ''}
-        ${sc.nota ? `<div style="background:#eef4ff;border-radius:8px;padding:9px 11px;margin-top:8px;font-size:0.75rem;color:#33415c;line-height:1.45;">ℹ️ ${sc.nota}</div>` : ''}
+        ${sc.nota ? `<div class="sc-nota-info"><span class="nota-icon">ℹ️</span><span>${sc.nota}</span></div>` : ''}
+        ${sc.iblNota ? `<div class="sc-nota-warn"><span class="nota-icon">⚠️</span><span><strong>Estimación asume cotización continua.</strong> ${sc.iblNota}</span></div>` : ''}
       </div>`;
   });
   document.getElementById('scenarios-grid').innerHTML = html;
@@ -2240,6 +2255,7 @@ function construirTextoResultados() {
       L.push('    Motivo: ' + sc.razon_no_pension);
     }
     if (sc.nota) L.push('    Nota: ' + sc.nota);
+    if (sc.iblNota) L.push('    Aviso IBL: ' + sc.iblNota);
     L.push('    Semanas actuales: ' + sc.semanas_actuales + ' · proyectadas al retiro: ' + sc.semanas_proy);
     if (sc.sem_faltantes) L.push('    Semanas faltantes para el mínimo: ' + sc.sem_faltantes);
     if (sc.edad_anticipada != null) {
