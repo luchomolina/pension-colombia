@@ -1341,6 +1341,12 @@ function evalColp(data) {
     iblNota,
     mesada: Math.round(mesada * 10) / 10,
     tasa: Math.round(tasa * 100),
+    // Valores intermedios — usados por la IA para explicar el cálculo exacto
+    efSal: Math.round(efSal * 100) / 100,
+    ibl:   Math.round(ibl   * 100) / 100,
+    iblCotizYears,
+    gapYears,
+    mesadaPlena: gapYears >= 2 ? mesadaPlena : null,
     semanas_actuales: data.semanas_actuales,
     semanas_proy: Math.round(total),
     estab: 0.95, hereda: 0.15, riesgo: 0.12
@@ -1532,7 +1538,11 @@ function decidir(data) {
   const confianza = diff > 0.15 ? 'alta' : diff > 0.07 ? 'media' : 'baja';
 
   const ra = resolverAnos(data);
-  return { mejor: scored[0], todos: scored, colp, afp, puede, advertenciaTraslado, refOblig, transicion, confianza, anosUsados: ra.anos, anosNota: ra.nota };
+  const rd = v => Math.round(v * 100) / 100;
+  const scoreColp = scored.find(e =>  e.regimen.includes('Colpensiones'))?.score ?? null;
+  const scoreAfp  = scored.find(e => !e.regimen.includes('Colpensiones'))?.score ?? null;
+  return { mejor: scored[0], todos: scored, colp, afp, puede, advertenciaTraslado, refOblig, transicion, confianza, anosUsados: ra.anos, anosNota: ra.nota,
+           pw, scoreColp: scoreColp != null ? rd(scoreColp) : null, scoreAfp: scoreAfp != null ? rd(scoreAfp) : null };
 }
 
 // ════════════════════════════════════════════════
@@ -1588,7 +1598,10 @@ function buildPrompt(result) {
     `  Mesada estimada: ${result.colp.mesada} SMMLV/mes`,
     `  Semanas actuales: ${result.colp.semanas_actuales}`,
     `  Semanas proyectadas al retiro: ${result.colp.semanas_proy}`,
-    result.colp.tasa ? `  Tasa de reemplazo: ${result.colp.tasa}% (Ley 100 art. 34, decreciente con el ingreso; IBL≈salario actual)` : `  Semanas faltantes para requisito mínimo: ${result.colp.sem_faltantes}`,
+    result.colp.tasa ? `  Tasa de reemplazo: ${result.colp.tasa}%` : `  Semanas faltantes para requisito mínimo: ${result.colp.sem_faltantes}`,
+    result.colp.ibl != null ? `  IBL utilizado: ${result.colp.ibl} SMMLV${result.colp.gapYears >= 2 ? ` (= ${result.colp.efSal} salario_eff × ${result.colp.iblCotizYears}/10 años con aportes)` : ''}` : '',
+    result.colp.ibl != null ? `  Cálculo exacto: ${result.colp.ibl} SMMLV × ${result.colp.tasa}% = ${result.colp.mesada} SMMLV/mes` : '',
+    result.colp.mesadaPlena != null ? `  Si cotizara hasta los ${result.colp.edad_pension} años: mesada sería ${result.colp.mesadaPlena} SMMLV/mes` : '',
     result.colp.nota ? `  Aviso timing: ${result.colp.nota}` : '',
     result.colp.iblNota ? `  Aviso IBL: ${result.colp.iblNota}` : '',
     ``,
@@ -1610,7 +1623,20 @@ function buildPrompt(result) {
     `  ¿Puede trasladarse de régimen?: ${result.puede ? 'SÍ (más de 10 años a la pensión)' : 'NO (menos de 10 años a la pensión)'}`,
     ...(result.refOblig && !result.transicion ? [`  Si la reforma entra en vigencia, aplicaría cotización obligatoria en Colpensiones (salario ≤ 2.3 SMMLV).`] : []),
     `  ¿Estaría en régimen de transición (Ley 2381) SI la reforma entra en vigencia?: ${result.transicion ? 'SÍ — conservaría reglas de Ley 100' : 'NO — quedaría sujeto/a a reglas nuevas'}`,
-    `  NOTA NORMATIVA: la Ley 2381 de 2024 está SUSPENDIDA por la Corte Constitucional (Auto 841/2025). Hoy rige la Ley 100 de 1993. No afirmes que la reforma ya está vigente.`
+    `  NOTA NORMATIVA: la Ley 2381 de 2024 está SUSPENDIDA por la Corte Constitucional (Auto 841/2025). Hoy rige la Ley 100 de 1993. No afirmes que la reforma ya está vigente.`,
+    ``,
+    `PUNTUACIÓN (qué determinó la recomendación):`,
+    (() => {
+      const pw = result.pw;
+      if (!pw) return '';
+      const p = k => Math.round(pw[k] * 100) + '%';
+      return `  Pesos activos: pensión=${p('pension')} · mesada=${p('mesada')} · estabilidad=${p('estab')} · herencia=${p('hereda')} · riesgo=${p('riesgo')}`;
+    })(),
+    result.scoreColp != null ? `  Score Colpensiones: ${result.scoreColp}` : '',
+    result.scoreAfp  != null ? `  Score AFP:          ${result.scoreAfp}` : '',
+    result.scoreColp != null && result.scoreAfp != null
+      ? `  Diferencia: ${Math.abs(Math.round((result.scoreColp - result.scoreAfp) * 100) / 100)} → confianza ${result.confianza}`
+      : `  Confianza: ${result.confianza}`
   ].join('\n');
 
   // Acción recomendada según el FONDO ACTUAL (para usar el verbo correcto)
