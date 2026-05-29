@@ -1283,7 +1283,8 @@ function evalColp(data) {
       semanas_actuales: data.semanas_actuales,
       semanas_proy: Math.round(total),
       sem_faltantes: Math.max(0, Math.round(minW - total)),
-      estab: 0.90, hereda: 0.15, riesgo: 0.65
+      estab: 0.90, hereda: 0.15, riesgo: 0.65,
+      iblNota: null
     };
   }
 
@@ -1296,29 +1297,37 @@ function evalColp(data) {
   // Tasa de reemplazo — Ley 100 art. 34 (modif. Ley 797/2003):
   //   r = 65.5 − 0.5·s   (s = IBL en SMMLV) → entre 55% y 65% para las 1.300 base
   //   + 1.5% por cada 50 semanas extra, tope 80% (se llega al 80% a las 1.800).
-  // IBL: usamos el salario actual, asumiendo salario ~estable en términos
-  // reales hasta el retiro. El IBL legal es el promedio de los 10 años
-  // ANTERIORES a la pensión (Ley 100 art. 21), no los últimos 10 desde hoy.
-  // Usamos efSal (salario × factor trayectoria) como proxy del IBL futuro.
-  const ibl = efSal; // en SMMLV
-  const rBase = Math.max(0.55, Math.min(0.65, 0.655 - 0.005 * ibl));
+  // IBL legal: promedio de los 10 años ANTERIORES a la pensión (Ley 100 art. 21).
+  // Si el usuario para antes de la edad de pensión, solo iblCotizYears de esos
+  // 10 años tendrán aportes → ajustamos el IBL proporcionalmente.
   const extra = Math.max(0, total - BASE_WEEKS);
   const bonus = Math.floor(extra / 50) * 0.015;
-  const tasa = Math.min(0.80, rBase + bonus);
-  const mesada = Math.max(efSal * tasa, 1.0);
 
-  // Si planea dejar de cotizar antes de la edad de pensión, la mesada igual
-  // empieza a los 62/57 — las semanas no se pierden. Lo explicamos.
-  // Cuántos de los 10 años del IBL tendrán cotización si se para en stopAge.
-  const gapYears = Math.round(pensionAge - stopAge);
+  const gapYears   = Math.round(pensionAge - stopAge);
   const iblCotizYears = Math.max(0, 10 - gapYears);
 
+  // IBL efectivo: si para ≥2 años antes del retiro, prorratear el salario
+  // por la fracción de los últimos 10 años que tendrán aportes reales.
+  const ibl = (stopAge < pensionAge && gapYears >= 2)
+    ? efSal * (iblCotizYears / 10)
+    : efSal;
+
+  const rBase = Math.max(0.55, Math.min(0.65, 0.655 - 0.005 * ibl));
+  let tasa = Math.min(0.80, rBase + bonus);
+  let mesada = Math.max(ibl * tasa, 1.0);
+
+  // Mesada "plena" (si cotizara hasta pensionAge) — para mostrar en la nota
+  const rBasePlena = Math.max(0.55, Math.min(0.65, 0.655 - 0.005 * efSal));
+  const tasaPlena  = Math.min(0.80, rBasePlena + bonus);
+  const mesadaPlena = Math.round(Math.max(efSal * tasaPlena, 1.0) * 10) / 10;
+
   let nota = null;
-  let iblNota = null;
+  const iblNota = null; // incorporado al cálculo — ya no se usa como aviso aparte
   if (stopAge < pensionAge) {
-    nota = `Las semanas no caducan: aunque pares de cotizar a los ${Math.round(stopAge)}, tu pensión arranca igual a los ${pensionAge}. Seguir aportando aumenta la mesada, pero no adelanta esa fecha.`;
     if (gapYears >= 2) {
-      iblNota = `Esta cifra asume que cotizas hasta los ${pensionAge}. Si paras a los ${Math.round(stopAge)}, solo ${iblCotizYears} de los 10 años del IBL (Ley 100 art. 21) tendrán aportes — la mesada real podría ser notablemente menor.`;
+      nota = `Proyección ajustada: paras a los ${Math.round(stopAge)}, pensión a los ${pensionAge} — solo ${iblCotizYears} de los 10 años del IBL (Ley 100 art. 21) tendrán aportes. Si cotizaras hasta los ${pensionAge}, la mesada subiría a ${mesadaPlena} SMMLV/mes.`;
+    } else {
+      nota = `Las semanas no caducan: aunque pares de cotizar a los ${Math.round(stopAge)}, tu pensión arranca igual a los ${pensionAge}. Seguir aportando aumenta la mesada, pero no adelanta esa fecha.`;
     }
   }
 

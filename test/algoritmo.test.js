@@ -94,7 +94,7 @@ test('Colpensiones: sin semanas suficientes => indemnización sustitutiva', () =
 // ════════════════════════════════════════════════
 test('Colpensiones: la tasa de reemplazo baja cuando sube el salario', () => {
   // mismas semanas (mismo bonus), distinto salario → el ingreso es lo único que cambia
-  const comun = { edad: 55, semanas_actuales: 1300, anos_lab: '<5', trayectoria: 'pleno' };
+  const comun = { edad: 60, semanas_actuales: 1300, anos_lab: '<5', trayectoria: 'pleno' };
   const bajo = T.evalColp(mk({ ...comun, salario: '1-2' }));   // IBL ≈ 1.5 SMMLV
   const alto = T.evalColp(mk({ ...comun, salario: 'gt8' }));   // IBL ≈ 11 SMMLV
   assert.ok(bajo.tasa > alto.tasa, `tasa baja-renta (${bajo.tasa}%) > alta-renta (${alto.tasa}%)`);
@@ -283,29 +283,32 @@ test('AFP: capital e mesada plausibles para un cotizante de 3-5 SMMLV', () => {
 });
 
 // ════════════════════════════════════════════════
-//  evalColp — advertencia IBL cuando hay brecha pre-retiro
+//  evalColp — ajuste de IBL cuando hay brecha pre-retiro
 // ════════════════════════════════════════════════
-test('Colpensiones: iblNota presente cuando gap ≥ 2 años', () => {
-  // stopAge = 45+10 = 55, pensionAge = 62 → gap = 7 años → iblNota obligatorio
+test('Colpensiones: mesada ajustada con IBL parcial cuando gap ≥ 2 años', () => {
+  // stopAge=55, pensionAge=62, gap=7, iblCotizYears=3
+  // iblAdj = 11 * 3/10 = 3.3  →  rBase ≈ 63.85%  →  mesada ≈ 3.3 * 0.6385 ≈ 2.1 SMMLV
   const r = T.evalColp(mk({
     edad: 45, semanas_actuales: 842, salario: 'gt8',
     anos_lab: '5-10', preferencias: ['maximizar_mesada'] // alab = 10
   }));
-  assert.ok(r.iblNota && /IBL/i.test(r.iblNota),
-    'iblNota debe mencionar IBL cuando se deja de cotizar 7 años antes');
-  assert.ok(/10 años/i.test(r.iblNota) || /10 de/.test(r.iblNota),
-    'iblNota debe mencionar la ventana de 10 años');
-  // la nota de timing no debe contener el aviso IBL (están separadas)
-  assert.doesNotMatch(r.nota || '', /IBL/i, 'nota timing no debe mezclar el aviso IBL');
+  assert.ok(r.mesada >= 1.8 && r.mesada <= 2.5,
+    `mesada ajustada por IBL parcial debe ser ~2.1 SMMLV (fue ${r.mesada})`);
+  assert.ok(r.nota && /IBL/i.test(r.nota),
+    'nota debe explicar el ajuste por IBL');
+  assert.ok(r.nota && /55/.test(r.nota) && /62/.test(r.nota),
+    'nota debe mencionar edad de parada y edad de pensión');
+  assert.strictEqual(r.iblNota, null, 'iblNota debe ser null (incorporado al cálculo)');
 });
 
-test('Colpensiones: iblNota ausente cuando gap < 2 años', () => {
-  // stopAge = 60+2 = 62 → pensionAge = 62 → gap = 0 → sin iblNota
+test('Colpensiones: mesada sin ajuste cuando gap < 2 años', () => {
+  // stopAge = 60+2 = 62 → gap = 0 → sin ajuste IBL, sin nota
   const r = T.evalColp(mk({
     edad: 60, semanas_actuales: 1200, salario: '3-5',
     anos_lab: '<5', preferencias: ['retirar_pronto'] // alab = lo = 2
   }));
-  assert.ok(!r.iblNota, 'iblNota debe ser null cuando gap < 2 años');
+  assert.strictEqual(r.iblNota, null, 'iblNota siempre null');
+  assert.ok(!r.nota, 'sin nota cuando stopAge >= pensionAge');
 });
 
 // ════════════════════════════════════════════════
