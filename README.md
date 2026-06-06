@@ -1,26 +1,14 @@
 # ¿Colpensiones o AFP? · Herramienta de orientación pensional
 
-Herramienta web para ayudar a colombianos a entender su situación pensional y orientarse entre el Régimen de Prima Media (Colpensiones) y el Régimen de Ahorro Individual con Solidaridad (AFP).
+Calculadora web que compara los dos regímenes pensionales colombianos (RPM y RAIS) y emite una recomendación personalizada. Todo el cálculo corre en el navegador — sin backend, sin registro, sin guardar datos.
 
-## Qué hace
+## Documentación
 
-Guía al usuario en 4 pasos recolectando:
-
-1. **Datos personales** — edad, sexo biológico, fondo actual
-2. **Historial de cotización** — semanas cotizadas, saldo AFP, situaciones especiales
-3. **Situación laboral** — rango salarial, años laborales restantes, trayectoria laboral futura
-4. **Factores personales** — número de hijos, prioridades (maximizar mesada, heredar, menor riesgo, etc.)
-
-Con esa información, el algoritmo local:
-
-- Proyecta semanas cotizadas y capital acumulado en AFP al momento del retiro
-- Calcula la mesada estimada en cada régimen (en SMMLV)
-- Detecta si aplica la obligatoriedad de cotizar en Colpensiones (Reforma 2024, ≤ 2.3 SMMLV)
-- Identifica si el usuario está en régimen de transición (Ley 2381) o puede trasladarse
-- Evalúa pensión anticipada en AFP (Art. 64, Ley 100) cuando el capital lo permite
-- Pondera los escenarios según las preferencias declaradas y emite una recomendación con nivel de confianza (alta / media / baja)
-
-Opcionalmente, el usuario puede solicitar un **análisis personalizado con IA** que genera una explicación detallada usando Claude Haiku.
+| Doc | Contenido |
+|---|---|
+| [Producto](docs/producto.md) | Problema, propuesta de valor, usuarios, principios |
+| [Flujo de usuario](docs/flujo.md) | Pasos del formulario, validación, pantalla de resultados |
+| [Sistema de diseño](docs/diseno.md) | Colores, tipografía, componentes, principios de UX |
 
 ## Tecnología
 
@@ -39,20 +27,10 @@ pension-colombia/
 ├── netlify/
 │   └── functions/
 │       └── analyze.js          # Serverless function que llama a la Anthropic API
-└── test/
-    └── algoritmo.test.js       # Tests del algoritmo (Node, sin dependencias)
+├── test/
+│   └── algoritmo.test.js       # Tests del algoritmo (Node, sin dependencias)
+└── docs/                       # Documentación de producto y diseño
 ```
-
-## Despliegue en Netlify
-
-1. Conectar el repositorio en [app.netlify.com](https://app.netlify.com)
-2. En **Site settings → Environment variables**, agregar:
-   ```
-   ANTHROPIC_API_KEY=sk-ant-...
-   ```
-3. Netlify detecta automáticamente `netlify.toml` — no se requiere configuración de build adicional.
-
-El endpoint `/api/analyze` se redirige a `/.netlify/functions/analyze` según `netlify.toml`.
 
 ## Desarrollo local
 
@@ -69,19 +47,30 @@ netlify dev
 
 La herramienta abre en `http://localhost:8888`. Sin la variable de entorno, el análisis IA muestra un error pero el algoritmo de comparación funciona igual.
 
+## Despliegue en Netlify
+
+1. Conectar el repositorio en [app.netlify.com](https://app.netlify.com)
+2. En **Site settings → Environment variables**, agregar:
+   ```
+   ANTHROPIC_API_KEY=sk-ant-...
+   ```
+3. Netlify detecta automáticamente `netlify.toml` — no se requiere configuración adicional.
+
+El endpoint `/api/analyze` se redirige a `/.netlify/functions/analyze` según `netlify.toml`.
+
 ## Tests
 
-El algoritmo (proyección de semanas, escenarios Colpensiones/AFP, puntuación, régimen de transición) tiene una suite de tests sin dependencias. Para no duplicar código, el test carga el `<script>` real de `index.html` y lo evalúa en un sandbox de Node, así que siempre corre contra el código de producción.
+El algoritmo (proyección de semanas, escenarios Colpensiones/AFP, puntuación, régimen de transición) tiene una suite de tests sin dependencias. El test carga el `<script>` real de `index.html` y lo evalúa en un sandbox de Node, así que siempre corre contra el código de producción.
 
 ```bash
 node --test
 ```
 
-Requiere Node 18+ (usa el runner integrado `node:test`). No hay paso de build ni `package.json`: la app sigue siendo un único `index.html`.
+Requiere Node 18+ (usa el runner integrado `node:test`). No hay paso de build ni `package.json`.
 
 ## Algoritmo y cálculos
 
-Todo el algoritmo corre en el navegador sin necesidad de servidor. El código está íntegramente en `index.html`.
+Todo el algoritmo corre en el navegador. El código está íntegramente en `index.html`.
 
 ### Constantes y supuestos
 
@@ -93,9 +82,9 @@ En lugar de capturar solo la frecuencia de cotización, el formulario recoge la 
 
 | Trayectoria | Factor de densidad `d` | Factor de IBC `ibc` |
 |---|---|---|
-| **A pleno** — cotizaré igual o más que ahora | 0,92 | 1,00 |
-| **Moderando** — trabajaré o ganaré menos | 0,65 | 0,70 |
-| **Bajando** — semi-retiro / ingresos de otras fuentes | 0,35 | 0,35 |
+| **Igual o más** — cotizaré al mismo ritmo o más | 0,92 | 1,00 |
+| **Menos** — trabajaré o ganaré menos | 0,65 | 0,70 |
+| **Semi-retiro** — ingresos esporádicos o de otras fuentes | 0,35 | 0,35 |
 
 El **factor de densidad** (`d`) pondera las semanas cotizadas futuras. El **factor de IBC** (`ibc`) escala el salario declarado para obtener el salario efectivo proyectado (`efSal = salario × ibc`), que se usa tanto para el IBL en Colpensiones como para los aportes mensuales en AFP.
 
@@ -103,54 +92,50 @@ El **factor de densidad** (`d`) pondera las semanas cotizadas futuras. El **fact
 
 Antes de calcular escenarios, el algoritmo evalúa tres condiciones que pueden restringir o contextualizar la decisión.
 
-> **Nota normativa:** La Reforma Pensional 2024 (Ley 2381 de 2024) está **suspendida** por la Corte Constitucional (Auto 841 de 2025), que la devolvió a la Cámara por un vicio de trámite. Hoy rige la Ley 100 de 1993. Las verificaciones de transición y obligatoriedad que siguen son **condicionales**: aplicarían solo si la reforma entra en vigencia. La herramienta las muestra como contexto, no como derecho vigente.
+> **Nota normativa:** La Reforma Pensional 2024 (Ley 2381 de 2024) está **suspendida** por la Corte Constitucional (Auto 841 de 2025), que la devolvió a la Cámara por un vicio de trámite. Hoy rige la Ley 100 de 1993. Las verificaciones de transición y obligatoriedad que siguen son **condicionales**: aplicarían solo si la reforma entra en vigencia.
 
 **Régimen de transición:** El criterio es por semanas y diferenciado por sexo (Ley 2381 art. 75): una persona quedaría en transición si al 1 de julio de 2025 tenía al menos 900 semanas (hombres) o 750 semanas (mujeres). La edad por sí sola no otorga transición. Quienes cumplan esta condición conservarían las reglas de la Ley 100 de 1993, sin la obligación de cotizar en Colpensiones por nivel de ingresos que introduce la Reforma 2024.
 
-**Obligatoriedad por reforma:** Si la persona no está en transición y su salario es igual o menor a 2,3 SMMLV, la Reforma 2024 —de entrar en vigencia— la obligaría a cotizar en Colpensiones. La herramienta lo informa pero sigue mostrando ambos escenarios para que entienda los pros y contras.
+**Obligatoriedad por reforma:** Si la persona no está en transición y su salario es igual o menor a 2,3 SMMLV, la Reforma 2024 —de entrar en vigencia— la obligaría a cotizar en Colpensiones. La herramienta lo informa pero sigue mostrando ambos escenarios.
 
-**Posibilidad de traslado:** Solo es posible cambiar de régimen si faltan más de 10 años para la edad legal de pensión. Si la persona ya se ha trasladado antes, se genera una advertencia sobre el bloqueo de 5 años entre traslados. Cuando el traslado no es posible, el algoritmo evalúa únicamente el escenario del fondo actual del usuario.
+**Posibilidad de traslado:** Solo es posible cambiar de régimen si faltan más de 10 años para la edad legal de pensión. Si la persona ya se ha trasladado antes, se genera una advertencia sobre el bloqueo de 5 años entre traslados. Cuando el traslado no es posible, el algoritmo evalúa únicamente el escenario del fondo actual.
 
 ### Escenario Colpensiones (RPM)
 
 El algoritmo proyecta las semanas totales sumando las semanas ya cotizadas más las que se acumularían durante los años laborales declarados, ponderadas por el factor de densidad. Con ese total verifica dos condiciones independientes: que la persona alcance la edad legal de pensión y que complete las semanas mínimas requeridas.
 
-Las semanas mínimas parten de 1.300 y se reducen para mujeres con tres hijos o más (25 semanas menos) y con cuatro hijos o más (50 semanas menos adicionales sobre el descuento anterior).
+Las semanas mínimas parten de 1.300 y se reducen para mujeres con tres hijos o más (25 semanas menos) y con cuatro hijos o más (50 semanas menos adicionales).
 
-Si no se cumplen ambas condiciones, el algoritmo reporta *indemnización sustitutiva* (devolución de lo cotizado en un único pago, sin mesada mensual) e indica con precisión si la restricción es de edad, de semanas, o de ambas.
-
-Si sí se cumplen, calcula la edad exacta de retiro tomando el máximo entre la edad legal y la edad en que se completarán las semanas necesarias.
+Si no se cumplen ambas condiciones, el algoritmo reporta *indemnización sustitutiva* e indica si la restricción es de edad, de semanas, o de ambas.
 
 **Tasa de reemplazo e IBL:** La mesada se expresa como porcentaje del *Ingreso Base de Liquidación* (IBL). La tasa base varía con el ingreso según la fórmula `65,5% − 0,5% × IBL` (donde IBL se mide en SMMLV), acotada entre 55% y 65%. A esa base se suman 1,5 puntos porcentuales por cada 50 semanas cotizadas sobre las 1.300, con un techo del 80%. La mesada nunca puede ser inferior a 1 SMMLV.
 
-**Ajuste de IBL por brecha pre-retiro (Ley 100 art. 21):** El IBL legal es el promedio salarial de los 10 años anteriores a la pensión. Si el usuario declara que dejará de cotizar antes de la edad de pensión con una brecha de 2 o más años, el algoritmo solo contabiliza los años con aportes dentro de esa ventana de 10 años (`iblCotizYears = 10 − gapYears`) y prorratea el IBL proporcionalmente (`IBL ajustado = efSal × iblCotizYears / 10`). En ese caso, la tarjeta de resultados muestra la mesada ajustada a la trayectoria declarada y también la mesada que obtendría si cotizara hasta la edad legal de pensión.
+**Ajuste de IBL por brecha pre-retiro (Ley 100 art. 21):** El IBL legal es el promedio salarial de los 10 años anteriores a la pensión. Si el usuario declara que dejará de cotizar antes de la edad de pensión con una brecha de 2 o más años, el algoritmo prorratea el IBL proporcionalmente (`IBL ajustado = efSal × iblCotizYears / 10`).
 
 ### Escenario AFP (RAIS)
 
-El cálculo se basa en la acumulación compuesta de capital a lo largo del tiempo en dos fases.
+El cálculo se basa en la acumulación compuesta de capital en dos fases.
 
-**Saldo inicial:** Si el usuario declaró su saldo real, se usa directamente. Si no, se estima a partir de las semanas cotizadas, el salario y la tasa de aporte, aplicando un factor que aproxima los rendimientos ya acumulados históricamente. Los independientes reciben un ajuste a la baja en la tasa de aporte efectiva, porque habitualmente cotizan sobre una base de ingreso menor a su ingreso real.
+**Saldo inicial:** Si el usuario declaró su saldo real, se usa directamente. Si no, se estima a partir de las semanas cotizadas, el salario y la tasa de aporte. Los independientes reciben un ajuste a la baja en la tasa de aporte efectiva.
 
-**Fase 1 — años laborales activos:** Mes a mes se aplica el rendimiento compuesto sobre el capital acumulado y se suma el aporte mensual (`efSal × tasa_aporte × d`), donde `efSal` es el salario ajustado por la trayectoria declarada y `d` es su factor de densidad. Al finalizar esta fase se agrega el bono pensional cuando aplica (trabajó en entidad pública antes de 1994).
+**Fase 1 — años laborales activos:** Mes a mes se aplica el rendimiento compuesto sobre el capital acumulado y se suma el aporte mensual (`efSal × tasa_aporte × d`). Al finalizar esta fase se agrega el bono pensional cuando aplica.
 
 **Fase 2 — brecha hasta la edad de pensión:** Si la persona deja de cotizar antes de la edad legal, el capital sigue rentando sin nuevos aportes hasta que llegue a esa edad.
 
-La mesada se obtiene dividiendo el capital total entre el número de meses de vida esperada desde la edad de retiro. Si el resultado es de al menos 1 SMMLV mensual, se considera que la persona logra pensión; de lo contrario, el beneficio es la *devolución de saldos*.
+La mesada se obtiene dividiendo el capital total entre los meses de vida esperada desde el retiro. Si el resultado es de al menos 1 SMMLV mensual, se logra pensión; si no, el beneficio es la *devolución de saldos*.
 
-**Pensión anticipada:** El algoritmo simula año a año desde la edad actual para encontrar el primer momento en que el capital ya acumulado financiaría una mesada de al menos 1,1 SMMLV. Si existe ese punto y la persona tiene al menos 50 años (mujeres) o 55 (hombres), se reporta como opción de retiro anticipado, indicando explícitamente que implica una mesada menor porque el capital debe distribuirse en más años de vida esperada.
+**Pensión anticipada:** El algoritmo simula año a año para encontrar el primer momento en que el capital financiaría una mesada de al menos 1,1 SMMLV. Si existe ese punto y la persona tiene al menos 50 años (mujeres) o 55 (hombres), se reporta como opción de retiro anticipado.
 
 ### Puntuación y recomendación
 
-Cada escenario recibe un puntaje compuesto sobre cinco dimensiones: probabilidad de lograr pensión, nivel de mesada, estabilidad del régimen, posibilidad de herencia y nivel de riesgo. Los pesos de cada dimensión parten de valores base y se ajustan según las prioridades declaradas por el usuario:
+Cada escenario recibe un puntaje compuesto sobre cinco dimensiones: probabilidad de lograr pensión, nivel de mesada, estabilidad del régimen, posibilidad de herencia y nivel de riesgo. Los pesos se ajustan según las prioridades declaradas:
 
 - **Maximizar mesada** sube el peso de la mesada.
 - **Retirarme pronto** sube el peso de lograr pensión y baja el de mesada.
-- **Dejar herencia** sube el peso de herencia. Las AFP permiten heredar el saldo acumulado; Colpensiones no.
-- **Menor riesgo** y **Garantía del Estado** suben el peso de estabilidad y reducen el de mesada.
+- **Dejar herencia** sube el peso de herencia (las AFP permiten heredar el saldo; Colpensiones no).
+- **Menor riesgo** y **Garantía del Estado** suben el peso de estabilidad.
 
-Los pesos se normalizan para que siempre sumen 1. La mesada se normaliza entre cero y la mesada máxima de los escenarios disponibles. Estabilidad, herencia y riesgo son puntuaciones fijas por régimen: Colpensiones puntúa alto en estabilidad y bajo en herencia; las AFP, al revés.
-
-La diferencia entre los puntajes de los dos escenarios determina el nivel de confianza de la recomendación: **alta** si la diferencia supera 0,15, **media** entre 0,07 y 0,15, y **baja** por debajo de 0,07. Una confianza baja indica que la decisión es marginal con las preferencias declaradas y conviene consultar un asesor.
+Los pesos se normalizan para que siempre sumen 1. La diferencia entre los puntajes de los dos escenarios determina el nivel de confianza: **alta** (> 0,15), **media** (0,07–0,15), **baja** (< 0,07).
 
 ### Diagrama del flujo
 
@@ -185,11 +170,9 @@ flowchart TD
 
 ## Contexto normativo
 
-El algoritmo toma en cuenta:
-
 - **Ley 100 de 1993** — requisitos base de semanas (1.300) y edades de pensión (62H / 57M)
 - **Reforma Pensional 2024 (Ley 2381 de 2024)** — hoy **suspendida** (Corte Constitucional, Auto 841 de 2025); de entrar en vigencia: obligatoriedad de cotizar en Colpensiones para ingresos ≤ 2.3 SMMLV y sistema de pilares
-- **Régimen de transición** — protección para hombres con ≥ 900 semanas o mujeres con ≥ 750 semanas al 1 de julio de 2025 (criterio por semanas y sexo, no por edad)
-- **Pensión anticipada (Art. 64, Ley 100)** — posibilidad de retiro antes de la edad legal cuando el capital AFP financia una mesada ≥ 1.1 SMMLV
+- **Régimen de transición** — protección para hombres con ≥ 900 semanas o mujeres con ≥ 750 semanas al 1 de julio de 2025
+- **Pensión anticipada (Art. 64, Ley 100)** — retiro antes de la edad legal cuando el capital AFP financia una mesada ≥ 1.1 SMMLV
 
 > **Aviso:** Esta herramienta es orientativa. Los cálculos son aproximaciones y no reemplazan la consulta oficial con Colpensiones, la AFP, ni un asesor pensional certificado.
