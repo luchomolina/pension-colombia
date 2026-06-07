@@ -28,7 +28,7 @@ Persona colombiana entre 25 y 60 años que:
 ## Funcionalidades
 
 ### Cálculo de pensión
-Recopila datos en 4 pasos y proyecta escenarios comparados para Colpensiones (RPM) y AFP (RAIS), con una recomendación y nivel de certeza (alta / media / baja).
+Recopila datos en 4 pasos y proyecta escenarios comparados para Colpensiones (RPM) y AFP (RAIS), con una recomendación y nivel de certeza (alta / media / baja). El detalle de la base legal, los supuestos y las limitaciones está en [algoritmo.md](algoritmo.md).
 
 ### Modo ejemplo
 Permite explorar la herramienta con datos simulados sin ingresar datos propios. Un banner fijo indica que se están viendo datos de ejemplo.

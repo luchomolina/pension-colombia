@@ -211,6 +211,49 @@ Una confianza baja indica que la diferencia entre regímenes es marginal con las
 
 ---
 
+## Qué NO tiene en cuenta el modelo
+
+El cálculo es una aproximación deliberadamente simplificada. Estos factores quedan fuera del alcance y pueden cambiar el resultado real:
+
+### Datos financieros omitidos
+
+- **Historia salarial real** — usa el salario actual ajustado por trayectoria como proxy del promedio de los 10 años de IBL. Una carrera con saltos salariales grandes (ascensos, cambios de sector) no se modela.
+- **Semanas con IBC variable** — asume un IBC constante por tramo de trayectoria, no la cotización mes a mes sobre bases distintas.
+- **Aportes voluntarios** y cuentas AFC/pensión voluntaria — no se consideran en la proyección de capital.
+- **Multifondos AFP** — no distingue entre fondo conservador, moderado o de mayor riesgo; aplica un solo rendimiento real (3%).
+- **Comisiones de administración y seguros previsionales** de las AFP — no se descuentan del aporte ni del rendimiento.
+- **Bono pensional con cálculo real** — se suma un estimado, no el valor actualizado según la metodología oficial (Decreto 1299/1994 y siguientes).
+
+### Factores personales omitidos
+
+- **Pensión de sobrevivientes e invalidez** — solo modela pensión de vejez.
+- **Beneficiarios y grupo familiar** — no afecta el cálculo más allá del descuento de semanas por hijos en mujeres.
+- **Sustitución pensional / herencia real** — se trata como dimensión cualitativa de puntuación, no como flujo proyectado.
+- **Otros ingresos de retiro** (arriendos, ahorro, negocio propio) — fuera de alcance.
+- **Estado de salud o expectativa de vida individual** — usa promedios actuariales por sexo, no el perfil de la persona.
+
+### Supuestos macroeconómicos fijos
+
+- **Rendimiento real constante (3%)** — en la realidad varía año a año; el modelo no simula secuencias de retornos ni riesgo de secuencia (importante cerca del retiro).
+- **Inflación neutralizada** — todo se expresa en SMMLV, lo que asume que el SMMLV crece ~con la inflación. Si el SMMLV crece por encima de la inflación (como ha pasado), el modelo subestima ligeramente las mesadas atadas a SMMLV.
+- **Sin cambios normativos futuros** — calcula bajo la Ley 100 vigente. No predice el desenlace de la Reforma 2024 ni reformas posteriores.
+
+## Debilidades conocidas
+
+| Debilidad | Impacto | Mitigación actual |
+|---|---|---|
+| El IBL se aproxima con el salario actual | Puede sobre/subestimar la mesada de Colpensiones para carreras no lineales | Ajuste por brecha pre-retiro (art. 21); se muestra como estimación |
+| Saldo AFP estimado cuando el usuario no lo conoce | Error acumulable en la proyección de capital | Se pide el saldo real; el estimado se marca como tal |
+| Rendimiento único sin volatilidad | No comunica el rango de incertidumbre real del RAIS | Se muestra rango 1,5%–4,5% como escenarios |
+| Punto medio de banda salarial | Pierde precisión en los extremos de cada banda | Bandas relativamente estrechas |
+| Densidad de cotización autodeclarada | Depende de la honestidad/conocimiento del usuario | Hints orientadores, especialmente para independientes |
+| Esperanza de vida por sexo, no individual | No refleja diferencias reales de longevidad | Uso de tablas actuariales estándar |
+| Pesos de puntuación calibrados a criterio | La recomendación es sensible a los pesos elegidos | Nivel de confianza explícito; "baja" invita a asesoría |
+
+> **En resumen:** el modelo es una herramienta de *orientación*, no de *liquidación*. Sirve para entender el orden de magnitud y la dirección de la decisión, no para conocer la mesada exacta. La cifra oficial solo la dan Colpensiones o la AFP con la historia laboral completa.
+
+---
+
 ## Diagrama del flujo
 
 ```mermaid
