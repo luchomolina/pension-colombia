@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preguntas frecuentes · Colpensiones o AFP</title>
+<style>
+/* === shared === */
+/* ── Shared styles · pension-colombia ── */
+:root {
+  --azul:    #003893;
+  --azul2:   #002776;
+  --azul-lt: #e8eeff;
+  --verde:   #2e7d32;
+  --rojo:    #c62828;
+  --ambar:   #f59e0b;
+  --gris:    #5c6470;
+  --fondo:   #f4f6fb;
+  --texto:   #1a1a2e;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--fondo); color: var(--texto);
+  min-height: 100vh; padding-bottom: 48px;
+}
+.page { max-width: 720px; margin: 0 auto; padding: 20px 16px; }
+
+/* flag */
+.flag { height: 5px; border-radius: 3px; margin: 14px auto 4px; max-width: 200px;
+  background: linear-gradient(to right, #FCD116 33.33%, #003893 33.33% 66.66%, #CE1126 66.66%); }
+
+/* header */
+.site-header { text-align: center; padding: 24px 16px 12px; }
+.site-header h1 { font-size: 1.5rem; font-weight: 900; color: var(--azul); letter-spacing: -0.5px; }
+.site-header .sub { font-size: 0.82rem; color: var(--gris); margin-top: 4px; }
+
+/* breadcrumb */
+.breadcrumb { font-size: 0.78rem; color: var(--gris); margin: 0 0 18px;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.breadcrumb a { color: var(--azul); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb span { opacity: 0.5; }
+
+/* card */
+.card {
+  background: white; border-radius: 16px; padding: 24px;
+  margin: 14px 0; box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+}
+.card h2 { font-size: 1.1rem; font-weight: 800; color: var(--azul); margin-bottom: 14px; }
+.card h3 { font-size: 0.95rem; font-weight: 700; color: var(--azul2); margin: 18px 0 8px; }
+.card p  { font-size: 0.9rem; line-height: 1.65; color: #2a2a3e; margin-bottom: 10px; }
+.card ul, .card ol { padding-left: 20px; margin-bottom: 10px; }
+.card li  { font-size: 0.88rem; line-height: 1.6; margin-bottom: 4px; }
+
+/* table */
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 12px 0; }
+th { background: var(--azul); color: white; padding: 9px 12px; text-align: left; font-size: 0.8rem; }
+td { padding: 9px 12px; border-bottom: 1px solid #e8eaf0; vertical-align: top; }
+tr:nth-child(even) td { background: #f7f8fc; }
+
+/* badge */
+.badge { display: inline-block; font-size: 0.72rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px; }
+.badge-verde { background: #e8f5e9; color: var(--verde); }
+.badge-rojo  { background: #ffebee; color: var(--rojo); }
+.badge-ambar { background: #fff8e1; color: #856404; }
+.badge-azul  { background: var(--azul-lt); color: var(--azul); }
+
+/* notice */
+.notice {
+  border-radius: 10px; padding: 12px 16px; font-size: 0.82rem; line-height: 1.5;
+  margin-bottom: 14px;
+}
+.notice-info  { background: #e8f4fd; border-left: 4px solid #2196f3; color: #1565c0; }
+.notice-warn  { background: #fff8e1; border-left: 4px solid var(--ambar); color: #856404; }
+.notice-ok    { background: #e8f5e9; border-left: 4px solid var(--verde); color: var(--verde); }
+.notice-legal { background: #f3f0ff; border-left: 4px solid #7c3aed; color: #4c1d95; font-size: 0.78rem; }
+
+/* buttons */
+.btn { display: inline-block; padding: 11px 22px; border-radius: 10px; font-size: 0.9rem;
+  font-weight: 700; cursor: pointer; border: none; text-decoration: none; transition: all 0.18s; }
+.btn-primary { background: var(--azul); color: white; }
+.btn-primary:hover { background: var(--azul2); }
+.btn-secondary { background: white; color: var(--azul); border: 2px solid var(--azul); }
+.btn-secondary:hover { background: var(--azul-lt); }
+.btn-block { display: block; width: 100%; text-align: center; margin-top: 8px; }
+
+/* nav */
+.back-link { font-size: 0.82rem; color: var(--azul); text-decoration: none; display: inline-flex;
+  align-items: center; gap: 4px; margin-bottom: 12px; }
+.back-link:hover { text-decoration: underline; }
+
+/* print */
+@media print {
+  body { background: white; }
+  .no-print { display: none !important; }
+  .card { box-shadow: none; border: 1px solid #ddd; }
+}
+
+/* === /shared === */
+</style>
+<style>
+.faq-item { border-bottom:1px solid #e8eaf0; }
+.faq-item:last-child { border-bottom:none; }
+.faq-q { width:100%; text-align:left; background:none; border:none; cursor:pointer;
+  padding:16px 0; font-size:.93rem; font-weight:700; color:#003893;
+  display:flex; justify-content:space-between; align-items:center; gap:10px; }
+.faq-q:hover { color:#0045c4; }
+.faq-chevron { font-size:.8rem; color:#5c6470; flex-shrink:0; transition:transform .2s; }
+.faq-a { display:none; padding:0 0 16px; font-size:.87rem; line-height:1.65; color:#2a2a3e; }
+.faq-a.open { display:block; }
+.faq-chevron.open { transform:rotate(180deg); }
+.faq-a p { margin-bottom:8px; }
+.faq-a ul { padding-left:18px; margin-bottom:8px; }
+.faq-a li { margin-bottom:4px; }
+.faq-a .nota { background:#e8f4fd; border-left:3px solid #2196f3; border-radius:5px;
+  padding:8px 12px; font-size:.82rem; color:#1565c0; margin-top:8px; }
+.cat-label { font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.8px;
+  color:#003893; margin:24px 0 4px; padding-bottom:4px; border-bottom:2px solid #e8eeff; }
+@media print { .faq-a { display:block !important; } .faq-chevron { display:none; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="site-header">
+    <div class="flag"></div>
+    <h1>⚖️ ¿Colpensiones o AFP?</h1>
+    <div class="sub">Preguntas frecuentes sobre pensiones en Colombia</div>
+  </div>
+  <a href="../index.html" class="back-link no-print">← Volver a la calculadora</a>
+
+  <div class="cat-label">📋 Semanas y requisitos</div>
+  <div class="card">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggle(this)">¿Cómo sé cuántas semanas llevo cotizadas? <span class="faq-chevron">▼</span></button>
+      <div class="faq-a">
+        <p>Puedes consultarlo de varias formas:</p>
+        <ul>
+          <li><strong>Colpensiones:</strong> ingresa a <em>mi.colpensiones.gov.co</em> con tu cédula o pide la historia laboral presencialmente.</li>
+          <li><strong>AFP privada:</strong> en el portal o app de tu fondo (Porvenir, Protección, etc.) en la sección "Historia de cotizaciones".</li>
+          <li><strong>Derecho de petición:</strong> si no tienes acceso digital, usa la plantilla disponible en esta carpeta.</li>
+        </ul>
+        <div class="nota">💡 Las semanas se cuentan como 7 días continuos, no como semanas calendario. Un mes completo cotizado equivale aproximadamente a 4,33 semanas.</div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggle(this)">¿Qué pasa si me faltan semanas para pensionarme? <span class="faq-chevron">▼</span></button>
+      <div class="faq-a">
+        <p>Tienes varias opciones:</p>
+        <ul>
+          <li><strong>Seguir cotizando:</strong> si aún estás activo laboralmente, cada semana suma.</li>
+          <li><strong>Cotización voluntaria:</strong> puedes cotizar como independiente para completar semanas faltantes.</li>
+          <li><strong>Indemnización sustitutiva (Colpensiones):</strong> si llegas a la edad de pensión sin las semanas, recibes tus aportes actualizados con intereses.</li>
+          <li><strong>BEPS (Beneficios Económicos Periódicos):</strong> si tienes menos de 1.000 semanas, el programa BEPS de Colpensiones te permite ahorrar y recibir un subsidio parcial.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggle(this)">¿Las semanas cotizadas en un fondo se transfieren al otro? <span class="faq-chevron">▼</span></button>
+      <div class="faq-a">
+        <p>Sí. Al trasladarte de régimen, todas las semanas cotizadas se trasladan automáticamente. No pierdes el historial acumulado.</p>
+        <p>Lo que <strong>no se trasfiere igual</strong> es el saldo en AFP: si te trasladas a Colpensiones, el saldo de tu cuenta individual se usa para respaldar tus semanas en el fondo común.</p>
+        <div class="nota">⚠️ Verifica siempre en tu nueva historia laboral que las semanas quedaron registradas correctamente después del traslado.</div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggle(this)">¿Las semanas cotizadas antes de la Ley 100 (antes de 1994) cuentan? <span class="faq-chevron">▼</span></button>
+      <div class="faq-a">
+        <p>Sí. Las semanas cotizadas al ISS, al Seguro Social o a cajas de previsión antes de 1994 cuentan y se incorporan mediante <strong>bono pensional</strong> (Art. 115 y ss., Ley 100/1993; Decreto 1748/1995).</p>
+        <p>Si eres empleado público que se trasladó al sistema general, debes verificar que el bono pensional esté reconocido en tu historia laboral.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cat-label">💰 Mesada y liquidación</div>
+  <div class="card">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggle(this)">¿Cómo se calcula la mesada en Colpensiones? <span class="faq-chevron">▼</span></button>
+      <div class="faq-a">
+        <p>La fórmula es: <strong>Mesada = IBL × Tasa de reemplazo</strong></p>
+        <ul>
+          <li><strong>IBL (Ingreso Base de Liquidación):</strong> promedio de los salarios de los últimos 10 años de cotización, actualizados con el índice de precios (Sentencia SU-023/2018).</li>
+          <li><strong>Tasa de reemplazo:</strong> entre el 65% y el 80% del IBL, según el número de semanas cotizadas (Art. 34, Ley 100/1993). Con 1.300 semanas la tasa es 65%; sube 2% por cada 50 semanas adicionales hasta el tope del 80%.</li>
+        </ul>
+        <div class="nota">💡 La mesada nunca puede ser inferior a 1 SMMLV (Art. 35, Ley 100/1993).</div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggle(this)">¿Cómo se calcula la mesada en una AFP? <span class="faq-chevron">▼</span></button>
+      <div class="faq-a">
+        <p>Depende del <strong>saldo acumulado</strong> en tu cuenta individual y de la modalidad de pensión que elijas:</p>
+        <ul>
+          <li><strong>Renta vitalicia:</strong> le pagas el saldo a una aseguradora, que te garantiza una mesada fija de por vida.</li>
+          <li><strong>Retiro programado:</strong> retiras el saldo en cuotas durante un período calculado actuarialmente. Si el saldo se agota y aún vives, el Estado garantiza la pensión mínima (si cumples 1.150 semanas).</li>
+          <li><strong>Renta temporal con renta vitalicia diferida:</strong> combinación de ambas.</li>
+        </ul>
+        <div class="nota">⚠️ En las AFP la mesada depende del mercado. Puede ser mayor o menor que en Colpensiones según la rentabilidad acumulada.</div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggle(this)">¿Qué es la garantía de pensión mínima? <span class="faq-chevron">▼</span></button>
+      <div class="faq-a">
+        <p>Es un mecanismo del Estado por el que, si un afiliado a AFP llega a la edad de pensión con capital insuficiente pero tiene al menos <strong>1.150 semanas cotizadas</strong>, el Estado subsidia la diferencia para garantizarle una pensión de 1 SMMLV (Art. 65, Ley 100/1993).</p>
+        <p>En Colpensiones la garantía aplica desde la primera semana: si cumples los 1.300 semanas y la edad, tu mesada mínima es siempre 1 SMMLV.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cat-label">🔄 Traslados y ventanas</div>
+  <div class="card">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggle(this)">¿Cuántas veces me puedo trasladar de régimen? <span class="faq-chevron">▼</span></button>
+      <div class="faq-a">
+        <p>No hay límite en el número de traslados, pero cada traslado exige un período mínimo de <strong>5 años</strong> desde la última afiliación o traslado anterior (Art. 13 lit. e, Ley 100/1993, modificado por Ley 797/2003).</p>
+        <p>Adicionalmente, <strong>no puedes trasladarte si te faltan 10 años o menos para la edad de pensión</strong> (62 H / 57 M), independientemente de cuándo fue tu último traslado.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggle(this)">¿Puedo trasladarme después de los 50 años (mujer) o 52 años (hombre)? <span class="faq-chevron">▼</span></button>
+      <div class="faq-a">
+        <p><strong>No.</strong> La Sentencia C-086/2002 y la Ley 797/2003 establecen que no se puede trasladar quien esté a 10 años o menos de la edad de pensión. Eso equivale a:</p>
+        <ul>
+          <li><strong>Hombres:</strong> no pueden trasladarse a los 52 años o más (62 − 10).</li>
+          <li><strong>Mujeres:</strong> no pueden trasladarse a los 47 años o más (57 − 10).</li>
+        </ul>
+        <div class="nota">⚠️ Este es el error más costoso del sistema: muchos afiliados descubren tardíamente que ya no pueden cambiar de régimen.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cat-label">👨‍👩‍👧 Familia y sobrevivientes</div>
+  <div class="card">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggle(this)">¿Qué pasa con mi pensión si muero antes de pensionarme? <span class="faq-chevron">▼</span></button>
+      <div class="faq-a">
+        <p><strong>En Colpensiones:</strong> si tienes al menos 50 semanas cotizadas en los últimos 3 años, tus beneficiarios (cónyuge o compañero(a), hijos menores o inválidos, padres a cargo) tienen derecho a <strong>pensión de sobrevivientes</strong> equivalente al 75% de la mesada a la que tendrías derecho (Art. 46–48, Ley 100/1993).</p>
+        <p><strong>En AFP:</strong> el saldo acumulado en tu cuenta individual se usa para financiar la pensión de sobrevivientes o, si no hay beneficiarios, puede ser heredado (Art. 74–78, Ley 100/1993).</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggle(this)">¿El saldo de la AFP se puede heredar? <span class="faq-chevron">▼</span></button>
+      <div class="faq-a">
+        <p>Sí, con condiciones:</p>
+        <ul>
+          <li>Si hay <strong>beneficiarios de pensión de sobrevivientes</strong> (cónyuge, hijos, padres dependientes), el saldo financia esa pensión primero.</li>
+          <li>Si <strong>no hay beneficiarios</strong> con derecho a pensión de sobrevivientes, el saldo restante se entrega como herencia a los herederos legales.</li>
+        </ul>
+        <p>En Colpensiones no hay saldo individual: los beneficiarios solo tienen derecho a pensión de sobrevivientes, no al capital.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cat-label">📅 Reforma pensional</div>
+  <div class="card">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggle(this)">¿Qué pasó con la reforma pensional de 2024? <span class="faq-chevron">▼</span></button>
+      <div class="faq-a">
+        <p>La <strong>Ley 2381 de 2024</strong> fue aprobada por el Congreso e introdujo cambios significativos al sistema pensional, incluyendo un umbral de 2,3 SMMLV para cotizar obligatoriamente a Colpensiones.</p>
+        <p>Sin embargo, la Corte Constitucional la <strong>suspendió provisionalmente</strong> mientras estudia su constitucionalidad. Mientras no haya fallo definitivo, <strong>rige la Ley 100 de 1993</strong> con las modificaciones anteriores (Ley 797/2003, Ley 860/2003).</p>
+        <div class="nota">⚠️ Si la reforma es declarada exequible, el umbral de 2,3 SMMLV aplicará: quienes ganen menos irán obligatoriamente a Colpensiones. Mantente informado.</div>
+      </div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggle(this)">¿Qué es la reducción de semanas para mujeres de 2023? <span class="faq-chevron">▼</span></button>
+      <div class="faq-a">
+        <p>La <strong>Sentencia C-197/2023</strong> de la Corte Constitucional declaró inconstitucional la igualdad de semanas entre hombres y mujeres en Colpensiones. A partir del 1 de enero de 2027, las semanas mínimas para mujeres se reducen escalonadamente:</p>
+        <ul>
+          <li>2027: 1.275 semanas</li>
+          <li>2028: 1.250 semanas</li>
+          <li>... (25 semanas menos por año)</li>
+          <li>2038 en adelante: 1.000 semanas</li>
+        </ul>
+        <p>Los hombres mantienen 1.300 semanas. Esta reducción es <strong>vigente e independiente</strong> de la reforma pensional suspendida.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="notice notice-legal" style="margin-top:20px;">
+    Documento informativo generado con IA — no es asesoría jurídica. Verifica la vigencia de las normas antes de tomar decisiones.
+    Acuerdo PCSJA24-12243 · Sentencia T-323/2024.
+  </div>
+</div>
+<script>
+function toggle(btn) {
+  const a = btn.nextElementSibling;
+  const ch = btn.querySelector('.faq-chevron');
+  a.classList.toggle('open');
+  ch.classList.toggle('open');
+}
+</script>
+</body>
+</html>

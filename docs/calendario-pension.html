@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendario pensional · Colpensiones o AFP</title>
+<style>
+/* === shared === */
+/* ── Shared styles · pension-colombia ── */
+:root {
+  --azul:    #003893;
+  --azul2:   #002776;
+  --azul-lt: #e8eeff;
+  --verde:   #2e7d32;
+  --rojo:    #c62828;
+  --ambar:   #f59e0b;
+  --gris:    #5c6470;
+  --fondo:   #f4f6fb;
+  --texto:   #1a1a2e;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--fondo); color: var(--texto);
+  min-height: 100vh; padding-bottom: 48px;
+}
+.page { max-width: 720px; margin: 0 auto; padding: 20px 16px; }
+
+/* flag */
+.flag { height: 5px; border-radius: 3px; margin: 14px auto 4px; max-width: 200px;
+  background: linear-gradient(to right, #FCD116 33.33%, #003893 33.33% 66.66%, #CE1126 66.66%); }
+
+/* header */
+.site-header { text-align: center; padding: 24px 16px 12px; }
+.site-header h1 { font-size: 1.5rem; font-weight: 900; color: var(--azul); letter-spacing: -0.5px; }
+.site-header .sub { font-size: 0.82rem; color: var(--gris); margin-top: 4px; }
+
+/* breadcrumb */
+.breadcrumb { font-size: 0.78rem; color: var(--gris); margin: 0 0 18px;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.breadcrumb a { color: var(--azul); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb span { opacity: 0.5; }
+
+/* card */
+.card {
+  background: white; border-radius: 16px; padding: 24px;
+  margin: 14px 0; box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+}
+.card h2 { font-size: 1.1rem; font-weight: 800; color: var(--azul); margin-bottom: 14px; }
+.card h3 { font-size: 0.95rem; font-weight: 700; color: var(--azul2); margin: 18px 0 8px; }
+.card p  { font-size: 0.9rem; line-height: 1.65; color: #2a2a3e; margin-bottom: 10px; }
+.card ul, .card ol { padding-left: 20px; margin-bottom: 10px; }
+.card li  { font-size: 0.88rem; line-height: 1.6; margin-bottom: 4px; }
+
+/* table */
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 12px 0; }
+th { background: var(--azul); color: white; padding: 9px 12px; text-align: left; font-size: 0.8rem; }
+td { padding: 9px 12px; border-bottom: 1px solid #e8eaf0; vertical-align: top; }
+tr:nth-child(even) td { background: #f7f8fc; }
+
+/* badge */
+.badge { display: inline-block; font-size: 0.72rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px; }
+.badge-verde { background: #e8f5e9; color: var(--verde); }
+.badge-rojo  { background: #ffebee; color: var(--rojo); }
+.badge-ambar { background: #fff8e1; color: #856404; }
+.badge-azul  { background: var(--azul-lt); color: var(--azul); }
+
+/* notice */
+.notice {
+  border-radius: 10px; padding: 12px 16px; font-size: 0.82rem; line-height: 1.5;
+  margin-bottom: 14px;
+}
+.notice-info  { background: #e8f4fd; border-left: 4px solid #2196f3; color: #1565c0; }
+.notice-warn  { background: #fff8e1; border-left: 4px solid var(--ambar); color: #856404; }
+.notice-ok    { background: #e8f5e9; border-left: 4px solid var(--verde); color: var(--verde); }
+.notice-legal { background: #f3f0ff; border-left: 4px solid #7c3aed; color: #4c1d95; font-size: 0.78rem; }
+
+/* buttons */
+.btn { display: inline-block; padding: 11px 22px; border-radius: 10px; font-size: 0.9rem;
+  font-weight: 700; cursor: pointer; border: none; text-decoration: none; transition: all 0.18s; }
+.btn-primary { background: var(--azul); color: white; }
+.btn-primary:hover { background: var(--azul2); }
+.btn-secondary { background: white; color: var(--azul); border: 2px solid var(--azul); }
+.btn-secondary:hover { background: var(--azul-lt); }
+.btn-block { display: block; width: 100%; text-align: center; margin-top: 8px; }
+
+/* nav */
+.back-link { font-size: 0.82rem; color: var(--azul); text-decoration: none; display: inline-flex;
+  align-items: center; gap: 4px; margin-bottom: 12px; }
+.back-link:hover { text-decoration: underline; }
+
+/* print */
+@media print {
+  body { background: white; }
+  .no-print { display: none !important; }
+  .card { box-shadow: none; border: 1px solid #ddd; }
+}
+
+/* === /shared === */
+</style>
+<style>
+.timeline { position:relative; padding-left:32px; }
+.timeline::before { content:''; position:absolute; left:10px; top:0; bottom:0; width:3px;
+  background:linear-gradient(to bottom, #003893, #2e7d32); border-radius:2px; }
+.tl-item { position:relative; margin-bottom:28px; }
+.tl-dot { position:absolute; left:-26px; top:3px; width:16px; height:16px; border-radius:50%;
+  border:3px solid white; box-shadow:0 0 0 2px currentColor; }
+.tl-dot.pasado { background:#5c6470; color:#5c6470; }
+.tl-dot.actual { background:#003893; color:#003893; box-shadow:0 0 0 3px #003893, 0 0 0 5px rgba(0,56,147,.2); }
+.tl-dot.futuro { background:#2e7d32; color:#2e7d32; }
+.tl-dot.pendiente { background:#f59e0b; color:#f59e0b; }
+.tl-year { font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.5px;
+  color:#5c6470; margin-bottom:4px; }
+.tl-title { font-weight:800; font-size:.92rem; color:#1a1a2e; margin-bottom:4px; }
+.tl-desc { font-size:.84rem; line-height:1.55; color:#2a2a3e; }
+.tl-badge { display:inline-block; font-size:.7rem; font-weight:700; padding:2px 8px;
+  border-radius:20px; margin-left:6px; vertical-align:middle; }
+.badge-vigente  { background:#e8f5e9; color:#2e7d32; }
+.badge-suspendida { background:#ffebee; color:#c62828; }
+.badge-pendiente  { background:#fff8e1; color:#856404; }
+.semanas-tabla { width:100%; border-collapse:collapse; font-size:.84rem; }
+.semanas-tabla th { background:#003893; color:white; padding:9px 12px; text-align:center; }
+.semanas-tabla td { padding:9px 12px; text-align:center; border-bottom:1px solid #e8eaf0; }
+.semanas-tabla tr.actual-year td { background:#e8eeff; font-weight:700; }
+.semanas-tabla tr:nth-child(even) td { background:#f7f8fc; }
+.semanas-tabla tr.actual-year:nth-child(even) td { background:#e8eeff; }
+.legend { display:flex; gap:12px; flex-wrap:wrap; margin:12px 0 4px; font-size:.78rem; }
+.leg-item { display:flex; align-items:center; gap:5px; }
+.leg-dot { width:10px; height:10px; border-radius:50%; }
+@media print { .no-print { display:none !important; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="site-header">
+    <div class="flag"></div>
+    <h1>⚖️ ¿Colpensiones o AFP?</h1>
+    <div class="sub">Calendario pensional · Fechas clave 1993–2038</div>
+  </div>
+  <a href="../index.html" class="back-link no-print">← Volver a la calculadora</a>
+
+  <div class="notice notice-info">
+    Fechas y cambios normativos relevantes para tu decisión pensional, en orden cronológico.
+    Las fechas futuras son las establecidas por ley y sentencias vigentes.
+  </div>
+
+  <div class="card">
+    <h2>Línea de tiempo normativa</h2>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot" style="background:#5c6470"></div> Pasado</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#003893"></div> Vigente hoy</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#2e7d32"></div> Próximo</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#f59e0b"></div> Pendiente decisión</div>
+    </div>
+
+    <div class="timeline" style="margin-top:20px;">
+
+      <div class="tl-item">
+        <div class="tl-dot pasado"></div>
+        <div class="tl-year">23 dic 1993</div>
+        <div class="tl-title">Ley 100/1993 — Nace el sistema pensional actual</div>
+        <div class="tl-desc">Crea los dos regímenes: RPM (Colpensiones) y RAIS (AFP). Fija 1.000 semanas mínimas y las edades de 60/55 años. Establece la garantía de pensión mínima.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot pasado"></div>
+        <div class="tl-year">29 ene 2002</div>
+        <div class="tl-title">Sentencia C-086/2002 — Reglas de traslado</div>
+        <div class="tl-desc">La Corte Constitucional fija las dos condiciones de traslado: mínimo 5 años de afiliación y más de 10 años para la edad de pensión. Aún vigente.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot pasado"></div>
+        <div class="tl-year">29 ene 2003</div>
+        <div class="tl-title">Ley 797/2003 — Eleva semanas a 1.300</div>
+        <div class="tl-desc">Aumenta semanas mínimas de 1.000 a 1.300 (transición gradual hasta 2015) y eleva edades de pensión a 62/57 años (hombres/mujeres). Aún vigente.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot pasado"></div>
+        <div class="tl-year">1 jul 2025</div>
+        <div class="tl-title">Corte de semanas para régimen de transición (Ley 2381/2024)</div>
+        <div class="tl-desc">Quienes tenían 15 o más años cotizados a esta fecha pueden tener derecho al régimen de transición de la reforma pensional — <span class="tl-badge badge-pendiente">pendiente decisión CC</span>. La ley está suspendida.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot actual"></div>
+        <div class="tl-year">2026 — hoy</div>
+        <div class="tl-title">Rige Ley 100/1993 con modificaciones <span class="tl-badge badge-vigente">vigente</span></div>
+        <div class="tl-desc">Semanas mínimas: 1.300 para hombres y mujeres. Edades: 62/57. SMMLV 2026: $1.423.500. Ley 2381/2024 suspendida por la Corte Constitucional — no aplica aún.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot pendiente"></div>
+        <div class="tl-year">2026 (pendiente)</div>
+        <div class="tl-title">Fallo definitivo sobre Ley 2381/2024 <span class="tl-badge badge-pendiente">pendiente</span></div>
+        <div class="tl-desc">La Corte Constitucional debe pronunciarse sobre la exequibilidad de la reforma pensional. Si la declara exequible, el umbral de 2,3 SMMLV para cotizar a Colpensiones entraría en vigencia.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot futuro"></div>
+        <div class="tl-year">1 ene 2027</div>
+        <div class="tl-title">Inicia reducción de semanas para mujeres (C-197/2023) <span class="tl-badge badge-vigente">vigente</span></div>
+        <div class="tl-desc">Primera reducción: mujeres pasan de 1.300 a 1.275 semanas mínimas en Colpensiones. Esta reducción es independiente de la reforma suspendida — ya es ley por sentencia de la CC.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot futuro"></div>
+        <div class="tl-year">2028–2037</div>
+        <div class="tl-title">Reducción anual de 25 semanas para mujeres</div>
+        <div class="tl-desc">Cada año del 1 de enero, las semanas mínimas para mujeres bajan 25. Ver tabla detallada abajo.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot futuro"></div>
+        <div class="tl-year">1 ene 2038</div>
+        <div class="tl-title">Semanas mínimas para mujeres: 1.000 (tope final)</div>
+        <div class="tl-desc">La reducción llega a su límite: 1.000 semanas mínimas para mujeres en Colpensiones, equivalente a la exigencia original de la Ley 100/1993 de 1993.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Semanas mínimas para mujeres — Tabla 2026–2038</h2>
+    <p style="font-size:.83rem;color:#5c6470;margin-bottom:12px;">Sentencia C-197/2023 · Vigente e independiente de la reforma pensional</p>
+    <table class="semanas-tabla">
+      <tr><th>Año</th><th>Semanas mínimas (mujeres)</th><th>Hombres</th><th>Diferencia</th></tr>
+      <tr class="actual-year"><td>2026</td><td>1.300</td><td>1.300</td><td>0</td></tr>
+      <tr><td>2027</td><td>1.275</td><td>1.300</td><td>−25</td></tr>
+      <tr><td>2028</td><td>1.250</td><td>1.300</td><td>−50</td></tr>
+      <tr><td>2029</td><td>1.225</td><td>1.300</td><td>−75</td></tr>
+      <tr><td>2030</td><td>1.200</td><td>1.300</td><td>−100</td></tr>
+      <tr><td>2031</td><td>1.175</td><td>1.300</td><td>−125</td></tr>
+      <tr><td>2032</td><td>1.150</td><td>1.300</td><td>−150</td></tr>
+      <tr><td>2033</td><td>1.125</td><td>1.300</td><td>−175</td></tr>
+      <tr><td>2034</td><td>1.100</td><td>1.300</td><td>−200</td></tr>
+      <tr><td>2035</td><td>1.075</td><td>1.300</td><td>−225</td></tr>
+      <tr><td>2036</td><td>1.050</td><td>1.300</td><td>−250</td></tr>
+      <tr><td>2037</td><td>1.025</td><td>1.300</td><td>−275</td></tr>
+      <tr><td>2038+</td><td><strong>1.000</strong></td><td>1.300</td><td>−300</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Ventanas de traslado por edad — Referencia rápida</h2>
+    <table>
+      <tr><th>Edad actual</th><th>Hombre</th><th>Mujer</th></tr>
+      <tr><td>Menos de 47</td><td>✅ Puede trasladarse (si cumple 5 años)</td><td>✅ Puede trasladarse (si cumple 5 años)</td></tr>
+      <tr><td>47–51</td><td>✅ Puede trasladarse (si cumple 5 años)</td><td>❌ Bloqueada (faltan ≤10 años)</td></tr>
+      <tr><td>52–61</td><td>❌ Bloqueado (faltan ≤10 años)</td><td>❌ Bloqueada</td></tr>
+      <tr><td>62 o más</td><td>En edad de pensión — tramitar pensión</td><td>—</td></tr>
+      <tr><td>57 o más (M)</td><td>—</td><td>En edad de pensión — tramitar pensión</td></tr>
+    </table>
+    <p style="font-size:.78rem;color:#5c6470;margin-top:8px;">Fuente: Art. 13 lit. e Ley 100/1993 · Ley 797/2003 · Sentencia C-086/2002</p>
+  </div>
+
+  <div class="notice notice-legal" style="margin-top:20px;">
+    Documento informativo generado con IA — no es asesoría jurídica. Verifica vigencia de normas.
+    Acuerdo PCSJA24-12243 · Sentencia T-323/2024.
+  </div>
+</div>
+</body>
+</html>

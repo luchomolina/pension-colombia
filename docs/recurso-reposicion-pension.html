@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recurso de reposición — Pensión de vejez · Colpensiones o AFP</title>
+<style>
+/* === shared === */
+/* ── Shared styles · pension-colombia ── */
+:root {
+  --azul:    #003893;
+  --azul2:   #002776;
+  --azul-lt: #e8eeff;
+  --verde:   #2e7d32;
+  --rojo:    #c62828;
+  --ambar:   #f59e0b;
+  --gris:    #5c6470;
+  --fondo:   #f4f6fb;
+  --texto:   #1a1a2e;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--fondo); color: var(--texto);
+  min-height: 100vh; padding-bottom: 48px;
+}
+.page { max-width: 720px; margin: 0 auto; padding: 20px 16px; }
+
+/* flag */
+.flag { height: 5px; border-radius: 3px; margin: 14px auto 4px; max-width: 200px;
+  background: linear-gradient(to right, #FCD116 33.33%, #003893 33.33% 66.66%, #CE1126 66.66%); }
+
+/* header */
+.site-header { text-align: center; padding: 24px 16px 12px; }
+.site-header h1 { font-size: 1.5rem; font-weight: 900; color: var(--azul); letter-spacing: -0.5px; }
+.site-header .sub { font-size: 0.82rem; color: var(--gris); margin-top: 4px; }
+
+/* breadcrumb */
+.breadcrumb { font-size: 0.78rem; color: var(--gris); margin: 0 0 18px;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.breadcrumb a { color: var(--azul); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb span { opacity: 0.5; }
+
+/* card */
+.card {
+  background: white; border-radius: 16px; padding: 24px;
+  margin: 14px 0; box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+}
+.card h2 { font-size: 1.1rem; font-weight: 800; color: var(--azul); margin-bottom: 14px; }
+.card h3 { font-size: 0.95rem; font-weight: 700; color: var(--azul2); margin: 18px 0 8px; }
+.card p  { font-size: 0.9rem; line-height: 1.65; color: #2a2a3e; margin-bottom: 10px; }
+.card ul, .card ol { padding-left: 20px; margin-bottom: 10px; }
+.card li  { font-size: 0.88rem; line-height: 1.6; margin-bottom: 4px; }
+
+/* table */
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 12px 0; }
+th { background: var(--azul); color: white; padding: 9px 12px; text-align: left; font-size: 0.8rem; }
+td { padding: 9px 12px; border-bottom: 1px solid #e8eaf0; vertical-align: top; }
+tr:nth-child(even) td { background: #f7f8fc; }
+
+/* badge */
+.badge { display: inline-block; font-size: 0.72rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px; }
+.badge-verde { background: #e8f5e9; color: var(--verde); }
+.badge-rojo  { background: #ffebee; color: var(--rojo); }
+.badge-ambar { background: #fff8e1; color: #856404; }
+.badge-azul  { background: var(--azul-lt); color: var(--azul); }
+
+/* notice */
+.notice {
+  border-radius: 10px; padding: 12px 16px; font-size: 0.82rem; line-height: 1.5;
+  margin-bottom: 14px;
+}
+.notice-info  { background: #e8f4fd; border-left: 4px solid #2196f3; color: #1565c0; }
+.notice-warn  { background: #fff8e1; border-left: 4px solid var(--ambar); color: #856404; }
+.notice-ok    { background: #e8f5e9; border-left: 4px solid var(--verde); color: var(--verde); }
+.notice-legal { background: #f3f0ff; border-left: 4px solid #7c3aed; color: #4c1d95; font-size: 0.78rem; }
+
+/* buttons */
+.btn { display: inline-block; padding: 11px 22px; border-radius: 10px; font-size: 0.9rem;
+  font-weight: 700; cursor: pointer; border: none; text-decoration: none; transition: all 0.18s; }
+.btn-primary { background: var(--azul); color: white; }
+.btn-primary:hover { background: var(--azul2); }
+.btn-secondary { background: white; color: var(--azul); border: 2px solid var(--azul); }
+.btn-secondary:hover { background: var(--azul-lt); }
+.btn-block { display: block; width: 100%; text-align: center; margin-top: 8px; }
+
+/* nav */
+.back-link { font-size: 0.82rem; color: var(--azul); text-decoration: none; display: inline-flex;
+  align-items: center; gap: 4px; margin-bottom: 12px; }
+.back-link:hover { text-decoration: underline; }
+
+/* print */
+@media print {
+  body { background: white; }
+  .no-print { display: none !important; }
+  .card { box-shadow: none; border: 1px solid #ddd; }
+}
+
+/* === /shared === */
+</style>
+<style>
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 0.8rem; font-weight: 700; color: #333; margin-bottom: 5px; }
+input, select, textarea { width: 100%; padding: 10px 13px; border: 2px solid #e0e4ed;
+  border-radius: 9px; font-size: 0.9rem; color: #1a1a2e; font-family: inherit; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: #003893; }
+textarea { min-height: 100px; resize: vertical; }
+.documento { background: white; border: 1.5px solid #d0d5e8; border-radius: 12px;
+  padding: 28px; margin-top: 20px; font-size: 0.9rem; line-height: 1.7; }
+.documento h3 { font-size: 1rem; font-weight: 800; text-align: center; margin-bottom: 6px; color: #003893; }
+.documento h4 { font-size: 0.88rem; font-weight: 700; text-align: center; margin-bottom: 20px; color: #555; }
+.documento .cuerpo p { margin-bottom: 12px; }
+.documento .firma { margin-top: 32px; }
+.ph { font-weight: 700; color: #856404; }
+.motivo-check { display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:0.88rem; }
+.motivo-check input[type=checkbox] { width:auto; }
+.btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+@media print { .no-print { display: none !important; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="site-header">
+    <div class="flag"></div>
+    <h1>⚖️ ¿Colpensiones o AFP?</h1>
+    <div class="sub">Documentos legales · Recurso de reposición pensional</div>
+  </div>
+
+  <a href="../index.html" class="back-link no-print">← Volver a la calculadora</a>
+
+  <div class="notice notice-warn">
+    ⚠️ <strong>Plazo legal:</strong> El recurso de reposición debe interponerse dentro de los
+    <strong>10 días hábiles</strong> siguientes a la notificación de la resolución (Art. 76 CPACA —
+    Ley 1437/2011). Vencido ese plazo, la resolución queda en firme.
+  </div>
+
+  <div class="card no-print">
+    <h2>Datos del recurso</h2>
+    <div class="field"><label>Nombre completo del recurrente</label>
+      <input id="nombre" placeholder="María Lucía Gómez Vargas" oninput="act()"></div>
+    <div class="field"><label>Tipo y número de documento</label>
+      <div style="display:grid;grid-template-columns:1fr 2fr;gap:8px;">
+        <select id="tipo_doc" onchange="act()">
+          <option>Cédula de ciudadanía</option>
+          <option>Cédula de extranjería</option>
+        </select>
+        <input id="num_doc" placeholder="52.345.678" oninput="act()">
+      </div></div>
+    <div class="field"><label>Número y fecha de la resolución recurrida</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <input id="res_num" placeholder="Ej. 2025-1234567" oninput="act()">
+        <input id="res_fecha" placeholder="Ej. 15 de enero de 2025" oninput="act()">
+      </div></div>
+    <div class="field"><label>Motivos del recurso (selecciona los que aplican)</label>
+      <div id="motivos-check">
+        <label class="motivo-check"><input type="checkbox" value="semanas" onchange="act()">
+          Error en el conteo de semanas cotizadas</label>
+        <label class="motivo-check"><input type="checkbox" value="ibl" onchange="act()">
+          Error en la liquidación del Ingreso Base de Liquidación (IBL)</label>
+        <label class="motivo-check"><input type="checkbox" value="transicion" onchange="act()">
+          No se aplicó el régimen de transición (Ley 2381/2024, art. 75)</label>
+        <label class="motivo-check"><input type="checkbox" value="bono" onchange="act()">
+          No se incorporó el bono pensional</label>
+        <label class="motivo-check"><input type="checkbox" value="otro" onchange="act()">
+          Otro error material en la resolución</label>
+      </div></div>
+    <div class="field"><label>Descripción adicional del error (opcional)</label>
+      <textarea id="desc_error" placeholder="Describe brevemente el error que encontraste..." oninput="act()"></textarea></div>
+    <div class="field"><label>Dirección de notificación</label>
+      <input id="direccion" placeholder="Cra. 15 No. 80-42, Bogotá" oninput="act()"></div>
+    <div class="field"><label>Correo electrónico</label>
+      <input id="email" placeholder="ejemplo@correo.com" oninput="act()"></div>
+    <div class="field"><label>Ciudad y fecha</label>
+      <input id="fecha" oninput="act()"></div>
+  </div>
+
+  <div class="documento" id="doc">
+    <div style="text-align:right;font-size:0.82rem;color:#555;margin-bottom:18px;">
+      <span id="d-fecha">__________________</span>
+    </div>
+
+    <h3>RECURSO DE REPOSICIÓN</h3>
+    <h4>Contra la Resolución N.° <span id="d-res_num" class="ph">NÚMERO</span>
+      del <span id="d-res_fecha" class="ph">FECHA</span></h4>
+
+    <div style="margin-bottom:18px;">
+      Señores<br>
+      <strong>COLPENSIONES</strong> — Gerencia de Reconocimiento de Prestaciones Económicas<br>
+      Ciudad
+    </div>
+
+    <div class="cuerpo">
+      <p>
+        <strong><span id="d-nombre" class="ph">NOMBRE COMPLETO</span></strong>,
+        identificado(a) con <span id="d-tipo">C.C.</span> N.°&nbsp;<strong><span id="d-doc" class="ph">NÚMERO</span></strong>,
+        con domicilio en <span id="d-dir" class="ph">DIRECCIÓN</span>,
+        correo <span id="d-email" class="ph">CORREO</span>, en ejercicio del recurso de reposición
+        previsto en los artículos 74 y 76 de la Ley 1437 de 2011 (CPACA), me permito interponer
+        recurso de reposición contra la Resolución N.°&nbsp;<span id="d-res_num2" class="ph">NÚMERO</span>
+        del <span id="d-res_fecha2" class="ph">FECHA</span>, por los siguientes fundamentos de hecho y de derecho:
+      </p>
+
+      <p><strong>I. FUNDAMENTOS DEL RECURSO</strong></p>
+
+      <div id="d-motivos"><p><em>(Selecciona los motivos en el formulario)</em></p></div>
+
+      <div id="d-desc-extra"></div>
+
+      <p><strong>II. FUNDAMENTOS JURÍDICOS</strong></p>
+      <p>
+        Artículos 13, 33 y 34 de la Ley 100 de 1993; artículo 74 y ss. de la Ley 1437 de 2011;
+        Sentencia C-258/2013 y SU-023/2018 de la Corte Constitucional; Decreto 692 de 1994.
+        El principio de favorabilidad en materia pensional impone la interpretación más
+        beneficiosa al trabajador (Art. 53 C.P.; T-832/2010).
+      </p>
+
+      <p><strong>III. PETICIÓN</strong></p>
+      <p>
+        Con base en los anteriores fundamentos, solicito respetuosamente:
+      </p>
+      <ol>
+        <li>REVOCAR la Resolución N.°&nbsp;<span id="d-res_num3" class="ph">NÚMERO</span> en los
+            aspectos señalados.</li>
+        <li>RELIQUIDAR la pensión de vejez teniendo en cuenta la totalidad de semanas cotizadas
+            y el IBL correcto.</li>
+        <li>RECONOCER y PAGAR las mesadas dejadas de cancelar desde la fecha en que se configuró
+            el derecho, con los respectivos intereses de mora (Art. 141 Ley 100/1993).</li>
+        <li>Dar respuesta en el término de <strong>dos (2) meses</strong> previsto en el artículo
+            76 del CPACA.</li>
+      </ol>
+    </div>
+
+    <div class="firma">
+      <p>Atentamente,</p><br><br>
+      <p>
+        <strong><span id="d-firma" class="ph">NOMBRE COMPLETO</span></strong><br>
+        <span id="d-tipo2">C.C.</span> <span id="d-doc2" class="ph">NÚMERO</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="btn-row no-print">
+    <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+    <a href="../index.html" class="btn btn-secondary">← Volver</a>
+  </div>
+
+  <div class="notice notice-legal" style="margin-top:20px;">
+    Plantilla orientativa generada con IA — verificar jurisprudencia y datos antes de radicar.
+    No constituye asesoría jurídica. Acuerdo PCSJA24-12243 · Sentencia T-323/2024.
+  </div>
+</div>
+<script>
+document.getElementById('fecha').value = new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});
+
+// Pre-llenar desde localStorage (calculadora principal)
+(function() {
+  try {
+    const raw = localStorage.getItem('pension_S');
+    if (!raw) return;
+    const S = JSON.parse(raw);
+    // No hay datos directamente mapeables a este recurso (requiere n.° de resolución),
+    // pero podemos pre-seleccionar tipo de documento y marcar aviso
+    if (S.semanas_actuales || S.edad) {
+      const nb = document.createElement('div');
+      nb.className = 'notice notice-ok no-print';
+      nb.innerHTML = 'ℹ️ Completaste la calculadora. <strong>Este recurso requiere el número de resolución de Colpensiones</strong> — tenlo a mano antes de continuar.';
+      nb.style.marginBottom = '12px';
+      const card = document.querySelector('.card.no-print');
+      if (card) card.prepend(nb);
+    }
+  } catch(e) {}
+})();
+
+const MOTIVOS_TEXT = {
+  semanas: 'La resolución presenta un <strong>error en el conteo de semanas cotizadas</strong>. De conformidad con el artículo 33 de la Ley 100 de 1993 y el artículo 57 del Decreto 692 de 1994, todas las semanas reportadas por los empleadores deben ser contabilizadas. La diferencia entre las semanas reconocidas en la resolución y las que constan en la historia laboral constituye un defecto material que afecta el monto de la pensión.',
+  ibl: 'La resolución incurre en un <strong>error en la liquidación del Ingreso Base de Liquidación (IBL)</strong>. Según el artículo 21 de la Ley 100 de 1993 y la Sentencia SU-023/2018 de la Corte Constitucional, el IBL debe calcularse sobre el promedio de los salarios de los últimos 10 años de cotización. El valor utilizado en la resolución no corresponde a dicho cálculo.',
+  transicion: 'No se aplicó el <strong>régimen de transición</strong> consagrado en el artículo 75 de la Ley 2381 de 2024, al que el suscrito tiene derecho por reunir el número de semanas exigidas al corte del 1.º de julio de 2025. Ello implica que la liquidación debió efectuarse conforme a las reglas de la Ley 100 de 1993.',
+  bono: 'La resolución <strong>no incorporó el bono pensional</strong> al que el suscrito tiene derecho por el tiempo cotizado al ISS o a cajas de previsión anteriores a la entrada en vigencia de la Ley 100 de 1993 (Art. 115 y ss. de la Ley 100/1993; Decreto 1748 de 1995).',
+  otro: 'La resolución presenta <strong>errores materiales</strong> que afectan el reconocimiento correcto del derecho y el monto de la prestación, tal como se describe a continuación.'
+};
+
+function act() {
+  const n = g('nombre')||'NOMBRE COMPLETO', td = g('tipo_doc'), nd = g('num_doc')||'NÚMERO',
+        rn = g('res_num')||'NÚMERO', rf = g('res_fecha')||'FECHA',
+        dir = g('direccion')||'DIRECCIÓN', em = g('email')||'CORREO', fch = g('fecha')||'——',
+        desc = g('desc_error')||'';
+
+  s('d-fecha',fch); s('d-nombre',n); s('d-tipo',ab(td)); s('d-doc',nd);
+  s('d-dir',dir); s('d-email',em);
+  ['d-res_num','d-res_num2','d-res_num3'].forEach(id=>s(id,rn));
+  ['d-res_fecha','d-res_fecha2'].forEach(id=>s(id,rf));
+  s('d-firma',n); s('d-tipo2',ab(td)); s('d-doc2',nd);
+
+  // Motivos
+  const checks = [...document.querySelectorAll('#motivos-check input:checked')].map(c=>c.value);
+  const mDiv = document.getElementById('d-motivos');
+  if (checks.length === 0) {
+    mDiv.innerHTML = '<p><em>(Selecciona los motivos en el formulario)</em></p>';
+  } else {
+    mDiv.innerHTML = checks.map((k,i)=>`<p><strong>${i+1}.</strong> ${MOTIVOS_TEXT[k]||''}</p>`).join('');
+  }
+  const extraDiv = document.getElementById('d-desc-extra');
+  extraDiv.innerHTML = desc ? `<p><strong>Descripción adicional:</strong> ${desc}</p>` : '';
+}
+function g(id){return document.getElementById(id)?.value||'';}
+function s(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+function ab(t){return t&&t.includes('extranjería')?'C.E.':'C.C.';}
+act();
+</script>
+</body>
+</html>

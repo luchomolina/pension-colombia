@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Derecho de petición — Asesoría de traslado · Colpensiones o AFP</title>
+<style>
+/* === shared === */
+/* ── Shared styles · pension-colombia ── */
+:root {
+  --azul:    #003893;
+  --azul2:   #002776;
+  --azul-lt: #e8eeff;
+  --verde:   #2e7d32;
+  --rojo:    #c62828;
+  --ambar:   #f59e0b;
+  --gris:    #5c6470;
+  --fondo:   #f4f6fb;
+  --texto:   #1a1a2e;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--fondo); color: var(--texto);
+  min-height: 100vh; padding-bottom: 48px;
+}
+.page { max-width: 720px; margin: 0 auto; padding: 20px 16px; }
+
+/* flag */
+.flag { height: 5px; border-radius: 3px; margin: 14px auto 4px; max-width: 200px;
+  background: linear-gradient(to right, #FCD116 33.33%, #003893 33.33% 66.66%, #CE1126 66.66%); }
+
+/* header */
+.site-header { text-align: center; padding: 24px 16px 12px; }
+.site-header h1 { font-size: 1.5rem; font-weight: 900; color: var(--azul); letter-spacing: -0.5px; }
+.site-header .sub { font-size: 0.82rem; color: var(--gris); margin-top: 4px; }
+
+/* breadcrumb */
+.breadcrumb { font-size: 0.78rem; color: var(--gris); margin: 0 0 18px;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.breadcrumb a { color: var(--azul); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb span { opacity: 0.5; }
+
+/* card */
+.card {
+  background: white; border-radius: 16px; padding: 24px;
+  margin: 14px 0; box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+}
+.card h2 { font-size: 1.1rem; font-weight: 800; color: var(--azul); margin-bottom: 14px; }
+.card h3 { font-size: 0.95rem; font-weight: 700; color: var(--azul2); margin: 18px 0 8px; }
+.card p  { font-size: 0.9rem; line-height: 1.65; color: #2a2a3e; margin-bottom: 10px; }
+.card ul, .card ol { padding-left: 20px; margin-bottom: 10px; }
+.card li  { font-size: 0.88rem; line-height: 1.6; margin-bottom: 4px; }
+
+/* table */
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 12px 0; }
+th { background: var(--azul); color: white; padding: 9px 12px; text-align: left; font-size: 0.8rem; }
+td { padding: 9px 12px; border-bottom: 1px solid #e8eaf0; vertical-align: top; }
+tr:nth-child(even) td { background: #f7f8fc; }
+
+/* badge */
+.badge { display: inline-block; font-size: 0.72rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px; }
+.badge-verde { background: #e8f5e9; color: var(--verde); }
+.badge-rojo  { background: #ffebee; color: var(--rojo); }
+.badge-ambar { background: #fff8e1; color: #856404; }
+.badge-azul  { background: var(--azul-lt); color: var(--azul); }
+
+/* notice */
+.notice {
+  border-radius: 10px; padding: 12px 16px; font-size: 0.82rem; line-height: 1.5;
+  margin-bottom: 14px;
+}
+.notice-info  { background: #e8f4fd; border-left: 4px solid #2196f3; color: #1565c0; }
+.notice-warn  { background: #fff8e1; border-left: 4px solid var(--ambar); color: #856404; }
+.notice-ok    { background: #e8f5e9; border-left: 4px solid var(--verde); color: var(--verde); }
+.notice-legal { background: #f3f0ff; border-left: 4px solid #7c3aed; color: #4c1d95; font-size: 0.78rem; }
+
+/* buttons */
+.btn { display: inline-block; padding: 11px 22px; border-radius: 10px; font-size: 0.9rem;
+  font-weight: 700; cursor: pointer; border: none; text-decoration: none; transition: all 0.18s; }
+.btn-primary { background: var(--azul); color: white; }
+.btn-primary:hover { background: var(--azul2); }
+.btn-secondary { background: white; color: var(--azul); border: 2px solid var(--azul); }
+.btn-secondary:hover { background: var(--azul-lt); }
+.btn-block { display: block; width: 100%; text-align: center; margin-top: 8px; }
+
+/* nav */
+.back-link { font-size: 0.82rem; color: var(--azul); text-decoration: none; display: inline-flex;
+  align-items: center; gap: 4px; margin-bottom: 12px; }
+.back-link:hover { text-decoration: underline; }
+
+/* print */
+@media print {
+  body { background: white; }
+  .no-print { display: none !important; }
+  .card { box-shadow: none; border: 1px solid #ddd; }
+}
+
+/* === /shared === */
+</style>
+<style>
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 0.8rem; font-weight: 700; color: #333; margin-bottom: 5px; }
+input, select, textarea { width: 100%; padding: 10px 13px; border: 2px solid #e0e4ed;
+  border-radius: 9px; font-size: 0.9rem; color: #1a1a2e; font-family: inherit; }
+input:focus, select:focus { outline: none; border-color: #003893; }
+.documento { background: white; border: 1.5px solid #d0d5e8; border-radius: 12px;
+  padding: 28px; margin-top: 20px; font-size: 0.9rem; line-height: 1.7; }
+.documento h3 { font-size: 1rem; font-weight: 800; text-align: center; margin-bottom: 20px; color: #003893; }
+.documento .ref { text-align: right; font-size: 0.82rem; color: #555; margin-bottom: 18px; }
+.documento .cuerpo p { margin-bottom: 12px; }
+.documento .firma { margin-top: 32px; }
+.ph { font-weight: 700; color: #856404; }
+.btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+@media print { .no-print { display: none !important; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="site-header">
+    <div class="flag"></div>
+    <h1>⚖️ ¿Colpensiones o AFP?</h1>
+    <div class="sub">Documentos legales · Solicitud de asesoría de traslado</div>
+  </div>
+
+  <a href="../index.html" class="back-link no-print">← Volver a la calculadora</a>
+
+  <div class="notice notice-info">
+    <strong>¿Para qué sirve?</strong> Toda persona afiliada al sistema pensional tiene derecho a recibir
+    <em>asesoría gratuita y obligatoria</em> antes de trasladarse de régimen (Ley 100/1993, art. 13 lit. e).
+    Este documento solicita formalmente esa asesoría y activa el plazo legal de respuesta.
+  </div>
+
+  <div class="notice notice-warn">
+    ⚠️ <strong>Ventana de traslado:</strong> Solo puedes trasladarte si han pasado al menos 5 años desde tu última
+    afiliación o traslado, y si te faltan más de 10 años para la edad de pensión (Ley 100, art. 13 lit. e,
+    modificado por Ley 797/2003 y C-086/2002).
+  </div>
+
+  <div class="card no-print">
+    <h2>Datos del solicitante</h2>
+    <div class="field"><label>Nombre completo</label>
+      <input id="nombre" placeholder="María Lucía Gómez Vargas" oninput="act()"></div>
+    <div class="field"><label>Tipo de documento</label>
+      <select id="tipo_doc" onchange="act()">
+        <option>Cédula de ciudadanía</option>
+        <option>Cédula de extranjería</option>
+        <option>Pasaporte</option>
+      </select></div>
+    <div class="field"><label>Número de documento</label>
+      <input id="num_doc" placeholder="52.345.678" oninput="act()"></div>
+    <div class="field"><label>Fondo actual (origen)</label>
+      <select id="fondo_origen" onchange="act()">
+        <option value="Colpensiones">Colpensiones (RPM)</option>
+        <option value="Porvenir">Porvenir (RAIS)</option>
+        <option value="Protección">Protección (RAIS)</option>
+        <option value="Colfondos">Colfondos (RAIS)</option>
+        <option value="Skandia">Skandia (RAIS)</option>
+      </select></div>
+    <div class="field"><label>Fondo al que desea trasladarse</label>
+      <select id="fondo_destino" onchange="act()">
+        <option value="Colpensiones">Colpensiones (RPM)</option>
+        <option value="Porvenir">Porvenir (RAIS)</option>
+        <option value="Protección">Protección (RAIS)</option>
+        <option value="Colfondos">Colfondos (RAIS)</option>
+        <option value="Skandia">Skandia (RAIS)</option>
+      </select></div>
+    <div class="field"><label>Dirección y ciudad de notificación</label>
+      <input id="direccion" placeholder="Cra. 15 No. 80-42, Bogotá" oninput="act()"></div>
+    <div class="field"><label>Correo electrónico</label>
+      <input id="email" placeholder="ejemplo@correo.com" oninput="act()"></div>
+    <div class="field"><label>Teléfono</label>
+      <input id="telefono" placeholder="300 123 4567" oninput="act()"></div>
+    <div class="field"><label>Ciudad y fecha</label>
+      <input id="fecha" oninput="act()"></div>
+  </div>
+
+  <div class="documento" id="doc">
+    <div class="ref"><span id="d-fecha">__________________</span></div>
+
+    <h3>DERECHO DE PETICIÓN — SOLICITUD DE ASESORÍA OBLIGATORIA DE TRASLADO DE RÉGIMEN PENSIONAL</h3>
+
+    <div style="margin-bottom:18px;">
+      Señores<br>
+      <strong id="d-dest">COLPENSIONES</strong><br>
+      Gerencia de Atención al Afiliado / Área de Traslados<br>
+      Ciudad
+    </div>
+
+    <div class="cuerpo">
+      <p>
+        Yo, <strong><span id="d-nombre" class="ph">NOMBRE COMPLETO</span></strong>,
+        identificado(a) con <span id="d-tipo">Cédula de ciudadanía</span> N.°&nbsp;<strong><span id="d-doc" class="ph">NÚMERO</span></strong>,
+        con domicilio en <span id="d-dir" class="ph">DIRECCIÓN</span>,
+        correo <span id="d-email" class="ph">CORREO</span> y teléfono <span id="d-tel" class="ph">TELÉFONO</span>,
+        me dirijo respetuosamente a ustedes en ejercicio del derecho de petición consagrado
+        en el artículo 23 de la Constitución Política y la Ley 1755 de 2015, para solicitar:
+      </p>
+
+      <p>
+        <strong>PRIMERO:</strong> Que se me brinde la <strong>asesoría gratuita y obligatoria</strong>
+        prevista en el artículo 13 literal e) de la Ley 100 de 1993 y el Decreto 692 de 1994,
+        en relación con mi intención de trasladarme desde el régimen
+        <strong><span id="d-origen" class="ph">ORIGEN</span></strong> hacia
+        <strong><span id="d-destino" class="ph">DESTINO</span></strong>.
+      </p>
+
+      <p>
+        <strong>SEGUNDO:</strong> Que, como parte de dicha asesoría, se me informe de manera
+        clara y por escrito:
+      </p>
+      <ul>
+        <li>Si cumplo con los requisitos legales para el traslado (tiempo mínimo de 5 años de afiliación
+            y más de 10 años faltantes para la edad de pensión — art. 13 lit. e, Ley 797/2003).</li>
+        <li>El número de semanas cotizadas a la fecha y la proyección bajo cada régimen.</li>
+        <li>Los efectos económicos del traslado sobre mis derechos pensionales adquiridos.</li>
+        <li>Las implicaciones del régimen de transición (Ley 2381/2024, art. 75), si aplica.</li>
+      </ul>
+
+      <p>
+        <strong>TERCERO:</strong> Solicito respuesta en el término de quince (15) días hábiles
+        previsto en el artículo 14 de la Ley 1437 de 2011, so pena de que opere el silencio
+        administrativo positivo en los términos del artículo 83 ibídem.
+      </p>
+
+      <p>
+        Me reservo el derecho de acudir a la acción de tutela por vulneración del derecho fundamental
+        de petición en caso de falta de respuesta oportuna y de fondo (C.P., art. 86;
+        Sentencia T-377/2000 y T-680/2012 de la Corte Constitucional).
+      </p>
+    </div>
+
+    <div class="firma">
+      <p>Atentamente,</p>
+      <br><br>
+      <p>
+        <strong><span id="d-firma" class="ph">NOMBRE COMPLETO</span></strong><br>
+        <span id="d-tipo2">C.C.</span> <span id="d-doc2" class="ph">NÚMERO</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="btn-row no-print">
+    <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+    <a href="../index.html" class="btn btn-secondary">← Volver</a>
+  </div>
+
+  <div class="notice notice-legal" style="margin-top:20px;">
+    Plantilla orientativa generada con IA — verificar antes de radicar. No es asesoría jurídica.
+    Acuerdo PCSJA24-12243 · Sentencia T-323/2024.
+  </div>
+</div>
+<script>
+document.getElementById('fecha').value = new Date().toLocaleDateString('es-CO', {year:'numeric',month:'long',day:'numeric'});
+
+// Pre-llenar desde localStorage (calculadora principal)
+(function() {
+  try {
+    const raw = localStorage.getItem('pension_S');
+    if (!raw) return;
+    const S = JSON.parse(raw);
+    const fondoMap = { Colpensiones:'Colpensiones', Porvenir:'Porvenir', 'Protección':'Protección', Proteccion:'Protección', Colfondos:'Colfondos', Skandia:'Skandia' };
+    if (S.fondo_actual && fondoMap[S.fondo_actual]) {
+      document.getElementById('fondo_origen').value = fondoMap[S.fondo_actual];
+      // Sugerir destino opuesto
+      const destMap = { Colpensiones:'Porvenir', Porvenir:'Colpensiones', 'Protección':'Colpensiones', Colfondos:'Colpensiones', Skandia:'Colpensiones' };
+      const dest = destMap[S.fondo_actual];
+      if (dest) document.getElementById('fondo_destino').value = dest;
+      // Mostrar aviso de auto-llenado
+      const nb = document.createElement('div');
+      nb.className = 'notice notice-ok no-print';
+      nb.innerHTML = '✅ <strong>Datos pre-llenados</strong> desde tu consulta. Revisa antes de imprimir.';
+      nb.style.marginBottom = '12px';
+      document.querySelector('.card.no-print').prepend(nb);
+    }
+  } catch(e) {}
+})();
+
+function act() {
+  const n = v('nombre')||'NOMBRE COMPLETO', td = v('tipo_doc')||'Cédula de ciudadanía',
+        nd = v('num_doc')||'NÚMERO', fo = v('fondo_origen')||'Colpensiones',
+        fd = v('fondo_destino')||'Destino', dir = v('direccion')||'DIRECCIÓN',
+        em = v('email')||'CORREO', tel = v('telefono')||'TELÉFONO', fch = v('fecha')||'——';
+  s('d-fecha',fch); s('d-dest',fd.toUpperCase()+' / '+fo.toUpperCase());
+  s('d-nombre',n); s('d-tipo',td); s('d-doc',nd); s('d-dir',dir); s('d-email',em); s('d-tel',tel);
+  s('d-origen',fo); s('d-destino',fd); s('d-firma',n); s('d-tipo2',ab(td)); s('d-doc2',nd);
+}
+function v(id){return document.getElementById(id)?.value||'';}
+function s(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+function ab(t){return t.includes('ciudadanía')?'C.C.':t.includes('extranjería')?'C.E.':'PAS.';}
+act();
+</script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comparativo RPM vs RAIS · Colpensiones o AFP</title>
+<style>
+/* === shared === */
+/* ── Shared styles · pension-colombia ── */
+:root {
+  --azul:    #003893;
+  --azul2:   #002776;
+  --azul-lt: #e8eeff;
+  --verde:   #2e7d32;
+  --rojo:    #c62828;
+  --ambar:   #f59e0b;
+  --gris:    #5c6470;
+  --fondo:   #f4f6fb;
+  --texto:   #1a1a2e;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--fondo); color: var(--texto);
+  min-height: 100vh; padding-bottom: 48px;
+}
+.page { max-width: 720px; margin: 0 auto; padding: 20px 16px; }
+
+/* flag */
+.flag { height: 5px; border-radius: 3px; margin: 14px auto 4px; max-width: 200px;
+  background: linear-gradient(to right, #FCD116 33.33%, #003893 33.33% 66.66%, #CE1126 66.66%); }
+
+/* header */
+.site-header { text-align: center; padding: 24px 16px 12px; }
+.site-header h1 { font-size: 1.5rem; font-weight: 900; color: var(--azul); letter-spacing: -0.5px; }
+.site-header .sub { font-size: 0.82rem; color: var(--gris); margin-top: 4px; }
+
+/* breadcrumb */
+.breadcrumb { font-size: 0.78rem; color: var(--gris); margin: 0 0 18px;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.breadcrumb a { color: var(--azul); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb span { opacity: 0.5; }
+
+/* card */
+.card {
+  background: white; border-radius: 16px; padding: 24px;
+  margin: 14px 0; box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+}
+.card h2 { font-size: 1.1rem; font-weight: 800; color: var(--azul); margin-bottom: 14px; }
+.card h3 { font-size: 0.95rem; font-weight: 700; color: var(--azul2); margin: 18px 0 8px; }
+.card p  { font-size: 0.9rem; line-height: 1.65; color: #2a2a3e; margin-bottom: 10px; }
+.card ul, .card ol { padding-left: 20px; margin-bottom: 10px; }
+.card li  { font-size: 0.88rem; line-height: 1.6; margin-bottom: 4px; }
+
+/* table */
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 12px 0; }
+th { background: var(--azul); color: white; padding: 9px 12px; text-align: left; font-size: 0.8rem; }
+td { padding: 9px 12px; border-bottom: 1px solid #e8eaf0; vertical-align: top; }
+tr:nth-child(even) td { background: #f7f8fc; }
+
+/* badge */
+.badge { display: inline-block; font-size: 0.72rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px; }
+.badge-verde { background: #e8f5e9; color: var(--verde); }
+.badge-rojo  { background: #ffebee; color: var(--rojo); }
+.badge-ambar { background: #fff8e1; color: #856404; }
+.badge-azul  { background: var(--azul-lt); color: var(--azul); }
+
+/* notice */
+.notice {
+  border-radius: 10px; padding: 12px 16px; font-size: 0.82rem; line-height: 1.5;
+  margin-bottom: 14px;
+}
+.notice-info  { background: #e8f4fd; border-left: 4px solid #2196f3; color: #1565c0; }
+.notice-warn  { background: #fff8e1; border-left: 4px solid var(--ambar); color: #856404; }
+.notice-ok    { background: #e8f5e9; border-left: 4px solid var(--verde); color: var(--verde); }
+.notice-legal { background: #f3f0ff; border-left: 4px solid #7c3aed; color: #4c1d95; font-size: 0.78rem; }
+
+/* buttons */
+.btn { display: inline-block; padding: 11px 22px; border-radius: 10px; font-size: 0.9rem;
+  font-weight: 700; cursor: pointer; border: none; text-decoration: none; transition: all 0.18s; }
+.btn-primary { background: var(--azul); color: white; }
+.btn-primary:hover { background: var(--azul2); }
+.btn-secondary { background: white; color: var(--azul); border: 2px solid var(--azul); }
+.btn-secondary:hover { background: var(--azul-lt); }
+.btn-block { display: block; width: 100%; text-align: center; margin-top: 8px; }
+
+/* nav */
+.back-link { font-size: 0.82rem; color: var(--azul); text-decoration: none; display: inline-flex;
+  align-items: center; gap: 4px; margin-bottom: 12px; }
+.back-link:hover { text-decoration: underline; }
+
+/* print */
+@media print {
+  body { background: white; }
+  .no-print { display: none !important; }
+  .card { box-shadow: none; border: 1px solid #ddd; }
+}
+
+/* === /shared === */
+</style>
+<style>
+.comp-header { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; border-radius:12px 12px 0 0; overflow:hidden; margin-bottom:0; }
+.comp-header .ch-blank { background:#f4f6fb; padding:14px; }
+.comp-header .ch-rpm { background:#003893; color:white; padding:14px; text-align:center; font-weight:800; font-size:.9rem; }
+.comp-header .ch-rais { background:#1b5e20; color:white; padding:14px; text-align:center; font-weight:800; font-size:.9rem; }
+.comp-header .ch-rpm span, .comp-header .ch-rais span { display:block; font-size:.75rem; font-weight:400; opacity:.85; margin-top:2px; }
+.comp-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; border-bottom:1px solid #e8eaf0; }
+.comp-row:last-child { border-bottom:none; }
+.cr-label { padding:12px 14px; font-size:.82rem; font-weight:700; color:#333; background:#f8f9fc; border-right:1px solid #e8eaf0; }
+.cr-rpm, .cr-rais { padding:12px 14px; font-size:.82rem; line-height:1.5; color:#1a1a2e; }
+.cr-rpm { border-right:1px solid #e8eaf0; }
+.comp-wrap { border:1.5px solid #d0d5e8; border-radius:12px; overflow:hidden; margin-bottom:20px; }
+.tag-v { color:#2e7d32; font-weight:700; }
+.tag-r { color:#c62828; font-weight:700; }
+.tag-n { color:#856404; font-weight:700; }
+.verdict { display:flex; gap:10px; flex-wrap:wrap; margin:10px 0; }
+.v-item { flex:1; min-width:200px; border-radius:10px; padding:14px; font-size:.84rem; line-height:1.5; }
+.v-rpm  { background:#e8eeff; border-left:4px solid #003893; }
+.v-rais { background:#e8f5e9; border-left:4px solid #2e7d32; }
+.v-item strong { display:block; margin-bottom:6px; }
+@media (max-width:500px) {
+  .comp-header, .comp-row { grid-template-columns:1fr; }
+  .cr-label { border-right:none; background:#e8eeff; font-size:.8rem; padding:8px 12px; }
+  .comp-header .ch-blank { display:none; }
+}
+@media print { .no-print { display:none !important; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="site-header">
+    <div class="flag"></div>
+    <h1>⚖️ ¿Colpensiones o AFP?</h1>
+    <div class="sub">Comparativo detallado · RPM vs RAIS</div>
+  </div>
+  <a href="../index.html" class="back-link no-print">← Volver a la calculadora</a>
+
+  <div class="notice notice-info">
+    Esta tabla compara las características estructurales de cada régimen.
+    Para una recomendación basada en <strong>tus datos</strong>, usa la calculadora.
+  </div>
+
+  <div class="card">
+    <h2>Tabla comparativa completa</h2>
+    <div class="comp-wrap">
+      <div class="comp-header">
+        <div class="ch-blank"></div>
+        <div class="ch-rpm">🏛️ Colpensiones<span>Régimen de Prima Media (RPM)</span></div>
+        <div class="ch-rais">🏦 AFP Privada<span>Régimen de Ahorro Individual (RAIS)</span></div>
+      </div>
+      <div class="comp-row">
+        <div class="cr-label">Administrador</div>
+        <div class="cr-rpm">Estado colombiano — Colpensiones</div>
+        <div class="cr-rais">Privado — Porvenir, Protección, Colfondos, Skandia</div>
+      </div>
+      <div class="comp-row">
+        <div class="cr-label">Tipo de cuenta</div>
+        <div class="cr-rpm">Fondo común — no hay cuenta individual. Los aportes financian pensiones actuales.</div>
+        <div class="cr-rais">Cuenta individual de ahorro. El saldo es tuyo y genera rendimientos.</div>
+      </div>
+      <div class="comp-row">
+        <div class="cr-label">Semanas mínimas</div>
+        <div class="cr-rpm">1.300 semanas (hombres). Mujeres: reducción escalonada desde 2027 hasta 1.000 en 2038 (C-197/2023).</div>
+        <div class="cr-rais">No aplica requisito de semanas para pensionarse, pero sí para la garantía de pensión mínima (1.150 semanas).</div>
+      </div>
+      <div class="comp-row">
+        <div class="cr-label">Edad de pensión</div>
+        <div class="cr-rpm">62 años (hombres) / 57 años (mujeres)</div>
+        <div class="cr-rais">Sin edad mínima obligatoria — puedes pensionarte antes si el capital lo permite.</div>
+      </div>
+      <div class="comp-row">
+        <div class="cr-label">Cálculo de la mesada</div>
+        <div class="cr-rpm">Fórmula legal sobre el IBL (promedio últimos 10 años) × tasa de reemplazo (65–80%). Mesada predecible.</div>
+        <div class="cr-rais">Depende del saldo acumulado y la rentabilidad del fondo. Variable e incierta.</div>
+      </div>
+      <div class="comp-row">
+        <div class="cr-label">Mesada mínima garantizada</div>
+        <div class="cr-rpm"><span class="tag-v">✅ Sí</span> — nunca inferior a 1 SMMLV si cumples requisitos (Art. 35 Ley 100).</div>
+        <div class="cr-rais"><span class="tag-n">⚠️ Solo</span> si tienes ≥ 1.150 semanas y capital insuficiente para pensión (Art. 65). El Estado subsidia la diferencia.</div>
+      </div>
+      <div class="comp-row">
+        <div class="cr-label">Herencia del saldo</div>
+        <div class="cr-rpm"><span class="tag-r">❌ No</span> — el saldo va al fondo común. Los beneficiarios reciben pensión de sobrevivientes, no el capital.</div>
+        <div class="cr-rais"><span class="tag-v">✅ Sí</span> — el saldo no consumido es heredable por los beneficiarios designados.</div>
+      </div>
+      <div class="comp-row">
+        <div class="cr-label">Riesgo del sistema</div>
+        <div class="cr-rpm">Lo asume el Estado — mesada fija garantizada si cumples requisitos.</div>
+        <div class="cr-rais">Lo asume el afiliado — rendimientos y mesada dependen del mercado de capitales.</div>
+      </div>
+      <div class="comp-row">
+        <div class="cr-label">Multifondos</div>
+        <div class="cr-rpm"><span class="tag-r">No aplica</span></div>
+        <div class="cr-rais"><span class="tag-v">✅ Sí</span> — puedes elegir entre fondo conservador, moderado y de mayor riesgo según tu edad.</div>
+      </div>
+      <div class="comp-row">
+        <div class="cr-label">Pensión anticipada</div>
+        <div class="cr-rpm"><span class="tag-r">❌ No</span> — debes cumplir edad y semanas obligatoriamente.</div>
+        <div class="cr-rais"><span class="tag-v">✅ Sí</span> — si el saldo acumulado financia una pensión ≥ 110% del SMMLV.</div>
+      </div>
+      <div class="comp-row">
+        <div class="cr-label">Indemnización sustitutiva</div>
+        <div class="cr-rpm"><span class="tag-v">✅ Sí</span> — si no cumples los requisitos al llegar a la edad de pensión, recibes el equivalente de tus aportes actualizados.</div>
+        <div class="cr-rais"><span class="tag-v">✅ Sí</span> — el saldo acumulado es tuyo en cualquier caso.</div>
+      </div>
+      <div class="comp-row">
+        <div class="cr-label">Reforma pendiente</div>
+        <div class="cr-rpm" colspan="2" style="grid-column:2/4;color:#856404;">⚠️ La Ley 2381/2024 (Reforma Pensional) fue expedida pero suspendida por la Corte Constitucional. Actualmente rige la Ley 100/1993.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>¿Quién se beneficia más de cada régimen?</h2>
+    <div class="verdict">
+      <div class="v-item v-rpm">
+        <strong>🏛️ Colpensiones conviene más si…</strong>
+        <ul style="padding-left:16px;font-size:.82rem;">
+          <li>Tu salario es menor de 2,3 SMMLV</li>
+          <li>Tienes muchas semanas acumuladas</li>
+          <li>Priorizas seguridad y mesada predecible</li>
+          <li>No te preocupa dejar herencia del capital</li>
+          <li>Tienes régimen de transición (Art. 75 L.2381/2024)</li>
+        </ul>
+      </div>
+      <div class="v-item v-rais">
+        <strong>🏦 AFP conviene más si…</strong>
+        <ul style="padding-left:16px;font-size:.82rem;">
+          <li>Tu salario es alto (más de 3–5 SMMLV)</li>
+          <li>Quieres pensionarte antes de la edad legal</li>
+          <li>Deseas dejar herencia del saldo a tu familia</li>
+          <li>Tu vida laboral es irregular (independiente/freelance)</li>
+          <li>Tienes pocas semanas y capital acumulado suficiente</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Fuentes normativas</h2>
+    <table>
+      <tr><th>Norma</th><th>Contenido relevante</th></tr>
+      <tr><td>Ley 100/1993, Art. 13</td><td>Características y reglas de traslado entre regímenes</td></tr>
+      <tr><td>Ley 100/1993, Art. 33–35</td><td>Requisitos y mesada en Colpensiones (RPM)</td></tr>
+      <tr><td>Ley 100/1993, Art. 64–65</td><td>Pensión de vejez y garantía de pensión mínima en AFP (RAIS)</td></tr>
+      <tr><td>Ley 797/2003, Art. 9</td><td>Modifica Art. 33 — eleva semanas mínimas a 1.300</td></tr>
+      <tr><td>Sentencia C-086/2002</td><td>Regula la ventana de traslado de 5 años y 10 años antes de pensión</td></tr>
+      <tr><td>Sentencia C-197/2023</td><td>Reducción escalonada de semanas para mujeres desde 2027</td></tr>
+      <tr><td>Ley 2381/2024, Art. 75</td><td>Régimen de transición — suspendida por la Corte Constitucional</td></tr>
+    </table>
+  </div>
+
+  <div class="notice notice-legal">
+    Documento informativo generado con IA — no es asesoría jurídica.
+    Acuerdo PCSJA24-12243 · Sentencia T-323/2024.
+  </div>
+</div>
+</body>
+</html>

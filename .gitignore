@@ -16,6 +16,11 @@
 node_modules/
 npm-debug.log*
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
 # Env
 .env
 .env.local

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tutela — Mora en reconocimiento de pensión · Colpensiones o AFP</title>
+<style>
+/* === shared === */
+/* ── Shared styles · pension-colombia ── */
+:root {
+  --azul:    #003893;
+  --azul2:   #002776;
+  --azul-lt: #e8eeff;
+  --verde:   #2e7d32;
+  --rojo:    #c62828;
+  --ambar:   #f59e0b;
+  --gris:    #5c6470;
+  --fondo:   #f4f6fb;
+  --texto:   #1a1a2e;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--fondo); color: var(--texto);
+  min-height: 100vh; padding-bottom: 48px;
+}
+.page { max-width: 720px; margin: 0 auto; padding: 20px 16px; }
+
+/* flag */
+.flag { height: 5px; border-radius: 3px; margin: 14px auto 4px; max-width: 200px;
+  background: linear-gradient(to right, #FCD116 33.33%, #003893 33.33% 66.66%, #CE1126 66.66%); }
+
+/* header */
+.site-header { text-align: center; padding: 24px 16px 12px; }
+.site-header h1 { font-size: 1.5rem; font-weight: 900; color: var(--azul); letter-spacing: -0.5px; }
+.site-header .sub { font-size: 0.82rem; color: var(--gris); margin-top: 4px; }
+
+/* breadcrumb */
+.breadcrumb { font-size: 0.78rem; color: var(--gris); margin: 0 0 18px;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.breadcrumb a { color: var(--azul); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb span { opacity: 0.5; }
+
+/* card */
+.card {
+  background: white; border-radius: 16px; padding: 24px;
+  margin: 14px 0; box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+}
+.card h2 { font-size: 1.1rem; font-weight: 800; color: var(--azul); margin-bottom: 14px; }
+.card h3 { font-size: 0.95rem; font-weight: 700; color: var(--azul2); margin: 18px 0 8px; }
+.card p  { font-size: 0.9rem; line-height: 1.65; color: #2a2a3e; margin-bottom: 10px; }
+.card ul, .card ol { padding-left: 20px; margin-bottom: 10px; }
+.card li  { font-size: 0.88rem; line-height: 1.6; margin-bottom: 4px; }
+
+/* table */
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 12px 0; }
+th { background: var(--azul); color: white; padding: 9px 12px; text-align: left; font-size: 0.8rem; }
+td { padding: 9px 12px; border-bottom: 1px solid #e8eaf0; vertical-align: top; }
+tr:nth-child(even) td { background: #f7f8fc; }
+
+/* badge */
+.badge { display: inline-block; font-size: 0.72rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px; }
+.badge-verde { background: #e8f5e9; color: var(--verde); }
+.badge-rojo  { background: #ffebee; color: var(--rojo); }
+.badge-ambar { background: #fff8e1; color: #856404; }
+.badge-azul  { background: var(--azul-lt); color: var(--azul); }
+
+/* notice */
+.notice {
+  border-radius: 10px; padding: 12px 16px; font-size: 0.82rem; line-height: 1.5;
+  margin-bottom: 14px;
+}
+.notice-info  { background: #e8f4fd; border-left: 4px solid #2196f3; color: #1565c0; }
+.notice-warn  { background: #fff8e1; border-left: 4px solid var(--ambar); color: #856404; }
+.notice-ok    { background: #e8f5e9; border-left: 4px solid var(--verde); color: var(--verde); }
+.notice-legal { background: #f3f0ff; border-left: 4px solid #7c3aed; color: #4c1d95; font-size: 0.78rem; }
+
+/* buttons */
+.btn { display: inline-block; padding: 11px 22px; border-radius: 10px; font-size: 0.9rem;
+  font-weight: 700; cursor: pointer; border: none; text-decoration: none; transition: all 0.18s; }
+.btn-primary { background: var(--azul); color: white; }
+.btn-primary:hover { background: var(--azul2); }
+.btn-secondary { background: white; color: var(--azul); border: 2px solid var(--azul); }
+.btn-secondary:hover { background: var(--azul-lt); }
+.btn-block { display: block; width: 100%; text-align: center; margin-top: 8px; }
+
+/* nav */
+.back-link { font-size: 0.82rem; color: var(--azul); text-decoration: none; display: inline-flex;
+  align-items: center; gap: 4px; margin-bottom: 12px; }
+.back-link:hover { text-decoration: underline; }
+
+/* print */
+@media print {
+  body { background: white; }
+  .no-print { display: none !important; }
+  .card { box-shadow: none; border: 1px solid #ddd; }
+}
+
+/* === /shared === */
+</style>
+<style>
+.field{margin-bottom:16px;} .field label{display:block;font-size:.8rem;font-weight:700;color:#333;margin-bottom:5px;}
+input,select,textarea{width:100%;padding:10px 13px;border:2px solid #e0e4ed;border-radius:9px;font-size:.9rem;color:#1a1a2e;font-family:inherit;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#003893;}
+textarea{min-height:90px;resize:vertical;}
+.documento{background:white;border:1.5px solid #d0d5e8;border-radius:12px;padding:28px;margin-top:20px;font-size:.9rem;line-height:1.7;}
+.documento h3{font-size:1rem;font-weight:800;text-align:center;margin-bottom:4px;color:#003893;}
+.documento h4{font-size:.82rem;font-weight:600;text-align:center;margin-bottom:20px;color:#555;}
+.documento .cuerpo p,.documento .cuerpo li{margin-bottom:11px;}
+.documento .firma{margin-top:32px;}
+.documento ol{padding-left:20px;}
+.ph{font-weight:700;color:#856404;}
+.btn-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+@media print{.no-print{display:none!important;}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="site-header">
+    <div class="flag"></div>
+    <h1>⚖️ ¿Colpensiones o AFP?</h1>
+    <div class="sub">Documentos legales · Acción de tutela por mora pensional</div>
+  </div>
+  <a href="../index.html" class="back-link no-print">← Volver a la calculadora</a>
+
+  <div class="notice notice-warn">
+    ⚠️ La tutela pensional procede cuando hay <strong>derecho estructurado</strong> (edad + semanas cumplidas)
+    y la entidad lleva más de <strong>4 meses</strong> sin resolver, o cuando el accionante es sujeto de
+    especial protección constitucional (adulto mayor, persona en condición de vulnerabilidad).
+    Ver T-001/2021 y T-110/2023.
+  </div>
+
+  <div class="card no-print">
+    <h2>Datos para la tutela</h2>
+    <div class="field"><label>Nombre completo del accionante</label>
+      <input id="nombre" placeholder="María Lucía Gómez Vargas" oninput="act()"></div>
+    <div class="field"><label>Tipo y número de documento</label>
+      <div style="display:grid;grid-template-columns:1fr 2fr;gap:8px;">
+        <select id="tipo_doc" onchange="act()">
+          <option>Cédula de ciudadanía</option><option>Cédula de extranjería</option>
+        </select>
+        <input id="num_doc" placeholder="52.345.678" oninput="act()">
+      </div></div>
+    <div class="field"><label>Edad</label>
+      <input id="edad" type="number" min="50" max="90" placeholder="Ej. 65" oninput="act()"></div>
+    <div class="field"><label>Entidad accionada</label>
+      <select id="accionada" onchange="act()">
+        <option>Colpensiones</option><option>Porvenir AFP</option>
+        <option>Protección AFP</option><option>Colfondos AFP</option><option>Skandia AFP</option>
+      </select></div>
+    <div class="field"><label>Semanas cotizadas (aproximado)</label>
+      <input id="semanas" type="number" placeholder="Ej. 1300" oninput="act()"></div>
+    <div class="field"><label>Fecha de la solicitud pensional que no han respondido</label>
+      <input id="fecha_solicitud" placeholder="Ej. 5 de marzo de 2024" oninput="act()"></div>
+    <div class="field"><label>Número de radicado de la solicitud (si tiene)</label>
+      <input id="radicado" placeholder="Ej. 2024-1234567" oninput="act()"></div>
+    <div class="field"><label>Derechos fundamentales vulnerados</label>
+      <div style="font-size:.82rem;color:#555;margin-bottom:6px;">Selecciona los que apliquen:</div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;margin-bottom:6px;">
+        <input type="checkbox" id="ch-mn" checked style="width:auto;" onchange="act()"> Mínimo vital</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;margin-bottom:6px;">
+        <input type="checkbox" id="ch-sv" checked style="width:auto;" onchange="act()"> Vida digna</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;margin-bottom:6px;">
+        <input type="checkbox" id="ch-sp" style="width:auto;" onchange="act()"> Seguridad social</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;">
+        <input type="checkbox" id="ch-pt" checked style="width:auto;" onchange="act()"> Petición (Art. 23 C.P.)</label>
+    </div>
+    <div class="field"><label>Ciudad de presentación y fecha</label>
+      <input id="fecha" oninput="act()"></div>
+    <div class="field"><label>Dirección y correo de notificación</label>
+      <input id="dir" placeholder="Cra. 15 No. 80-42, Bogotá / ejemplo@correo.com" oninput="act()"></div>
+  </div>
+
+  <div class="documento" id="doc">
+    <div style="text-align:right;font-size:.82rem;color:#555;margin-bottom:18px;"><span id="d-fecha">__________</span></div>
+    <h3>ACCIÓN DE TUTELA</h3>
+    <h4>Art. 86 C.P. · Decreto 2591/1991<br>
+      Accionante: <span id="dh-nombre" class="ph">NOMBRE</span> ·
+      Accionada: <span id="dh-acc" class="ph">ENTIDAD</span></h4>
+
+    <div style="margin-bottom:16px;">
+      Señor(a) Juez<br>
+      <strong>Juzgado de turno</strong><br>
+      Ciudad
+    </div>
+
+    <div class="cuerpo">
+      <p><strong>I. PARTES</strong></p>
+      <p>
+        <strong>Accionante:</strong> <span id="d-nombre" class="ph">NOMBRE COMPLETO</span>,
+        <span id="d-tipo">C.C.</span> N.°&nbsp;<span id="d-doc" class="ph">NÚMERO</span>,
+        de <span id="d-edad" class="ph">XX</span> años de edad.
+        Notificaciones: <span id="d-dir" class="ph">DIRECCIÓN / CORREO</span>.
+      </p>
+      <p>
+        <strong>Accionada:</strong> <span id="d-acc" class="ph">ENTIDAD</span>,
+        en su calidad de administradora del régimen pensional al que pertenece el accionante.
+      </p>
+
+      <p><strong>II. HECHOS</strong></p>
+      <ol>
+        <li>El accionante cuenta con <strong><span id="d-sem" class="ph">XXX</span> semanas</strong>
+            cotizadas al sistema general de pensiones, cifra que supera el mínimo legal exigido
+            para acceder a la pensión de vejez (1.300 semanas — art. 33, Ley 100/1993).</li>
+        <li>El <span id="d-fsol" class="ph">FECHA</span>, el accionante presentó ante
+            <span id="d-acc2" class="ph">ENTIDAD</span> la solicitud formal de reconocimiento
+            de pensión de vejez (radicado: <span id="d-rad" class="ph">N.° RADICADO</span>).</li>
+        <li>A la fecha de presentación de esta acción, la entidad no ha proferido resolución
+            de reconocimiento ni negación, superando con creces el plazo de cuatro (4) meses
+            establecido jurisprudencialmente para este tipo de actuaciones
+            (T-001/2021, T-110/2023).</li>
+        <li>La ausencia de respuesta impide al accionante percibir el ingreso mensual al que
+            tiene derecho, afectando su mínimo vital y la vida en condiciones dignas.</li>
+      </ol>
+
+      <p><strong>III. DERECHOS FUNDAMENTALES VULNERADOS</strong></p>
+      <div id="d-derechos"><p class="ph">(completa el formulario)</p></div>
+
+      <p><strong>IV. FUNDAMENTOS JURÍDICOS</strong></p>
+      <p>
+        Artículo 86 de la Constitución Política; Decreto 2591 de 1991; artículos 13, 33 y 34
+        de la Ley 100 de 1993; artículo 23 C.P. (derecho de petición); artículo 46 C.P.
+        (protección a personas de la tercera edad). Jurisprudencia: T-693/2010, T-001/2021,
+        T-110/2023, SU-442/2016 de la Corte Constitucional.
+      </p>
+
+      <p><strong>V. PRETENSIONES</strong></p>
+      <ol>
+        <li>TUTELAR los derechos fundamentales del accionante.</li>
+        <li>ORDENAR a <span id="d-acc3" class="ph">ENTIDAD</span> que, en el término de
+            <strong>cuarenta y ocho (48) horas</strong> siguientes a la notificación del fallo,
+            profiera resolución de reconocimiento o negación de la pensión de vejez, debidamente
+            motivada.</li>
+        <li>En caso de reconocimiento, ORDENAR el pago de las mesadas retroactivas desde la
+            fecha en que se configuró el derecho, con intereses de mora (Art. 141, Ley 100/1993).</li>
+        <li>PREVENIR a la entidad para que no incurra en conductas similares (art. 24 D. 2591/1991).</li>
+      </ol>
+
+      <p><strong>VI. PRUEBAS</strong></p>
+      <ul>
+        <li>Copia del documento de identidad del accionante.</li>
+        <li>Historia laboral con semanas cotizadas.</li>
+        <li>Copia de la solicitud pensional radicada con número de radicado.</li>
+        <li>Prueba de la mora (ausencia de respuesta en el plazo legal).</li>
+      </ul>
+      <p class="notice notice-warn no-print" style="font-size:.82rem;">
+        [VERIFICAR ANTES DE RADICAR]: Adjuntar los documentos físicos enumerados.
+      </p>
+    </div>
+
+    <div class="firma">
+      <p>Atentamente,</p><br><br>
+      <p>
+        <strong><span id="d-firma" class="ph">NOMBRE COMPLETO</span></strong><br>
+        <span id="d-tipo2">C.C.</span> <span id="d-doc2" class="ph">NÚMERO</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="btn-row no-print">
+    <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+    <a href="../index.html" class="btn btn-secondary">← Volver</a>
+  </div>
+
+  <div class="notice notice-legal" style="margin-top:20px;">
+    Plantilla orientativa generada con IA. Verificar jurisprudencia y adjuntar pruebas antes de radicar.
+    No es asesoría jurídica. Acuerdo PCSJA24-12243 · Sentencia T-323/2024.
+  </div>
+</div>
+<script>
+document.getElementById('fecha').value = new Date().toLocaleDateString('es-CO',{year:'numeric',month:'long',day:'numeric'});
+
+// Pre-llenar desde localStorage (calculadora principal)
+(function() {
+  try {
+    const raw = localStorage.getItem('pension_S');
+    if (!raw) return;
+    const S = JSON.parse(raw);
+    if (S.edad) document.getElementById('edad').value = S.edad;
+    if (S.semanas_actuales) document.getElementById('semanas').value = S.semanas_actuales;
+    if (S.fondo_actual) {
+      const acc = document.getElementById('accionada');
+      const map = { Colpensiones:'Colpensiones', Porvenir:'Porvenir S.A. – AFP', 'Protección':'Protección S.A. – AFP', Colfondos:'Colfondos S.A. – AFP', Skandia:'Skandia (Old Mutual) – AFP' };
+      if (map[S.fondo_actual]) acc.value = map[S.fondo_actual];
+    }
+    const nb = document.createElement('div');
+    nb.className = 'notice notice-ok no-print';
+    nb.innerHTML = '✅ <strong>Edad y semanas pre-llenadas</strong> desde tu consulta. Completa los datos faltantes.';
+    nb.style.marginBottom = '12px';
+    const card = document.querySelector('.card.no-print');
+    if (card) card.prepend(nb);
+    act();
+  } catch(e) {}
+})();
+
+function act(){
+  const n=g('nombre')||'NOMBRE COMPLETO', td=g('tipo_doc'), nd=g('num_doc')||'NÚMERO',
+        ed=g('edad')||'XX', acc=g('accionada')||'ENTIDAD', sem=g('semanas')||'XXX',
+        fsol=g('fecha_solicitud')||'FECHA', rad=g('radicado')||'N.° RADICADO',
+        fch=g('fecha')||'——', dir=g('dir')||'DIRECCIÓN';
+  s('d-fecha',fch); s('d-nombre',n); s('d-tipo',ab(td)); s('d-doc',nd); s('d-edad',ed);
+  ['d-acc','d-acc2','d-acc3','dh-acc'].forEach(id=>s(id,acc));
+  s('d-sem',sem); s('d-fsol',fsol); s('d-rad',rad); s('d-dir',dir);
+  s('d-firma',n); s('d-tipo2',ab(td)); s('d-doc2',nd); s('dh-nombre',n);
+
+  const derechos=[];
+  if(document.getElementById('ch-mn').checked) derechos.push('Mínimo vital (Art. 11 C.P.)');
+  if(document.getElementById('ch-sv').checked) derechos.push('Vida digna (Art. 11 C.P.)');
+  if(document.getElementById('ch-sp').checked) derechos.push('Seguridad social (Art. 48 C.P.)');
+  if(document.getElementById('ch-pt').checked) derechos.push('Petición (Art. 23 C.P.)');
+  document.getElementById('d-derechos').innerHTML = derechos.length
+    ? '<p>' + derechos.join(', ') + '.</p>'
+    : '<p class="ph">(selecciona al menos uno)</p>';
+}
+function g(id){return document.getElementById(id)?.value||'';}
+function s(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+function ab(t){return t&&t.includes('extranjería')?'C.E.':'C.C.';}
+act();
+</script>
+</body>
+</html>

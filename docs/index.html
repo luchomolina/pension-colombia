@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentos · Colpensiones o AFP</title>
+<style>
+/* === shared === */
+/* ── Shared styles · pension-colombia ── */
+:root {
+  --azul:    #003893;
+  --azul2:   #002776;
+  --azul-lt: #e8eeff;
+  --verde:   #2e7d32;
+  --rojo:    #c62828;
+  --ambar:   #f59e0b;
+  --gris:    #5c6470;
+  --fondo:   #f4f6fb;
+  --texto:   #1a1a2e;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--fondo); color: var(--texto);
+  min-height: 100vh; padding-bottom: 48px;
+}
+.page { max-width: 720px; margin: 0 auto; padding: 20px 16px; }
+
+/* flag */
+.flag { height: 5px; border-radius: 3px; margin: 14px auto 4px; max-width: 200px;
+  background: linear-gradient(to right, #FCD116 33.33%, #003893 33.33% 66.66%, #CE1126 66.66%); }
+
+/* header */
+.site-header { text-align: center; padding: 24px 16px 12px; }
+.site-header h1 { font-size: 1.5rem; font-weight: 900; color: var(--azul); letter-spacing: -0.5px; }
+.site-header .sub { font-size: 0.82rem; color: var(--gris); margin-top: 4px; }
+
+/* breadcrumb */
+.breadcrumb { font-size: 0.78rem; color: var(--gris); margin: 0 0 18px;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.breadcrumb a { color: var(--azul); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb span { opacity: 0.5; }
+
+/* card */
+.card {
+  background: white; border-radius: 16px; padding: 24px;
+  margin: 14px 0; box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+}
+.card h2 { font-size: 1.1rem; font-weight: 800; color: var(--azul); margin-bottom: 14px; }
+.card h3 { font-size: 0.95rem; font-weight: 700; color: var(--azul2); margin: 18px 0 8px; }
+.card p  { font-size: 0.9rem; line-height: 1.65; color: #2a2a3e; margin-bottom: 10px; }
+.card ul, .card ol { padding-left: 20px; margin-bottom: 10px; }
+.card li  { font-size: 0.88rem; line-height: 1.6; margin-bottom: 4px; }
+
+/* table */
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 12px 0; }
+th { background: var(--azul); color: white; padding: 9px 12px; text-align: left; font-size: 0.8rem; }
+td { padding: 9px 12px; border-bottom: 1px solid #e8eaf0; vertical-align: top; }
+tr:nth-child(even) td { background: #f7f8fc; }
+
+/* badge */
+.badge { display: inline-block; font-size: 0.72rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px; }
+.badge-verde { background: #e8f5e9; color: var(--verde); }
+.badge-rojo  { background: #ffebee; color: var(--rojo); }
+.badge-ambar { background: #fff8e1; color: #856404; }
+.badge-azul  { background: var(--azul-lt); color: var(--azul); }
+
+/* notice */
+.notice {
+  border-radius: 10px; padding: 12px 16px; font-size: 0.82rem; line-height: 1.5;
+  margin-bottom: 14px;
+}
+.notice-info  { background: #e8f4fd; border-left: 4px solid #2196f3; color: #1565c0; }
+.notice-warn  { background: #fff8e1; border-left: 4px solid var(--ambar); color: #856404; }
+.notice-ok    { background: #e8f5e9; border-left: 4px solid var(--verde); color: var(--verde); }
+.notice-legal { background: #f3f0ff; border-left: 4px solid #7c3aed; color: #4c1d95; font-size: 0.78rem; }
+
+/* buttons */
+.btn { display: inline-block; padding: 11px 22px; border-radius: 10px; font-size: 0.9rem;
+  font-weight: 700; cursor: pointer; border: none; text-decoration: none; transition: all 0.18s; }
+.btn-primary { background: var(--azul); color: white; }
+.btn-primary:hover { background: var(--azul2); }
+.btn-secondary { background: white; color: var(--azul); border: 2px solid var(--azul); }
+.btn-secondary:hover { background: var(--azul-lt); }
+.btn-block { display: block; width: 100%; text-align: center; margin-top: 8px; }
+
+/* nav */
+.back-link { font-size: 0.82rem; color: var(--azul); text-decoration: none; display: inline-flex;
+  align-items: center; gap: 4px; margin-bottom: 12px; }
+.back-link:hover { text-decoration: underline; }
+
+/* print */
+@media print {
+  body { background: white; }
+  .no-print { display: none !important; }
+  .card { box-shadow: none; border: 1px solid #ddd; }
+}
+
+/* === /shared === */
+</style>
+<style>
+.doc-grid { display:flex; flex-direction:column; gap:10px; }
+.doc-item { display:flex; align-items:center; gap:14px; background:white; border:1.5px solid #e0e4ed;
+  border-radius:12px; padding:14px 16px; text-decoration:none; color:inherit; transition:all .18s; }
+.doc-item:hover { border-color:#003893; background:#f0f4ff; box-shadow:0 2px 10px rgba(0,56,147,.08); }
+.doc-icon { font-size:1.5rem; flex-shrink:0; }
+.doc-info .doc-title { font-weight:700; font-size:.92rem; color:#003893; margin-bottom:3px; }
+.doc-info .doc-desc  { font-size:.8rem; color:#5c6470; line-height:1.4; }
+.cat-label { font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.8px;
+  color:#5c6470; margin:20px 0 8px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="site-header">
+    <div class="flag"></div>
+    <h1>⚖️ ¿Colpensiones o AFP?</h1>
+    <div class="sub">Centro de documentos pensionales</div>
+  </div>
+  <a href="../index.html" class="back-link">← Volver a la calculadora</a>
+
+  <div class="cat-label">📄 Reportes personalizados</div>
+  <div class="doc-grid">
+    <a href="reporte.html" class="doc-item">
+      <div class="doc-icon">📊</div>
+      <div class="doc-info">
+        <div class="doc-title">Mi reporte pensional</div>
+        <div class="doc-desc">Resumen imprimible con tu recomendación, proyecciones de mesada, situación normativa y análisis IA.</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="cat-label">⚖️ Documentos legales</div>
+  <div class="doc-grid">
+    <a href="derecho-peticion-historia-laboral.html" class="doc-item">
+      <div class="doc-icon">📋</div>
+      <div class="doc-info">
+        <div class="doc-title">Derecho de petición — Historia laboral</div>
+        <div class="doc-desc">Solicita tu historia laboral completa a Colpensiones o AFP. Se genera listo para radicar.</div>
+      </div>
+    </a>
+    <a href="derecho-peticion-traslado.html" class="doc-item">
+      <div class="doc-icon">🔄</div>
+      <div class="doc-info">
+        <div class="doc-title">Derecho de petición — Asesoría de traslado</div>
+        <div class="doc-desc">Solicita la asesoría gratuita y obligatoria antes de cambiar de régimen (Art. 13 Ley 100).</div>
+      </div>
+    </a>
+    <a href="recurso-reposicion-pension.html" class="doc-item">
+      <div class="doc-icon">🏛️</div>
+      <div class="doc-info">
+        <div class="doc-title">Recurso de reposición — Resolución pensional</div>
+        <div class="doc-desc">Impugna una resolución de pensión que niegue o reliquide incorrectamente tu prestación.</div>
+      </div>
+    </a>
+    <a href="tutela-mora-pension.html" class="doc-item">
+      <div class="doc-icon">⚡</div>
+      <div class="doc-info">
+        <div class="doc-title">Acción de tutela — Mora en reconocimiento</div>
+        <div class="doc-desc">Protege tu derecho fundamental al mínimo vital cuando Colpensiones o la AFP dilata el reconocimiento.</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="cat-label">📖 Guías e información</div>
+  <div class="doc-grid">
+    <a href="guia-traslado-regimen.html" class="doc-item">
+      <div class="doc-icon">🗺️</div>
+      <div class="doc-info">
+        <div class="doc-title">Guía de traslado de régimen</div>
+        <div class="doc-desc">Cuándo conviene trasladarse, requisitos legales, ventanas, trampas comunes y régimen de transición.</div>
+      </div>
+    </a>
+    <a href="comparativo-rpm-rais.html" class="doc-item">
+      <div class="doc-icon">⚖️</div>
+      <div class="doc-info">
+        <div class="doc-title">Comparativo detallado RPM vs RAIS</div>
+        <div class="doc-desc">Tabla fila a fila: mesada, herencia, riesgo, garantía del Estado, multifondos, pensión anticipada.</div>
+      </div>
+    </a>
+    <a href="faq-pension.html" class="doc-item">
+      <div class="doc-icon">❓</div>
+      <div class="doc-info">
+        <div class="doc-title">Preguntas frecuentes</div>
+        <div class="doc-desc">Semanas mínimas, bono pensional, historia laboral, reforma 2024, pensión anticipada y más.</div>
+      </div>
+    </a>
+    <a href="calendario-pension.html" class="doc-item">
+      <div class="doc-icon">📅</div>
+      <div class="doc-info">
+        <div class="doc-title">Calendario de hitos pensionales</div>
+        <div class="doc-desc">Fechas clave: reducción de semanas mujeres (C-197/2023), corte de transición (1-jul-2025), reforma 2024.</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="notice notice-legal" style="margin-top:24px;">
+    Todos los documentos son orientativos y generados con asistencia de IA. No constituyen asesoría jurídica.
+    Antes de radicar cualquier escrito, verifica la jurisprudencia y los datos con Colpensiones, tu AFP o un
+    asesor pensional certificado. Acuerdo PCSJA24-12243 · Sentencia T-323/2024.
+  </div>
+</div>
+</body>
+</html>

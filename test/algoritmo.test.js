@@ -14,10 +14,13 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
-// ── Cargar y evaluar el <script> de index.html ──
+// ── Cargar y evaluar el <script> del algoritmo en index.html ──
+// index.html tiene varios bloques <script>; el del algoritmo es el que
+// declara el estado global `const S = {`.
 const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
-const m = html.match(/<script>([\s\S]*?)<\/script>/);
-if (!m) throw new Error('No se encontró el bloque <script> en index.html');
+const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+const m = scripts.map(s => s[1]).find(s => /const S = \{/.test(s));
+if (!m) throw new Error('No se encontró el bloque <script> del algoritmo en index.html');
 
 // El script solo toca el DOM con document.addEventListener al cargar.
 const noop = () => {};
@@ -32,7 +35,7 @@ vm.createContext(sandbox);
 const shim = `;var __T = { decidir, evalColp, evalAFP, pesos, score, enTransicion,
   minWeeks, puedeTransladarse, resolverAnos, anosLab, salMid, trayDens, trayIbc, fmtPesos,
   ANOS_RANGE, AFP_RETURN_REAL, RET_AGE, BASE_WEEKS };`;
-vm.runInContext(m[1] + shim, sandbox);
+vm.runInContext(m + shim, sandbox);
 const T = sandbox.__T;
 
 // Caso base válido (hombre, perfil intermedio)
@@ -131,7 +134,8 @@ test('minWeeks: base 1300, reducciones para mujeres con hijos', () => {
   assert.strictEqual(T.minWeeks(mk({ sexo: 'M', hijos: 3 })), 1300);
   assert.strictEqual(T.minWeeks(mk({ sexo: 'F', hijos: 0 })), 1300);
   assert.strictEqual(T.minWeeks(mk({ sexo: 'F', hijos: 3 })), 1275);
-  assert.strictEqual(T.minWeeks(mk({ sexo: 'F', hijos: 4 })), 1225);
+  // -25 por >=3 hijos, -25 adicionales por >=4 hijos (docs/algoritmo.md): total -50, no -75.
+  assert.strictEqual(T.minWeeks(mk({ sexo: 'F', hijos: 4 })), 1250);
 });
 
 // ════════════════════════════════════════════════
