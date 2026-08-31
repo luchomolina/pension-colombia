@@ -1,0 +1,13 @@
+{
+    "num_threads": 4,
+    "ocr_batch_size": 8,
+    "layout_batch_size": 8,
+    "table_batch_size": 4,
+    "force_full_page_ocr": true,
+    "ocr_engines": ["rapidocr", "suryaocr"],
+    "tesseract_data_path": "C:/Program Files/Tesseract-OCR/tessdata",
+    "tesseract_langs": ["spa", "eng"],
+    "easyocr_langs": ["es", "en"],
+    "suryaocr_langs": ["en"],
+    "rapidocr_langs": ["english"]
+}

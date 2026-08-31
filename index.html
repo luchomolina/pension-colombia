@@ -444,11 +444,55 @@ input.field-error {
 .save-btn-title { font-size: 0.92rem; font-weight: 800; color: #1a1a2e; }
 .save-btn-desc { font-size: 0.76rem; color: #5c6470; line-height: 1.35; }
 
+/* ── Historia Laboral upload ── */
+.hl-drop {
+  border: 2.5px dashed #c2c9d6; border-radius: 14px; padding: 32px 20px;
+  text-align: center; cursor: pointer; transition: all 0.2s; background: #fafbff;
+  margin-bottom: 18px;
+}
+.hl-drop:hover, .hl-drop.drag-over { border-color: #003893; background: #eef3ff; }
+.hl-drop-icon { font-size: 2.4rem; display: block; margin-bottom: 8px; }
+.hl-drop-label { font-size: 0.9rem; font-weight: 700; color: #003893; }
+.hl-drop-sub { font-size: 0.78rem; color: #6b7280; margin-top: 4px; }
+.hl-file-input { display: none; }
+.hl-result {
+  background: #f0f9ff; border: 1.5px solid #38bdf8; border-radius: 10px;
+  padding: 14px 16px; font-size: 0.82rem; color: #0c4a6e; display: none;
+  margin-bottom: 14px; line-height: 1.55;
+}
+.hl-result.show { display: block; }
+.hl-result strong { color: #003893; }
+.hl-semanas-found {
+  background: #dcfce7; border: 1.5px solid #22c55e; border-radius: 10px;
+  padding: 12px 16px; font-size: 0.88rem; color: #14532d; display: none;
+  margin-bottom: 14px; font-weight: 600;
+}
+.hl-semanas-found.show { display: block; }
+.hl-filename {
+  display: flex; align-items: center; gap: 8px; background: #f0f4ff;
+  border: 1.5px solid #c7d2fe; border-radius: 9px; padding: 9px 14px;
+  font-size: 0.84rem; color: #1a1a2e; margin-bottom: 12px; display: none;
+}
+.hl-filename.show { display: flex; }
+.hl-filename-name { font-weight: 700; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hl-remove { background: none; border: none; cursor: pointer; color: #6b7280; font-size: 1.1rem; padding: 2px; }
+.hl-remove:hover { color: #dc2626; }
+.hl-preview {
+  max-height: 180px; overflow-y: auto; background: #f8fafc; border: 1px solid #e2e8f0;
+  border-radius: 8px; padding: 10px 12px; font-size: 0.75rem; color: #374151;
+  line-height: 1.6; white-space: pre-wrap; margin-top: 10px; display: none;
+}
+.hl-preview.show { display: block; }
+.hl-toggle-preview { font-size: 0.78rem; color: #003893; font-weight: 600;
+  cursor: pointer; background: none; border: none; padding: 0; margin-top: 6px; text-decoration: underline; }
+.hl-processing { display: none; align-items: center; gap: 10px; font-size: 0.84rem; color: #5c6470; margin-bottom: 12px; }
+.hl-processing.show { display: flex; }
+
 /* ── Impresión / Guardar como PDF ── */
 @media print {
   body { background: #fff; padding: 0; color: #000; }
   .header .subtitle, .flag,
-  #progress, #step-labels, #trust-intro, #loading,
+  #progress, #step-labels, #trust-intro, #step-hl, #loading,
   #step-1, #step-2, #step-3, #step-4,
   .save-card, .results-actions,
   #ai-preview, #ai-btn, .print-hide { display: none !important; }
@@ -503,6 +547,7 @@ a:focus-visible { outline: 2px solid #003893; outline-offset: 2px; border-radius
 body.has-ejemplo-banner { padding-top: 46px; }
 @media print { .ejemplo-banner { display: none !important; } }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 <!-- Banner de modo ejemplo — sólo visible al usar verEjemplo() -->
@@ -527,7 +572,7 @@ body.has-ejemplo-banner { padding-top: 46px; }
   <div class="ccc-notice">
     <span class="ccc-notice-icon">⚖️</span>
     <div>
-Esta herramienta no es asesoría pensional</strong> ni criterio formal de decisión.
+<strong>Esta herramienta no es asesoría pensional</strong> ni criterio formal de decisión.
       Úsala para orientarte, con reservas. Antes de trasladarte o afiliarte,
       tienes derecho a una <strong>asesoría gratuita</strong> con <a href="https://www.colpensiones.gov.co" target="_blank" rel="noopener">Colpensiones</a> y con tu AFP
     </div>
@@ -582,6 +627,45 @@ Esta herramienta no es asesoría pensional</strong> ni criterio formal de decisi
 
     <button class="btn-primary" onclick="dismissTrust()">Entendido — empezar →</button>
     <button class="btn-secondary" onclick="verEjemplo()" style="width:100%;margin-top:8px;">👀 Ver un ejemplo primero</button>
+  </div>
+
+  <!-- ─────────────────── STEP HISTORIA LABORAL ─────────────────── -->
+  <div class="card" id="step-hl" style="display:none">
+    <h2>📄 Historia Laboral (opcional)</h2>
+    <p class="step-desc">Sube el PDF de tu historia laboral de Colpensiones o tu AFP. Extraeremos automáticamente las semanas cotizadas para no tener que digitarlas.</p>
+
+    <div class="info-box">
+      🔒 El archivo <strong>no sale de tu computador</strong> — todo se procesa en tu navegador sin enviar nada a servidores.
+    </div>
+
+    <div class="hl-drop" id="hl-drop" onclick="document.getElementById('hl-file').click()" ondragover="hlDragOver(event)" ondragleave="hlDragLeave(event)" ondrop="hlDrop(event)">
+      <span class="hl-drop-icon">📂</span>
+      <div class="hl-drop-label">Haz clic o arrastra tu PDF aquí</div>
+      <div class="hl-drop-sub">Descárgalo desde colpensiones.gov.co → "Mi historia laboral"</div>
+    </div>
+    <input type="file" accept=".pdf,application/pdf" class="hl-file-input" id="hl-file" onchange="hlFileSelected(this.files[0])">
+
+    <div class="hl-filename" id="hl-filename">
+      <span>📄</span>
+      <span class="hl-filename-name" id="hl-filename-name"></span>
+      <button class="hl-remove" onclick="hlRemove()" title="Quitar archivo">✕</button>
+    </div>
+
+    <div class="hl-processing" id="hl-processing">
+      <div class="spinner" style="width:22px;height:22px;border-width:3px"></div>
+      <span>Leyendo PDF...</span>
+    </div>
+
+    <div class="hl-semanas-found" id="hl-semanas-found"></div>
+    <div class="hl-result" id="hl-result"></div>
+
+    <button class="hl-toggle-preview" id="hl-toggle-preview" onclick="hlTogglePreview()" style="display:none">Ver texto extraído ▾</button>
+    <div class="hl-preview" id="hl-preview"></div>
+
+    <div class="nav-row" style="margin-top:20px">
+      <button class="btn-secondary" onclick="hlSkip()">Saltar este paso →</button>
+      <button class="btn-primary" id="hl-continuar" onclick="hlContinuar()" style="display:none">Usar estos datos →</button>
+    </div>
   </div>
 
   <!-- Progress -->
@@ -1012,6 +1096,9 @@ Esta herramienta no es asesoría pensional</strong> ni criterio formal de decisi
       <button class="btn-secondary" onclick="volverAEditar()" style="flex:2;">← Volver a editar</button>
       <button class="btn-secondary" onclick="reiniciar()" style="flex:1;">🔄 Nueva consulta</button>
     </div>
+    <a href="docs/index.html" class="btn-secondary" style="display:block;text-align:center;margin-top:6px;padding:12px;border-radius:11px;font-weight:700;text-decoration:none;font-size:.93rem;">
+      📄 Ver documentos y formularios legales
+    </a>
   </div>
 
 </div><!-- /app -->
@@ -1159,9 +1246,220 @@ function iniciarMiCaso() {
 // ════════════════════════════════════════════════
 function dismissTrust() {
   document.getElementById('trust-intro').style.display = 'none';
+  document.getElementById('step-hl').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+// ════════════════════════════════════════════════
+//  HISTORIA LABORAL
+// ════════════════════════════════════════════════
+function hlShowForm() {
+  document.getElementById('step-hl').style.display = 'none';
   document.getElementById('progress').style.display = 'flex';
   document.getElementById('step-1').style.display = 'block';
   window.scrollTo(0, 0);
+}
+
+function hlSkip() { hlShowForm(); }
+
+function hlContinuar() { hlShowForm(); }
+
+function hlDragOver(e) {
+  e.preventDefault();
+  document.getElementById('hl-drop').classList.add('drag-over');
+}
+function hlDragLeave(e) {
+  document.getElementById('hl-drop').classList.remove('drag-over');
+}
+function hlDrop(e) {
+  e.preventDefault();
+  document.getElementById('hl-drop').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') hlFileSelected(file);
+}
+
+function hlRemove() {
+  document.getElementById('hl-file').value = '';
+  document.getElementById('hl-filename').classList.remove('show');
+  document.getElementById('hl-result').classList.remove('show');
+  document.getElementById('hl-semanas-found').classList.remove('show');
+  document.getElementById('hl-preview').classList.remove('show');
+  document.getElementById('hl-toggle-preview').style.display = 'none';
+  document.getElementById('hl-continuar').style.display = 'none';
+  document.getElementById('hl-processing').classList.remove('show');
+}
+
+function hlTogglePreview() {
+  const p = document.getElementById('hl-preview');
+  const btn = document.getElementById('hl-toggle-preview');
+  const open = p.classList.toggle('show');
+  btn.textContent = open ? 'Ocultar texto extraído ▴' : 'Ver texto extraído ▾';
+}
+
+async function hlFileSelected(file) {
+  if (!file) return;
+  hlRemove();
+  document.getElementById('hl-filename-name').textContent = file.name;
+  document.getElementById('hl-filename').classList.add('show');
+  document.getElementById('hl-processing').classList.add('show');
+
+  try {
+    const text = await hlExtractText(file);
+    document.getElementById('hl-processing').classList.remove('show');
+
+    const previewEl = document.getElementById('hl-preview');
+    previewEl.textContent = text.slice(0, 4000) + (text.length > 4000 ? '\n...texto truncado...' : '');
+    document.getElementById('hl-toggle-preview').style.display = 'inline';
+
+    const { semanas, filled } = hlParseYRellenar(text);
+    const resultEl = document.getElementById('hl-result');
+    const foundEl = document.getElementById('hl-semanas-found');
+
+    if (filled.length > 0) {
+      foundEl.innerHTML = '✅ Se completaron automáticamente:<br><ul style="margin:6px 0 0 16px;">' +
+        filled.map(f => '<li>' + f + '</li>').join('') + '</ul>';
+      foundEl.classList.add('show');
+    } else {
+      resultEl.innerHTML = 'ℹ️ No se encontraron datos reconocibles automáticamente. Revisa el texto extraído y copia los valores manualmente en el paso 2.';
+      resultEl.classList.add('show');
+    }
+    document.getElementById('hl-continuar').style.display = 'block';
+  } catch (err) {
+    document.getElementById('hl-processing').classList.remove('show');
+    const resultEl = document.getElementById('hl-result');
+    resultEl.innerHTML = '⚠️ No se pudo leer el PDF: ' + (err.message || 'error') + '. Puedes continuar sin subir el archivo.';
+    resultEl.classList.add('show');
+  }
+}
+function hlInitPdfJs() {
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+}
+
+async function hlExtractText(file) {
+  hlInitPdfJs();
+  if (!window.pdfjsLib) throw new Error('pdf.js no cargó. Verifica tu conexión a internet.');
+
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let fullText = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const pageText = content.items.map(item => item.str).join(' ');
+    fullText += pageText + '\n';
+  }
+  return fullText;
+}
+
+// Extrae todos los campos reconocibles del texto y llena el formulario
+function hlParseYRellenar(text) {
+  const filled = [];
+
+  // --- Semanas totales ---
+  const semPatterns = [
+    /total\s+semanas?\s+cotizadas?[^\d]*([\d][\d\.]{1,6})/i,
+    /semanas?\s+cotizadas?[^\d]*([\d][\d\.]{1,6})/i,
+    /n[uú]mero\s+(?:total\s+)?semanas?[^\d]*([\d][\d\.]{1,6})/i,
+    /semanas?\s+acumuladas?[^\d]*([\d][\d\.]{1,6})/i,
+    /semanas?\s+reportadas?[^\d]*([\d][\d\.]{1,6})/i,
+    // tabla: un número de 3-4 dígitos seguido por la palabra semanas
+    /\b([1-9]\d{2,3})\s+semanas?/i,
+  ];
+  let semanas = null;
+  for (const re of semPatterns) {
+    const m = text.match(re);
+    if (m) {
+      const val = parseInt(m[1].replace(/\./g, '').replace(/,/g, ''));
+      if (val > 0 && val < 4000) { semanas = val; break; }
+    }
+  }
+
+  // Si no encontró total, sumar semanas de filas del historial Colpensiones
+  // Formato: DD/MM/AAAA DD/MM/AAAA $monto  N,NN  0,00  0,00  N,NN  NIT  EMPRESA
+  if (semanas === null) {
+    const filaRe = /\d{2}\/\d{2}\/\d{4}\s+\d{2}\/\d{2}\/\d{4}[^\d]*([\d]+[,\.][\d]{2})/g;
+    let total = 0, count = 0;
+    for (const m of text.matchAll(filaRe)) {
+      const val = parseFloat(m[1].replace(',', '.'));
+      if (val > 0 && val <= 5) { total += val; count++; }
+    }
+    if (count > 2) semanas = Math.round(total);
+  }
+
+  if (semanas !== null) {
+    const el = document.getElementById('semanas_actuales');
+    if (el) { el.value = semanas; filled.push('Semanas cotizadas: ' + semanas); }
+    const elJ = document.getElementById('semanas_julio25');
+    if (elJ && !elJ.value) { elJ.value = semanas; filled.push('Semanas a jul-2025: ' + semanas); }
+  }
+
+  // --- Saldo AFP (en pesos) ---
+  const saldoPatterns = [
+    /saldo\s+(?:total|acumulado|cuenta)[^\d]*\$?\s*([\d][\d\.,]{3,})/i,
+    /valor\s+(?:total|cuenta)[^\d]*\$?\s*([\d][\d\.,]{3,})/i,
+    /total\s+(?:ahorrado|acumulado)[^\d]*\$?\s*([\d][\d\.,]{3,})/i,
+  ];
+  for (const re of saldoPatterns) {
+    const m = text.match(re);
+    if (m) {
+      const raw = m[1].replace(/\./g, '').replace(/,/g, '').trim();
+      const val = parseInt(raw);
+      if (val > 1_000_000 && val < 5_000_000_000) {
+        const elS = document.getElementById('saldo_afp');
+        if (elS) {
+          elS.value = '$' + val.toLocaleString('es-CO');
+          filled.push('Saldo AFP: $' + val.toLocaleString('es-CO'));
+        }
+        break;
+      }
+    }
+  }
+
+  // --- Edad / fecha de nacimiento ---
+  const nacPatterns = [
+    /fecha\s+de\s+nacimiento[^\d]*([\d]{1,2})[\-\/]([\d]{1,2})[\-\/]([\d]{4})/i,
+    /nacido[^\d]*([\d]{1,2})[\-\/]([\d]{1,2})[\-\/]([\d]{4})/i,
+  ];
+  for (const re of nacPatterns) {
+    const m = text.match(re);
+    if (m) {
+      const anioNac = parseInt(m[3]);
+      const edad = new Date().getFullYear() - anioNac;
+      if (edad > 16 && edad < 90) {
+        const elE = document.getElementById('edad');
+        if (elE && !elE.value) { elE.value = edad; filled.push('Edad aprox.: ' + edad + ' años'); }
+      }
+      break;
+    }
+  }
+
+  // --- Fondo / AFP detectado ---
+  const fondoMap = [
+    { re: /colpensiones/i,  val: 'Colpensiones' },
+    { re: /porvenir/i,      val: 'Porvenir' },
+    { re: /protecci[oó]n/i,  val: 'Proteccion' },
+    { re: /colfondos/i,     val: 'Colfondos' },
+    { re: /skandia|sura/i,  val: 'Skandia' },
+  ];
+  for (const { re, val } of fondoMap) {
+    if (re.test(text)) {
+      // Hacer clic en el radio correspondiente
+      const radios = document.querySelectorAll('#fondo-group .radio-item');
+      radios.forEach(item => {
+        const inp = item.querySelector('input');
+        if (inp && inp.value === val) {
+          item.click();
+          filled.push('Fondo: ' + val);
+        }
+      });
+      break;
+    }
+  }
+
+  return { semanas, filled };
 }
 
 // ════════════════════════════════════════════════
@@ -1234,7 +1532,15 @@ function validate(step) {
     } else if (sa > 3500) {
       ok = false; msg = 'El total de semanas no parece válido (máximo 3.500).'; markError('semanas_actuales');
     } else if (S.edad && sa > maxPlausible) {
-      ok = false; msg = `Con ${S.edad} años no es posible tener ${sa} semanas (máximo ~${maxPlausible}). Revisa el dato.`; markError('semanas_actuales');
+      // Advertencia suave: no bloquea, pero avisa — algunos trabajadores cotizaron desde muy jóvenes
+      const warnEl = document.getElementById('semanas_actuales');
+      if (warnEl) warnEl.style.borderColor = '#f59e0b';
+      const errEl = document.getElementById('err2');
+      if (errEl) { errEl.textContent = `⚠️ Con ${S.edad} años lo habitual es un máximo de ~${maxPlausible} semanas. Verifica el dato antes de continuar — si es correcto, puedes seguir.`; errEl.classList.add('show'); errEl.style.color = '#92400e'; }
+      S.semanas_actuales = sa;
+      S.semanas_julio25 = isNaN(sj) ? sa : sj;
+      const saldoPesosW = parseInt(document.getElementById('saldo_afp').value.replace(/[^\d]/g, '')) || 0;
+      S.saldo_afp = saldoPesosW / SMMLV;
     } else if (!isNaN(sj) && sj < 0) {
       ok = false; msg = 'Las semanas al 1-jul-2025 no pueden ser negativas.'; markError('semanas_julio25');
     } else if (!isNaN(sj) && sj > sa) {
@@ -1276,7 +1582,7 @@ function validate(step) {
 const RET_AGE = { M: 62, F: 57 };
 const BASE_WEEKS = 1300;
 const GPM_WEEKS = 1150; // garantía de pensión mínima en RAIS (Ley 100 art. 65)
-const YEAR = 2026;      // año de cálculo — actualizar junto con el SMMLV
+const YEAR = new Date().getFullYear(); // año de cálculo — dinámico; actualizar SMMLV cada enero
 const REFORM_THRESH = 2.3; // SMMLV
 
 // Semanas mínimas de las mujeres en Colpensiones (Sentencia C-197/2023, VIGENTE
@@ -1748,7 +2054,7 @@ function buildPrompt(result) {
     `Semanas al 1-jul-2025: ${S.semanas_julio25}`,
     `Saldo AFP declarado (SMMLV): ${S.saldo_afp || 'no indicado'}`,
     `Ha trasladado de fondo: ${S.ha_trasladado === 'si' ? 'Sí' : 'No'}`,
-    `Situaciones especiales: ${S.especiales.length ? S.especiales.join(', ') : 'ninguna'}`,
+    `Situaciones especiales: ${S.especiales.length ? S.especiales.map(e => ESP_LBL[e] || e).join(', ') : 'ninguna'}`,
     `Salario: ${SAL_LBL[S.salario]}`,
     `Años que planea cotizar (resuelto según prioridades): ~${anosLab(S)} (rango elegido: ${ANOS_RANGE[S.anos_lab]?.label || S.anos_lab})`,
     `Trayectoria laboral futura: ${TRAY_LBL[S.trayectoria]}`,
@@ -1903,6 +2209,7 @@ async function pedirAnalisisIA() {
     document.getElementById('ai-preview').style.display = 'none';
     aiDiv.style.display = 'block';
     aiDiv.innerHTML = renderMd(aiText);
+    try { localStorage.setItem('pension_IA', aiText); } catch(e) {}
     mostrarSeguimiento();
   } catch (e) {
     btn.disabled = false;
@@ -2078,6 +2385,11 @@ function renderQueryCard() {
 // ════════════════════════════════════════════════
 function renderResults(res) {
   LAST = res;
+  // Persistir para el reporte externo (docs/reporte.html)
+  try {
+    localStorage.setItem('pension_LAST', JSON.stringify(res));
+    localStorage.setItem('pension_S', JSON.stringify(S));
+  } catch(e) {}
   document.getElementById('results').style.display = 'block';
   renderQueryCard();
   if (S._isEjemplo) showEjemploBanner(); else hideEjemploBanner();
@@ -2253,6 +2565,8 @@ function renderResults(res) {
   // Reform / transfer notice
   const ri = document.getElementById('reform-impact');
   const notices = [];
+  ri.replaceChildren();
+  ri.classList.remove('show');
 
   // Régimen de transición — mensaje prioritario, suprime la obligatoriedad Colpensiones.
   // La Ley 2381 está suspendida (Auto 841/2025): estos avisos son condicionales.
@@ -2337,7 +2651,7 @@ function reiniciar() {
   document.getElementById('progress').style.display = 'flex';
   showStep(1);
   refreshAria();
-  try { sessionStorage.removeItem('pension_S'); } catch (e) {}
+  try { localStorage.removeItem('pension_S'); } catch (e) {}
 }
 
 // ════════════════════════════════════════════════
@@ -2371,10 +2685,10 @@ function estimarSemanas() {
 }
 
 // ════════════════════════════════════════════════
-//  PERSISTENCIA — sessionStorage (sobrevive recargas, no el cierre)
+//  PERSISTENCIA — localStorage (sobrevive recargas, no el cierre)
 // ════════════════════════════════════════════════
 function saveState() {
-  try { sessionStorage.setItem('pension_S', JSON.stringify(S)); } catch (e) {}
+  try { localStorage.setItem('pension_S', JSON.stringify(S)); } catch (e) {}
 }
 
 function applyStateToUI() {
@@ -2412,7 +2726,7 @@ function applyStateToUI() {
 
 function restoreState() {
   let saved;
-  try { saved = JSON.parse(sessionStorage.getItem('pension_S')); } catch (e) { return; }
+  try { saved = JSON.parse(localStorage.getItem('pension_S')); } catch (e) { return; }
   if (!saved) return;
   const fields = ['edad','sexo','fondo_actual','semanas_actuales','semanas_julio25','saldo_afp','ha_trasladado','especiales','salario','anos_lab','trayectoria','hijos','preferencias'];
   for (const f of fields) if (saved[f] !== undefined) S[f] = saved[f];

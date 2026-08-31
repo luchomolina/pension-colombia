@@ -1,76 +1,84 @@
-# ¿Colpensiones o AFP? · Herramienta de orientación pensional
+# Pension Colombia — Proyecto Unificado
 
-Calculadora web que compara los dos regímenes pensionales colombianos (RPM y RAIS) y emite una recomendación personalizada. Todo el cálculo corre en el navegador — sin backend, sin registro, sin guardar datos.
+Herramienta de análisis pensional para Colombia que combina:
 
-## Documentación
+- **App principal** (`pensioncolombia.html`) — SPA para calcular y comparar pensiones (Colpensiones vs AFP), con análisis de documentos (CETIL, historia laboral, resoluciones).
+- **Servidor local** (`server.py`) — extracción mejorada de PDFs con Docling + RapidOCR, y análisis con IA.
+- **Benchmark** (`benchmark/`) — OCR Workbench para comparar motores OCR en tus propios PDFs.
 
-| Doc | Contenido |
-|---|---|
-| [Producto](docs/producto.md) | Problema, propuesta de valor, usuarios, principios |
-| [Algoritmo y base teórica](docs/algoritmo.md) | Base legal, supuestos, fórmulas, limitaciones conocidas |
-| [Flujo de usuario](docs/flujo.md) | Pasos del formulario, validación, pantalla de resultados |
-| [Sistema de diseño](docs/diseno.md) | Colores, tipografía, componentes, principios de UX |
+---
 
-## Tecnología
+## Instalación rápida (Windows)
 
-| Capa | Detalle |
-|---|---|
-| Frontend | HTML + CSS + JavaScript vanilla (sin frameworks, sin dependencias) |
-| Backend IA | Netlify Function (`netlify/functions/analyze.js`) → Claude Haiku via Anthropic API |
-| Hosting | Netlify (configurado en `netlify.toml`) |
+```
+1. Instala Python 3.10+  →  https://python.org
+2. Doble clic en start_docling.bat
+3. Abre pensioncolombia.html en tu navegador
+```
 
-El algoritmo de comparación corre íntegramente en el navegador (`index.html`); la documentación detallada está en [docs/algoritmo.md](docs/algoritmo.md).
+Para habilitar el análisis con IA:
+
+```
+1. Copia .env.example → .env
+2. Agrega tu OPENROUTER_API_KEY (gratis en https://openrouter.ai)
+3. Reinicia start_docling.bat
+```
+
+---
 
 ## Estructura
 
 ```
 pension-colombia/
-├── index.html                  # Toda la UI y lógica del algoritmo (SPA)
-├── netlify.toml                # Configuración de build y redirect /api/analyze
-├── netlify/
-│   └── functions/
-│       └── analyze.js          # Serverless function que llama a la Anthropic API
-├── test/
-│   └── algoritmo.test.js       # Tests del algoritmo (Node, sin dependencias)
-└── docs/                       # Documentación de producto, algoritmo y diseño
+├── pensioncolombia.html      ← App principal (abrir en navegador)
+├── server.py                 ← Servidor Flask: Docling + RapidOCR + IA
+├── start_docling.bat         ← Lanzador Windows
+├── .env.example              ← Plantilla de configuración
+├── requirements.txt          ← Dependencias Python
+└── benchmark/                ← OCR Workbench (comparativa de motores)
+    ├── run_ocr_experiments.sh      ← Linux/Mac
+    ├── run_ocr_experiments.bat     ← Windows
+    ├── docling_environment/        ← Config Docling (RapidOCR, SuryaOCR…)
+    ├── marker_environment/         ← Config Marker
+    ├── mineru_environment/         ← Config MinerU
+    ├── docint_environment/         ← Config Azure Document Intelligence
+    └── data/
+        ├── input/                  ← Coloca aquí los PDFs a comparar
+        └── output/                 ← Resultados en Markdown por motor
 ```
-
-## Desarrollo local
-
-```bash
-# Instalar Netlify CLI
-npm install -g netlify-cli
-
-# Crear archivo de variables locales
-echo 'ANTHROPIC_API_KEY=sk-ant-...' > .env
-
-# Levantar servidor local con funciones
-netlify dev
-```
-
-La herramienta abre en `http://localhost:8888`. Sin la variable de entorno, el análisis IA muestra un error pero el algoritmo de comparación funciona igual.
-
-## Despliegue en Netlify
-
-1. Conectar el repositorio en [app.netlify.com](https://app.netlify.com)
-2. En **Site settings → Environment variables**, agregar:
-   ```
-   ANTHROPIC_API_KEY=sk-ant-...
-   ```
-3. Netlify detecta automáticamente `netlify.toml` — no se requiere configuración adicional.
-
-El endpoint `/api/analyze` se redirige a `/.netlify/functions/analyze` según `netlify.toml`.
-
-## Tests
-
-El algoritmo (proyección de semanas, escenarios Colpensiones/AFP, puntuación, régimen de transición) tiene una suite de tests sin dependencias. El test carga el `<script>` real de `index.html` y lo evalúa en un sandbox de Node, así que siempre corre contra el código de producción.
-
-```bash
-node --test
-```
-
-Requiere Node 18+ (usa el runner integrado `node:test`). No hay paso de build ni `package.json`.
 
 ---
 
-> **Aviso:** Esta herramienta es orientativa. Los cálculos son aproximaciones y no reemplazan la consulta oficial con Colpensiones, la AFP, ni un asesor pensional certificado. Ver [limitaciones conocidas](docs/algoritmo.md#qué-no-tiene-en-cuenta-el-modelo).
+## Servidor (`server.py`) — Endpoints
+
+| Endpoint | Método | Descripción |
+|---|---|---|
+| `/health` | GET | Estado del servidor. `ai: true` si hay API key configurada. |
+| `/extract` | POST | Extrae texto de un PDF. Campo `pdf` (multipart). Parámetro `force_ocr=1` para forzar RapidOCR. Devuelve `{ text, pages, engine }`. |
+| `/analyze` | POST | Analiza el texto con IA. Body JSON `{ text, tipo }`. Devuelve `{ analysis, model }`. Requiere API key en `.env`. |
+
+**Estrategia de extracción** (basada en OCR Workbench):
+1. Extracción nativa Docling — rápida, sin OCR.
+2. Si el texto está vacío o ilegible → RapidOCR con `force_full_page_ocr=True` (mejor relación calidad/velocidad para documentos tipográficos).
+
+---
+
+## Benchmark — Uso en Windows
+
+```bat
+cd benchmark
+run_ocr_experiments.bat -e docling -a cpu
+run_ocr_experiments.bat -e marker  -a cpu
+```
+
+Coloca los PDFs en `benchmark/data/input/`. Los resultados en Markdown quedan en `benchmark/data/output/<motor>/`.
+
+Requiere [uv](https://astral.sh/uv) para gestión de entornos aislados.
+
+---
+
+## Créditos
+
+- **OCR Workbench** — benchmark de motores OCR (Docling, Marker, MinerU, Azure).
+- **Analizador Jurídico IA** — concepto de análisis PDF → AI → explicación (josema-2005).
+- **Pension Colombia** — app de análisis pensional colombiana.

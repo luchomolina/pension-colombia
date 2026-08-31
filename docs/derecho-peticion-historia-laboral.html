@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Derecho de Petición · Historia Laboral · Colpensiones o AFP</title>
+<style>
+/* === shared === */
+/* ── Shared styles · pension-colombia ── */
+:root {
+  --azul:    #003893;
+  --azul2:   #002776;
+  --azul-lt: #e8eeff;
+  --verde:   #2e7d32;
+  --rojo:    #c62828;
+  --ambar:   #f59e0b;
+  --gris:    #5c6470;
+  --fondo:   #f4f6fb;
+  --texto:   #1a1a2e;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--fondo); color: var(--texto);
+  min-height: 100vh; padding-bottom: 48px;
+}
+.page { max-width: 720px; margin: 0 auto; padding: 20px 16px; }
+
+/* flag */
+.flag { height: 5px; border-radius: 3px; margin: 14px auto 4px; max-width: 200px;
+  background: linear-gradient(to right, #FCD116 33.33%, #003893 33.33% 66.66%, #CE1126 66.66%); }
+
+/* header */
+.site-header { text-align: center; padding: 24px 16px 12px; }
+.site-header h1 { font-size: 1.5rem; font-weight: 900; color: var(--azul); letter-spacing: -0.5px; }
+.site-header .sub { font-size: 0.82rem; color: var(--gris); margin-top: 4px; }
+
+/* breadcrumb */
+.breadcrumb { font-size: 0.78rem; color: var(--gris); margin: 0 0 18px;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.breadcrumb a { color: var(--azul); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb span { opacity: 0.5; }
+
+/* card */
+.card {
+  background: white; border-radius: 16px; padding: 24px;
+  margin: 14px 0; box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+}
+.card h2 { font-size: 1.1rem; font-weight: 800; color: var(--azul); margin-bottom: 14px; }
+.card h3 { font-size: 0.95rem; font-weight: 700; color: var(--azul2); margin: 18px 0 8px; }
+.card p  { font-size: 0.9rem; line-height: 1.65; color: #2a2a3e; margin-bottom: 10px; }
+.card ul, .card ol { padding-left: 20px; margin-bottom: 10px; }
+.card li  { font-size: 0.88rem; line-height: 1.6; margin-bottom: 4px; }
+
+/* table */
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 12px 0; }
+th { background: var(--azul); color: white; padding: 9px 12px; text-align: left; font-size: 0.8rem; }
+td { padding: 9px 12px; border-bottom: 1px solid #e8eaf0; vertical-align: top; }
+tr:nth-child(even) td { background: #f7f8fc; }
+
+/* badge */
+.badge { display: inline-block; font-size: 0.72rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px; }
+.badge-verde { background: #e8f5e9; color: var(--verde); }
+.badge-rojo  { background: #ffebee; color: var(--rojo); }
+.badge-ambar { background: #fff8e1; color: #856404; }
+.badge-azul  { background: var(--azul-lt); color: var(--azul); }
+
+/* notice */
+.notice {
+  border-radius: 10px; padding: 12px 16px; font-size: 0.82rem; line-height: 1.5;
+  margin-bottom: 14px;
+}
+.notice-info  { background: #e8f4fd; border-left: 4px solid #2196f3; color: #1565c0; }
+.notice-warn  { background: #fff8e1; border-left: 4px solid var(--ambar); color: #856404; }
+.notice-ok    { background: #e8f5e9; border-left: 4px solid var(--verde); color: var(--verde); }
+.notice-legal { background: #f3f0ff; border-left: 4px solid #7c3aed; color: #4c1d95; font-size: 0.78rem; }
+
+/* buttons */
+.btn { display: inline-block; padding: 11px 22px; border-radius: 10px; font-size: 0.9rem;
+  font-weight: 700; cursor: pointer; border: none; text-decoration: none; transition: all 0.18s; }
+.btn-primary { background: var(--azul); color: white; }
+.btn-primary:hover { background: var(--azul2); }
+.btn-secondary { background: white; color: var(--azul); border: 2px solid var(--azul); }
+.btn-secondary:hover { background: var(--azul-lt); }
+.btn-block { display: block; width: 100%; text-align: center; margin-top: 8px; }
+
+/* nav */
+.back-link { font-size: 0.82rem; color: var(--azul); text-decoration: none; display: inline-flex;
+  align-items: center; gap: 4px; margin-bottom: 12px; }
+.back-link:hover { text-decoration: underline; }
+
+/* print */
+@media print {
+  body { background: white; }
+  .no-print { display: none !important; }
+  .card { box-shadow: none; border: 1px solid #ddd; }
+}
+
+/* === /shared === */
+</style>
+<style>
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 0.8rem; font-weight: 700; color: #333; margin-bottom: 5px; }
+input, select, textarea { width: 100%; padding: 10px 13px; border: 2px solid #e0e4ed;
+  border-radius: 9px; font-size: 0.9rem; color: #1a1a2e; font-family: inherit; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: #003893; }
+textarea { min-height: 90px; resize: vertical; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width:500px) { .row2 { grid-template-columns: 1fr; } }
+.documento { background: white; border: 1.5px solid #d0d5e8; border-radius: 12px;
+  padding: 28px; margin-top: 20px; font-size: 0.9rem; line-height: 1.7; }
+.documento h3 { font-size: 1rem; font-weight: 800; text-align: center; margin-bottom: 20px; color: #003893; }
+.documento .ref { text-align: right; font-size: 0.82rem; color: #555; margin-bottom: 18px; }
+.documento .cuerpo p { margin-bottom: 12px; }
+.documento ul { padding-left: 22px; margin: 8px 0 12px; }
+.documento li { margin-bottom: 5px; }
+.documento .firma { margin-top: 36px; }
+.ph { font-weight: 700; color: #856404; }
+.btn-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.tag-auto { display:inline-block; background:#e8f5e9; color:#2e7d32; font-size:0.7rem;
+  font-weight:700; border-radius:4px; padding:1px 6px; margin-left:5px; }
+@media print { .no-print { display: none !important; } }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="site-header">
+    <div class="flag"></div>
+    <h1>⚖️ ¿Colpensiones o AFP?</h1>
+    <div class="sub">Documentos legales · Derecho de petición — Historia laboral</div>
+  </div>
+
+  <a href="../index.html" class="back-link no-print">← Volver a la calculadora</a>
+
+  <div class="notice notice-info no-print" id="autofill-notice" style="display:none;">
+    ✅ <strong>Datos pre-llenados</strong> a partir de tu consulta. Revisa y completa antes de imprimir.
+  </div>
+
+  <div class="notice notice-info">
+    <strong>¿Para qué sirve?</strong> Tu historia laboral es el documento oficial que detalla todas las
+    semanas cotizadas, empleadores y aportes al sistema pensional. Es imprescindible para verificar tu
+    derecho a pensión y detectar semanas faltantes o errores de registro.
+  </div>
+
+  <div class="notice notice-warn">
+    ⚠️ <strong>Término de respuesta:</strong> La entidad tiene <strong>15 días hábiles</strong> para
+    responder de fondo (Ley 1755/2015, art. 14). Sin respuesta oportuna, procede acción de tutela
+    por vulneración del derecho de petición (C.P., art. 23).
+  </div>
+
+  <div class="card no-print">
+    <h2>Tus datos</h2>
+    <div class="row2">
+      <div class="field"><label>Nombre completo</label>
+        <input id="nombre" placeholder="Nombres y apellidos completos" oninput="act()"></div>
+      <div class="field"><label>N.° de cédula</label>
+        <input id="cedula" placeholder="52.345.678" oninput="act()"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Dirección</label>
+        <input id="direccion" placeholder="Calle, carrera, barrio" oninput="act()"></div>
+      <div class="field"><label>Ciudad</label>
+        <input id="ciudad" placeholder="Ciudad" oninput="act()"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Teléfono</label>
+        <input id="telefono" placeholder="300 123 4567" oninput="act()"></div>
+      <div class="field"><label>Correo electrónico</label>
+        <input id="email" placeholder="correo@ejemplo.com" oninput="act()"></div>
+    </div>
+  </div>
+
+  <div class="card no-print">
+    <h2>Destino de la petición</h2>
+    <div class="field">
+      <label>Dirigida a <span class="tag-auto" id="tag-fondo" style="display:none">auto</span></label>
+      <select id="entidad" onchange="act()">
+        <option value="">— Seleccionar entidad —</option>
+        <option value="COLPENSIONES">Colpensiones (Administradora Colombiana de Pensiones)</option>
+        <option value="PORVENIR">Porvenir S.A. – AFP</option>
+        <option value="PROTECCIÓN">Protección S.A. – AFP</option>
+        <option value="COLFONDOS">Colfondos S.A. – AFP</option>
+        <option value="SKANDIA">Skandia (Old Mutual) – AFP</option>
+      </select>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Ciudad de radicación</label>
+        <input id="ciudad_entidad" placeholder="Ciudad" oninput="act()"></div>
+      <div class="field"><label>Fecha</label>
+        <input id="fecha" oninput="act()"></div>
+    </div>
+    <div class="field">
+      <label>Semanas cotizadas conocidas <span class="tag-auto" id="tag-semanas" style="display:none">auto</span></label>
+      <input id="semanas" placeholder="Ej: 850 semanas (o 'desconocido')" oninput="act()">
+    </div>
+    <div class="field"><label>Solicitud adicional (opcional)</label>
+      <textarea id="extra" placeholder="Ej: Corrección de semanas, vinculación de semanas faltantes, certificación de empleadores..." oninput="act()"></textarea>
+    </div>
+  </div>
+
+  <div class="documento" id="doc">
+    <div class="ref"><span id="d-ciudad-fecha">__________________</span></div>
+
+    <h3>DERECHO DE PETICIÓN<br>HISTORIA LABORAL COMPLETA</h3>
+
+    <div style="margin-bottom:18px;">
+      Señores<br>
+      <strong id="d-entidad">COLPENSIONES / AFP</strong><br>
+      Gerencia de Atención al Afiliado<br>
+      Ciudad
+    </div>
+
+    <div class="cuerpo">
+      <p>
+        Yo, <strong><span id="d-nombre" class="ph">NOMBRE COMPLETO</span></strong>,
+        identificado(a) con Cédula de Ciudadanía N.°&nbsp;<strong><span id="d-cedula" class="ph">NÚMERO</span></strong>,
+        con domicilio en <span id="d-dir" class="ph">DIRECCIÓN, CIUDAD</span>,
+        teléfono <span id="d-tel" class="ph">TELÉFONO</span>
+        y correo electrónico <span id="d-email" class="ph">CORREO</span>,
+        en ejercicio del derecho fundamental de petición consagrado en el artículo 23
+        de la Constitución Política y desarrollado por la Ley 1755 de 2015,
+        me dirijo respetuosamente a ustedes para solicitar:
+      </p>
+
+      <p>
+        <strong>PRIMERO.</strong> Que se me expida la <strong>HISTORIA LABORAL COMPLETA</strong>,
+        con la totalidad de las semanas cotizadas al Sistema General de Pensiones desde el inicio
+        de mi vida laboral hasta la fecha de la presente solicitud, discriminadas por empleador,
+        período cotizado, semanas aportadas y valor de los aportes.
+      </p>
+
+      <p>
+        <strong>SEGUNDO.</strong> Que el documento incluya el resumen consolidado del total de semanas
+        cotizadas. De acuerdo con mis registros aproximados, cuento con
+        <strong><span id="d-semanas" class="ph">[SEMANAS]</span></strong>; solicito
+        confirmación oficial o corrección de este dato mediante respuesta de fondo.
+      </p>
+
+      <p id="p-extra" style="display:none">
+        <strong>TERCERO.</strong> <span id="d-extra"></span>
+      </p>
+
+      <p>
+        <strong>FUNDAMENTOS DE DERECHO:</strong> Artículo 23 de la Constitución Política;
+        Ley 1755 de 2015 (derecho de petición — plazo de 15 días hábiles para respuesta de fondo);
+        Ley 100 de 1993, artículos 13 y 33 (derecho del afiliado a conocer su historia pensional);
+        Sentencias T-377/2000 y T-680/2012 de la Corte Constitucional.
+      </p>
+
+      <p>
+        <strong>PETICIÓN CONCRETA:</strong> Solicito dar respuesta de fondo dentro de los
+        <strong>quince (15) días hábiles</strong> previstos en el artículo 14 de la Ley 1755 de 2015,
+        so pena de acudir a la acción de tutela por vulneración del derecho fundamental de petición.
+        La respuesta puede enviarse al correo <span id="d-email2" class="ph">CORREO</span>
+        o a la dirección <span id="d-dir2" class="ph">DIRECCIÓN</span>.
+      </p>
+    </div>
+
+    <div class="firma">
+      <p>Atentamente,</p><br><br>
+      <p>
+        <strong><span id="d-firma" class="ph">NOMBRE COMPLETO</span></strong><br>
+        C.C. N.° <span id="d-cedula2" class="ph">NÚMERO</span><br>
+        Tel. <span id="d-tel2" class="ph">TELÉFONO</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="btn-row no-print">
+    <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+    <a href="../index.html" class="btn btn-secondary">← Volver</a>
+  </div>
+
+  <div class="notice notice-legal" style="margin-top:20px;">
+    Plantilla orientativa generada con IA — verificar antes de radicar. No es asesoría jurídica.
+    Acuerdo PCSJA24-12243 · Sentencia T-323/2024.
+  </div>
+</div>
+
+<script>
+// Pre-llenar desde localStorage (calculadora principal)
+(function() {
+  const fecha = new Date().toLocaleDateString('es-CO', {year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('fecha').value = fecha;
+
+  try {
+    const raw = localStorage.getItem('pension_S');
+    if (!raw) return;
+    const S = JSON.parse(raw);
+
+    if (S.semanas_actuales) {
+      document.getElementById('semanas').value = S.semanas_actuales + ' semanas';
+      document.getElementById('tag-semanas').style.display = 'inline-block';
+    }
+
+    const fondoMap = {
+      Colpensiones:'COLPENSIONES', Porvenir:'PORVENIR',
+      'Protección':'PROTECCIÓN', Proteccion:'PROTECCIÓN',
+      Colfondos:'COLFONDOS', Skandia:'SKANDIA'
+    };
+    if (S.fondo_actual && fondoMap[S.fondo_actual]) {
+      document.getElementById('entidad').value = fondoMap[S.fondo_actual];
+      document.getElementById('tag-fondo').style.display = 'inline-block';
+    }
+
+    document.getElementById('autofill-notice').style.display = 'block';
+  } catch(e) {}
+})();
+
+function v(id){ return document.getElementById(id)?.value?.trim()||''; }
+function s(id, val, cls){ const el=document.getElementById(id); if(!el)return; el.textContent=val; el.className=val?'':'ph'; }
+
+function act() {
+  const nombre  = v('nombre')  || 'NOMBRE COMPLETO';
+  const cedula  = v('cedula')  || 'NÚMERO';
+  const dir     = v('direccion')|| 'DIRECCIÓN';
+  const ciudad  = v('ciudad')  || 'CIUDAD';
+  const tel     = v('telefono')|| 'TELÉFONO';
+  const email   = v('email')   || 'CORREO';
+  const ent     = v('entidad') || 'COLPENSIONES / AFP';
+  const ciudadEnt = v('ciudad_entidad') || 'CIUDAD';
+  const fecha   = v('fecha')   || '——';
+  const semanas = v('semanas') || '[SEMANAS]';
+  const extra   = v('extra');
+
+  s('d-ciudad-fecha', ciudadEnt + ', ' + fecha);
+  s('d-entidad', ent);
+  s('d-nombre', nombre);
+  s('d-cedula', cedula);
+  s('d-dir', dir + ', ' + ciudad);
+  s('d-tel', tel);
+  s('d-email', email);
+  s('d-semanas', semanas);
+  s('d-extra', extra);
+  s('d-email2', email);
+  s('d-dir2', dir + ', ' + ciudad);
+  s('d-firma', nombre);
+  s('d-cedula2', cedula);
+  s('d-tel2', tel);
+
+  document.getElementById('p-extra').style.display = extra ? 'block' : 'none';
+}
+
+act();
+</script>
+</body>
+</html>

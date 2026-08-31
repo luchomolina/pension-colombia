@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi reporte pensional · Colpensiones o AFP</title>
+<style>
+/* === shared === */
+/* ── Shared styles · pension-colombia ── */
+:root {
+  --azul:    #003893;
+  --azul2:   #002776;
+  --azul-lt: #e8eeff;
+  --verde:   #2e7d32;
+  --rojo:    #c62828;
+  --ambar:   #f59e0b;
+  --gris:    #5c6470;
+  --fondo:   #f4f6fb;
+  --texto:   #1a1a2e;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--fondo); color: var(--texto);
+  min-height: 100vh; padding-bottom: 48px;
+}
+.page { max-width: 720px; margin: 0 auto; padding: 20px 16px; }
+
+/* flag */
+.flag { height: 5px; border-radius: 3px; margin: 14px auto 4px; max-width: 200px;
+  background: linear-gradient(to right, #FCD116 33.33%, #003893 33.33% 66.66%, #CE1126 66.66%); }
+
+/* header */
+.site-header { text-align: center; padding: 24px 16px 12px; }
+.site-header h1 { font-size: 1.5rem; font-weight: 900; color: var(--azul); letter-spacing: -0.5px; }
+.site-header .sub { font-size: 0.82rem; color: var(--gris); margin-top: 4px; }
+
+/* breadcrumb */
+.breadcrumb { font-size: 0.78rem; color: var(--gris); margin: 0 0 18px;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.breadcrumb a { color: var(--azul); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb span { opacity: 0.5; }
+
+/* card */
+.card {
+  background: white; border-radius: 16px; padding: 24px;
+  margin: 14px 0; box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+}
+.card h2 { font-size: 1.1rem; font-weight: 800; color: var(--azul); margin-bottom: 14px; }
+.card h3 { font-size: 0.95rem; font-weight: 700; color: var(--azul2); margin: 18px 0 8px; }
+.card p  { font-size: 0.9rem; line-height: 1.65; color: #2a2a3e; margin-bottom: 10px; }
+.card ul, .card ol { padding-left: 20px; margin-bottom: 10px; }
+.card li  { font-size: 0.88rem; line-height: 1.6; margin-bottom: 4px; }
+
+/* table */
+table { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 12px 0; }
+th { background: var(--azul); color: white; padding: 9px 12px; text-align: left; font-size: 0.8rem; }
+td { padding: 9px 12px; border-bottom: 1px solid #e8eaf0; vertical-align: top; }
+tr:nth-child(even) td { background: #f7f8fc; }
+
+/* badge */
+.badge { display: inline-block; font-size: 0.72rem; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px; }
+.badge-verde { background: #e8f5e9; color: var(--verde); }
+.badge-rojo  { background: #ffebee; color: var(--rojo); }
+.badge-ambar { background: #fff8e1; color: #856404; }
+.badge-azul  { background: var(--azul-lt); color: var(--azul); }
+
+/* notice */
+.notice {
+  border-radius: 10px; padding: 12px 16px; font-size: 0.82rem; line-height: 1.5;
+  margin-bottom: 14px;
+}
+.notice-info  { background: #e8f4fd; border-left: 4px solid #2196f3; color: #1565c0; }
+.notice-warn  { background: #fff8e1; border-left: 4px solid var(--ambar); color: #856404; }
+.notice-ok    { background: #e8f5e9; border-left: 4px solid var(--verde); color: var(--verde); }
+.notice-legal { background: #f3f0ff; border-left: 4px solid #7c3aed; color: #4c1d95; font-size: 0.78rem; }
+
+/* buttons */
+.btn { display: inline-block; padding: 11px 22px; border-radius: 10px; font-size: 0.9rem;
+  font-weight: 700; cursor: pointer; border: none; text-decoration: none; transition: all 0.18s; }
+.btn-primary { background: var(--azul); color: white; }
+.btn-primary:hover { background: var(--azul2); }
+.btn-secondary { background: white; color: var(--azul); border: 2px solid var(--azul); }
+.btn-secondary:hover { background: var(--azul-lt); }
+.btn-block { display: block; width: 100%; text-align: center; margin-top: 8px; }
+
+/* nav */
+.back-link { font-size: 0.82rem; color: var(--azul); text-decoration: none; display: inline-flex;
+  align-items: center; gap: 4px; margin-bottom: 12px; }
+.back-link:hover { text-decoration: underline; }
+
+/* print */
+@media print {
+  body { background: white; }
+  .no-print { display: none !important; }
+  .card { box-shadow: none; border: 1px solid #ddd; }
+}
+
+/* === /shared === */
+</style>
+<style>
+/* Tabs */
+.tabs { display:flex; gap:4px; margin:14px 0; background:#e8eaf0; border-radius:10px; padding:4px; }
+.tab { flex:1; text-align:center; padding:9px 6px; border-radius:7px; font-size:.82rem;
+  font-weight:700; cursor:pointer; border:none; background:none; color:#5c6470; transition:all .2s; }
+.tab.active { background:white; color:#003893; box-shadow:0 1px 4px rgba(0,0,0,.1); }
+
+/* Verdict */
+.verdict { border-radius:14px; padding:22px; background:linear-gradient(135deg,#002776,#0045c4);
+  color:white; text-align:center; margin:14px 0; }
+.verdict .eyebrow { font-size:.75rem; color:rgba(255,255,255,.8); text-transform:uppercase;
+  letter-spacing:.8px; margin-bottom:6px; }
+.verdict .rname { font-size:1.5rem; font-weight:900; margin-bottom:6px; }
+.verdict .vsub  { font-size:.88rem; color:rgba(255,255,255,.9); margin-bottom:8px; }
+.verdict .vbadge { display:inline-block; background:rgba(255,255,255,.18); border-radius:8px;
+  padding:5px 12px; font-size:.82rem; font-weight:600; }
+
+/* Data grid */
+.data-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+@media (max-width:440px) { .data-grid { grid-template-columns:1fr; } }
+.data-item { background:#f7f8fc; border-radius:8px; padding:10px 13px; }
+.data-item .lbl { font-size:.7rem; font-weight:700; color:#5c6470; text-transform:uppercase;
+  letter-spacing:.4px; margin-bottom:3px; }
+.data-item .val { font-size:.88rem; font-weight:700; color:#1a1a2e; line-height:1.3; }
+
+/* Escenarios */
+.esc-card { border:2px solid #e0e4ed; border-radius:12px; padding:16px; margin-bottom:12px; }
+.esc-card.winner { border-color:#003893; background:#f0f4ff; }
+.esc-title { font-weight:800; font-size:.93rem; color:#003893; margin-bottom:10px;
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.esc-mesada { font-size:1.3rem; font-weight:900; color:#003893; }
+.esc-sub { font-size:.8rem; color:#5c6470; margin-top:4px; line-height:1.4; }
+.stars { color:#f59e0b; letter-spacing:2px; font-size:.9rem; }
+
+/* Ficha de afiliado */
+.ficha { background:white; border:2px solid #003893; border-radius:14px; padding:24px; }
+.ficha-header { display:flex; align-items:center; gap:14px; border-bottom:2px solid #e8eeff;
+  padding-bottom:16px; margin-bottom:16px; }
+.ficha-header .fh-icon { font-size:2rem; }
+.ficha-header h3 { font-size:1.1rem; font-weight:900; color:#003893; margin-bottom:3px; }
+.ficha-header .fh-sub { font-size:.78rem; color:#5c6470; }
+.ficha-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+@media (max-width:440px) { .ficha-row { grid-template-columns:1fr; } }
+.ficha-campo { border:1px solid #e0e4ed; border-radius:8px; padding:10px 12px; }
+.ficha-campo .fc-lbl { font-size:.68rem; font-weight:700; color:#5c6470; text-transform:uppercase; margin-bottom:4px; }
+.ficha-campo .fc-val { font-size:.9rem; font-weight:700; color:#1a1a2e; min-height:20px; }
+.ficha-campo .fc-edit { border:none; background:none; font-size:.9rem; font-weight:700;
+  color:#1a1a2e; width:100%; padding:0; font-family:inherit; }
+.ficha-campo .fc-edit:focus { outline:none; border-bottom:2px solid #003893; }
+.ficha-nota { background:#fff8e1; border-left:3px solid #f59e0b; border-radius:6px;
+  padding:8px 12px; font-size:.78rem; color:#856404; margin-top:12px; }
+
+/* Acciones */
+.action-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0; }
+@media (max-width:440px) { .action-grid { grid-template-columns:1fr; } }
+.action-btn { display:flex; align-items:center; gap:10px; padding:13px 14px;
+  background:white; border:2px solid #e0e4ed; border-radius:11px;
+  cursor:pointer; font-family:inherit; text-decoration:none; transition:all .18s; }
+.action-btn:hover { border-color:#003893; background:#f0f4ff; }
+.action-btn .ab-icon { font-size:1.3rem; flex-shrink:0; }
+.action-btn .ab-text .ab-title { font-size:.85rem; font-weight:700; color:#003893; }
+.action-btn .ab-text .ab-desc  { font-size:.73rem; color:#5c6470; line-height:1.3; }
+
+/* Empty */
+.empty-state { text-align:center; padding:50px 20px; }
+.empty-state .ei { font-size:3rem; margin-bottom:14px; }
+.empty-state p { font-size:.9rem; color:#5c6470; margin-bottom:20px; line-height:1.5; }
+
+/* Print */
+@media print {
+  .no-print { display:none !important; }
+  .tabs { display:none; }
+  .tab-content { display:block !important; }
+  body { background:white; }
+  .card { box-shadow:none; border:1px solid #ddd; break-inside:avoid; }
+  .verdict { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="site-header">
+    <div class="flag"></div>
+    <h1>⚖️ ¿Colpensiones o AFP?</h1>
+    <div class="sub" id="reporte-fecha">Mi reporte pensional personalizado</div>
+  </div>
+  <a href="../index.html" class="back-link no-print">← Volver a la calculadora</a>
+
+  <!-- Estado vacío -->
+  <div class="empty-state card" id="empty-state" style="display:none;">
+    <div class="ei">📊</div>
+    <p>Aún no has calculado tu resultado.<br>
+    Completa el formulario en la calculadora para ver tu reporte aquí.<br>
+    <small style="color:#aaa;">El reporte usa datos de la sesión actual — si cerraste la pestaña, deberás calcular de nuevo.</small></p>
+    <a href="../index.html" class="btn btn-primary" style="display:inline-block;">Ir a la calculadora →</a>
+  </div>
+
+  <!-- Contenido con datos -->
+  <div id="reporte-main" style="display:none;">
+
+    <!-- Tabs -->
+    <div class="tabs no-print">
+      <button class="tab active" onclick="showTab('reporte', this)">📊 Reporte</button>
+      <button class="tab" onclick="showTab('ficha', this)">🪪 Ficha de afiliado</button>
+      <button class="tab" onclick="showTab('descargar', this)">⬇️ Descargar</button>
+    </div>
+
+    <!-- TAB 1: Reporte completo -->
+    <div id="tab-reporte" class="tab-content">
+
+      <div class="verdict">
+        <div class="eyebrow">Régimen recomendado para tu caso</div>
+        <div class="rname" id="r-mejor">—</div>
+        <div class="vsub" id="r-mesada-txt">—</div>
+        <div class="vbadge" id="r-confianza">—</div>
+      </div>
+
+      <div class="card">
+        <h2>Tus datos</h2>
+        <div class="data-grid">
+          <div class="data-item"><div class="lbl">Edad</div><div class="val" id="r-edad">—</div></div>
+          <div class="data-item"><div class="lbl">Sexo</div><div class="val" id="r-sexo">—</div></div>
+          <div class="data-item"><div class="lbl">Fondo actual</div><div class="val" id="r-fondo">—</div></div>
+          <div class="data-item"><div class="lbl">Semanas cotizadas</div><div class="val" id="r-semanas">—</div></div>
+          <div class="data-item"><div class="lbl">Salario</div><div class="val" id="r-salario">—</div></div>
+          <div class="data-item"><div class="lbl">Años más de cotización</div><div class="val" id="r-anos">—</div></div>
+        </div>
+        <div class="data-item" style="margin-top:8px;">
+          <div class="lbl">Prioridades</div><div class="val" id="r-prioridades">—</div>
+        </div>
+        <div class="data-item" style="margin-top:8px;" id="r-especiales-wrap">
+          <div class="lbl">Situaciones especiales</div><div class="val" id="r-especiales">—</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Situación normativa</h2>
+        <table>
+          <tr><th>Aspecto</th><th>Resultado</th></tr>
+          <tr><td>Régimen de transición (Ley 2381/2024)</td><td id="r-transicion">—</td></tr>
+          <tr><td>¿Puede trasladarse de régimen?</td><td id="r-puede">—</td></tr>
+          <tr><td>Umbral de reforma (≤ 2,3 SMMLV)</td><td id="r-refoblig">—</td></tr>
+        </table>
+        <p style="font-size:.75rem;color:#5c6470;margin-top:8px;">
+          ⚠️ La Ley 2381/2024 está suspendida por la Corte Constitucional. Hoy rige la Ley 100/1993.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>Comparación de escenarios</h2>
+        <div id="r-escenarios"></div>
+      </div>
+
+      <div class="card" id="r-ia-card" style="display:none;">
+        <h2>Análisis del asistente IA</h2>
+        <div id="r-ia-texto" style="font-size:.87rem;line-height:1.65;"></div>
+      </div>
+
+      <div class="notice notice-warn">
+        ⚠️ Este reporte es orientativo. Los cálculos son aproximaciones — confirma con
+        Colpensiones, tu AFP o un asesor pensional certificado antes de decidir.
+      </div>
+
+      <div class="action-grid no-print" style="margin-top:16px;">
+        <button class="action-btn" onclick="window.print()">
+          <span class="ab-icon">🖨️</span>
+          <span class="ab-text"><span class="ab-title">Imprimir / PDF</span><span class="ab-desc">Guarda el reporte completo</span></span>
+        </button>
+        <a href="../index.html" class="action-btn">
+          <span class="ab-icon">🔄</span>
+          <span class="ab-text"><span class="ab-title">Nueva consulta</span><span class="ab-desc">Volver a la calculadora</span></span>
+        </a>
+      </div>
+    </div>
+
+    <!-- TAB 2: Ficha de afiliado -->
+    <div id="tab-ficha" class="tab-content" style="display:none;">
+      <div class="notice notice-info">
+        📋 Esta ficha resume tus datos para llevar a la asesoría con Colpensiones o tu AFP.
+        Puedes completar los campos vacíos y luego imprimir.
+      </div>
+      <div class="ficha">
+        <div class="ficha-header">
+          <div class="fh-icon">🪪</div>
+          <div>
+            <h3>Ficha de afiliado pensional</h3>
+            <div class="fh-sub">Generada el <span id="f-fecha">—</span> · Herramienta ¿Colpensiones o AFP?</div>
+          </div>
+        </div>
+
+        <p style="font-size:.8rem;font-weight:700;color:#003893;margin-bottom:10px;">DATOS PERSONALES</p>
+        <div class="ficha-row">
+          <div class="ficha-campo"><div class="fc-lbl">Nombre completo</div>
+            <input class="fc-edit" id="fc-nombre" placeholder="Escribe aquí"></div>
+          <div class="ficha-campo"><div class="fc-lbl">Cédula de ciudadanía</div>
+            <input class="fc-edit" id="fc-cedula" placeholder="Número"></div>
+        </div>
+        <div class="ficha-row">
+          <div class="ficha-campo"><div class="fc-lbl">Edad</div>
+            <div class="fc-val" id="fc-edad">—</div></div>
+          <div class="ficha-campo"><div class="fc-lbl">Sexo</div>
+            <div class="fc-val" id="fc-sexo">—</div></div>
+        </div>
+        <div class="ficha-row">
+          <div class="ficha-campo"><div class="fc-lbl">Teléfono / Celular</div>
+            <input class="fc-edit" id="fc-tel" placeholder="Número de contacto"></div>
+          <div class="ficha-campo"><div class="fc-lbl">Correo electrónico</div>
+            <input class="fc-edit" id="fc-email" placeholder="correo@ejemplo.com"></div>
+        </div>
+
+        <p style="font-size:.8rem;font-weight:700;color:#003893;margin:14px 0 10px;">SITUACIÓN PENSIONAL</p>
+        <div class="ficha-row">
+          <div class="ficha-campo"><div class="fc-lbl">Fondo / Régimen actual</div>
+            <div class="fc-val" id="fc-fondo">—</div></div>
+          <div class="ficha-campo"><div class="fc-lbl">Semanas cotizadas</div>
+            <div class="fc-val" id="fc-semanas">—</div></div>
+        </div>
+        <div class="ficha-row">
+          <div class="ficha-campo"><div class="fc-lbl">Rango salarial</div>
+            <div class="fc-val" id="fc-salario">—</div></div>
+          <div class="ficha-campo"><div class="fc-lbl">Régimen de transición</div>
+            <div class="fc-val" id="fc-transicion">—</div></div>
+        </div>
+        <div class="ficha-row">
+          <div class="ficha-campo"><div class="fc-lbl">¿Puede trasladarse?</div>
+            <div class="fc-val" id="fc-puede">—</div></div>
+          <div class="ficha-campo"><div class="fc-lbl">Régimen recomendado</div>
+            <div class="fc-val" id="fc-recomendado">—</div></div>
+        </div>
+
+        <p style="font-size:.8rem;font-weight:700;color:#003893;margin:14px 0 10px;">PROYECCIONES (orientativas)</p>
+        <div class="ficha-row">
+          <div class="ficha-campo"><div class="fc-lbl">Mesada estimada (Colpensiones)</div>
+            <div class="fc-val" id="fc-mesada-colp">—</div></div>
+          <div class="ficha-campo"><div class="fc-lbl">Mesada estimada (AFP)</div>
+            <div class="fc-val" id="fc-mesada-afp">—</div></div>
+        </div>
+
+        <div class="ficha-nota">
+          ⚠️ Las cifras son orientativas y no reemplazan la asesoría oficial.
+          Esta ficha es un apoyo para la reunión — solicita confirmación escrita al fondo.
+        </div>
+      </div>
+
+      <div class="action-grid no-print" style="margin-top:14px;">
+        <button class="action-btn" onclick="window.print()">
+          <span class="ab-icon">🖨️</span>
+          <span class="ab-text"><span class="ab-title">Imprimir ficha</span><span class="ab-desc">Llevar a la asesoría</span></span>
+        </button>
+        <a href="derecho-peticion-traslado.html" class="action-btn">
+          <span class="ab-icon">📋</span>
+          <span class="ab-text"><span class="ab-title">Pedir asesoría</span><span class="ab-desc">Radicar derecho de petición</span></span>
+        </a>
+      </div>
+    </div>
+
+    <!-- TAB 3: Descargar -->
+    <div id="tab-descargar" class="tab-content" style="display:none;">
+      <div class="card">
+        <h2>⬇️ Opciones de descarga</h2>
+        <div class="action-grid" style="margin-top:4px;">
+          <button class="action-btn" onclick="window.print()">
+            <span class="ab-icon">🖨️</span>
+            <span class="ab-text">
+              <span class="ab-title">Reporte completo PDF</span>
+              <span class="ab-desc">Imprimir → "Guardar como PDF"</span>
+            </span>
+          </button>
+          <button class="action-btn" onclick="descargarTxt()">
+            <span class="ab-icon">📄</span>
+            <span class="ab-text">
+              <span class="ab-title">Archivo de texto (.txt)</span>
+              <span class="ab-desc">Resultado completo, legible en cualquier app</span>
+            </span>
+          </button>
+          <button class="action-btn" onclick="descargarFichaHtml()">
+            <span class="ab-icon">🪪</span>
+            <span class="ab-text">
+              <span class="ab-title">Ficha de afiliado (.html)</span>
+              <span class="ab-desc">Se abre en el navegador, lista para imprimir</span>
+            </span>
+          </button>
+          <button class="action-btn" onclick="copiarResultado()">
+            <span class="ab-icon">📋</span>
+            <span class="ab-text">
+              <span class="ab-title">Copiar al portapapeles</span>
+              <span class="ab-desc">Para pegar en WhatsApp, correo, etc.</span>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Vista previa del texto descargable</h2>
+        <pre id="txt-preview" style="font-size:.75rem;line-height:1.5;background:#f7f8fc;
+          border-radius:8px;padding:14px;overflow-x:auto;white-space:pre-wrap;
+          color:#2a2a3e;max-height:400px;overflow-y:auto;"></pre>
+      </div>
+    </div>
+
+  </div><!-- /reporte-main -->
+
+  <div class="notice notice-legal" style="margin-top:20px;">
+    Reporte generado con IA (Claude · Anthropic). No constituye asesoría jurídica ni actuarial.
+    Acuerdo PCSJA24-12243 · Sentencia T-323/2024.
+  </div>
+</div>
+
+<script>
+const SAL_LBL  = { lt1:'< 1 SMMLV', '1-2':'1–2 SMMLV', '2-3':'2–3 SMMLV', '3-5':'3–5 SMMLV', '5-8':'5–8 SMMLV', gt8:'> 8 SMMLV' };
+const PREF_LBL = { maximizar_mesada:'Maximizar mesada', retirar_pronto:'Retirarme pronto',
+  heredar:'Dejar herencia', menor_riesgo:'Menor riesgo', garantia_estado:'Garantía del Estado' };
+const ESP_LBL  = { bono_pensional:'Bono pensional (entidad pública pre-1994)',
+  independiente_actual:'Cotiza como independiente / freelance', ninguna:'Ninguna' };
+const CONF_LBL = { alta:'Alta certeza', media:'Con matices', baja:'Consulta un experto' };
+const SMMLV    = 1423500; // 2026
+
+function fmt(v) {
+  const p = Math.round(v * SMMLV);
+  if (p >= 1e6) return '$' + (Math.round(p / 1e5) / 10).toFixed(1) + 'M/mes';
+  return '$' + p.toLocaleString('es-CO') + '/mes';
+}
+function stars(v) { const n = Math.round(v * 5); return '★'.repeat(n) + '☆'.repeat(5 - n); }
+
+// ─── Tabs ───────────────────────────────────────────────
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).style.display = 'block';
+  btn.classList.add('active');
+}
+
+// ─── Carga de datos ─────────────────────────────────────
+function s(id, html) { const el = document.getElementById(id); if (el) el.innerHTML = html; }
+function t(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
+
+let _S = null, _LAST = null;
+
+function cargar() {
+  try {
+    _S    = JSON.parse(localStorage.getItem('pension_S')    || 'null');
+    _LAST = JSON.parse(localStorage.getItem('pension_LAST') || 'null');
+  } catch(e) { _S = null; _LAST = null; }
+
+  if (!_S || !_LAST) {
+    document.getElementById('empty-state').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('reporte-main').style.display = 'block';
+  const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
+  t('reporte-fecha', 'Generado el ' + fecha);
+
+  // ── Veredicto ──
+  const r = _LAST;
+  t('r-mejor', r.mejor.regimen);
+  s('r-mesada-txt', r.mejor.logra_pension
+    ? `Proyección: ~${r.mejor.mesada} SMMLV/mes ≈ <strong>${fmt(r.mejor.mesada)}</strong> (pesos de hoy)`
+    : 'Con tus datos actuales no alcanzarías pensión completa en el plazo proyectado');
+  t('r-confianza', CONF_LBL[r.confianza] || r.confianza);
+
+  // ── Datos ──
+  t('r-edad', (_S.edad || '—') + ' años');
+  t('r-sexo', _S.sexo === 'M' ? 'Hombre' : 'Mujer');
+  t('r-fondo', _S.fondo_actual || '—');
+  t('r-semanas', (_S.semanas_actuales || 0) + ' semanas');
+  t('r-salario', SAL_LBL[_S.salario] || '—');
+  t('r-anos', r.anosUsados ? '~' + r.anosUsados + ' años' : '—');
+  t('r-prioridades', _S.preferencias?.length
+    ? _S.preferencias.map(p => PREF_LBL[p] || p).join(' · ') : 'No indicadas');
+  t('r-especiales', _S.especiales?.length
+    ? _S.especiales.map(e => ESP_LBL[e] || e).join(', ') : 'Ninguna');
+
+  // ── Normativa ──
+  s('r-transicion', r.transicion
+    ? '<span class="badge badge-verde">✅ Sí — conserva reglas Ley 100</span>'
+    : '<span class="badge badge-rojo">No</span>');
+  s('r-puede', r.puede
+    ? '<span class="badge badge-verde">✅ Sí</span>'
+    : '<span class="badge badge-rojo">❌ No — a menos de 10 años de la edad de pensión</span>');
+  s('r-refoblig', r.refOblig
+    ? '<span class="badge badge-ambar">⚠️ Bajo umbral — iría a Colpensiones si reforma entra</span>'
+    : '<span class="badge badge-azul">Por encima del umbral</span>');
+
+  // ── Escenarios ──
+  const escDiv = document.getElementById('r-escenarios');
+  escDiv.innerHTML = '';
+  [r.colp, r.afp].forEach(sc => {
+    if (!sc) return;
+    const winner = sc.regimen === r.mejor.regimen;
+    const div = document.createElement('div');
+    div.className = 'esc-card' + (winner ? ' winner' : '');
+    let html = `<div class="esc-title">${winner ? '🏆 ' : ''}${sc.regimen}${winner ? ' <span class="badge badge-azul">Recomendado</span>' : ''}</div>`;
+    if (sc.logra_pension) {
+      html += `<div class="esc-mesada">${sc.mesada} SMMLV/mes</div>`;
+      html += `<div class="esc-sub">≈ ${fmt(sc.mesada)} (pesos de hoy)`;
+      if (sc.mesada_lo) html += ` &nbsp;·&nbsp; Rango: ${sc.mesada_lo}–${sc.mesada_hi} SMMLV`;
+      html += `</div>`;
+      if (sc.edad_pension) html += `<div class="esc-sub" style="margin-top:5px;">Edad de pensión proyectada: <strong>${sc.edad_pension} años</strong></div>`;
+      if (sc.edad_anticipada) html += `<div class="esc-sub">Pensión anticipada posible: ${sc.edad_anticipada} años — ${sc.mesada_anticipada} SMMLV/mes</div>`;
+      if (sc.nota) html += `<div class="esc-sub" style="margin-top:5px;font-style:italic;">${sc.nota}</div>`;
+    } else {
+      html += `<div style="color:#c62828;font-weight:700;font-size:.95rem;">Sin pensión mensual</div>`;
+      if (sc.beneficio_desc) html += `<div class="esc-sub" style="margin-top:4px;">${sc.beneficio_desc}</div>`;
+      if (sc.razon_no_pension) html += `<div class="esc-sub" style="margin-top:4px;">${sc.razon_no_pension}</div>`;
+    }
+    html += `<div style="margin-top:12px;font-size:.8rem;color:#5c6470;">
+      Estabilidad: <span class="stars">${stars(sc.estab)}</span> &nbsp;&nbsp;
+      Herencia: <span class="stars">${stars(sc.hereda)}</span> &nbsp;&nbsp;
+      Menor riesgo: <span class="stars">${stars(sc.riesgo)}</span>
+    </div>`;
+    div.innerHTML = html;
+    escDiv.appendChild(div);
+  });
+
+  // ── IA ──
+  const iaTexto = localStorage.getItem('pension_IA');
+  if (iaTexto) {
+    document.getElementById('r-ia-card').style.display = 'block';
+    document.getElementById('r-ia-texto').innerHTML = renderMd(iaTexto);
+  }
+
+  // ── Ficha ──
+  t('f-fecha', fecha);
+  t('fc-edad', (_S.edad || '—') + ' años');
+  t('fc-sexo', _S.sexo === 'M' ? 'Hombre' : 'Mujer');
+  t('fc-fondo', _S.fondo_actual || '—');
+  t('fc-semanas', (_S.semanas_actuales || 0) + ' semanas');
+  t('fc-salario', SAL_LBL[_S.salario] || '—');
+  t('fc-transicion', r.transicion ? 'Sí (Ley 100)' : 'No');
+  t('fc-puede', r.puede ? 'Sí' : 'No');
+  t('fc-recomendado', r.mejor.regimen);
+  t('fc-mesada-colp', r.colp?.logra_pension ? r.colp.mesada + ' SMMLV/mes ≈ ' + fmt(r.colp.mesada) : 'Sin pensión mensual');
+  t('fc-mesada-afp',  r.afp?.logra_pension  ? r.afp.mesada  + ' SMMLV/mes ≈ ' + fmt(r.afp.mesada)  : 'Sin pensión mensual');
+
+  // ── Texto descargable ──
+  generarTexto();
+}
+
+// ─── Texto descargable ──────────────────────────────────
+function generarTexto() {
+  if (!_S || !_LAST) return '';
+  const r = _LAST;
+  const sep = '='.repeat(56);
+  const sub = '-'.repeat(56);
+  const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
+  const L = [];
+
+  L.push('¿COLPENSIONES O AFP? · REPORTE PENSIONAL PERSONALIZADO');
+  L.push('Generado el ' + fecha);
+  L.push(sep);
+  L.push('');
+  L.push('RESULTADO');
+  L.push('  Régimen recomendado: ' + r.mejor.regimen);
+  L.push('  ' + (r.mejor.logra_pension
+    ? 'Proyección: ~' + r.mejor.mesada + ' SMMLV/mes ≈ ' + fmt(r.mejor.mesada)
+    : 'No alcanzarías pensión completa en el plazo proyectado'));
+  L.push('  Confianza: ' + (CONF_LBL[r.confianza] || r.confianza));
+  L.push('');
+  L.push(sub);
+  L.push('TUS DATOS');
+  L.push('  Edad: ' + _S.edad + ' años');
+  L.push('  Sexo: ' + (_S.sexo === 'M' ? 'Hombre' : 'Mujer'));
+  L.push('  Fondo actual: ' + (_S.fondo_actual || '—'));
+  L.push('  Semanas cotizadas: ' + (_S.semanas_actuales || 0));
+  L.push('  Semanas al 1-jul-2025: ' + (_S.semanas_julio25 || 0));
+  L.push('  Salario: ' + (SAL_LBL[_S.salario] || '—'));
+  L.push('  Situaciones especiales: ' + (_S.especiales?.length ? _S.especiales.map(e => ESP_LBL[e]||e).join(', ') : 'ninguna'));
+  L.push('  Prioridades: ' + (_S.preferencias?.length ? _S.preferencias.map(p => PREF_LBL[p]||p).join(', ') : '—'));
+  L.push('');
+  L.push(sub);
+  L.push('SITUACIÓN NORMATIVA');
+  L.push('  Régimen de transición: ' + (r.transicion ? 'Sí — conserva reglas Ley 100' : 'No'));
+  L.push('  Puede trasladarse: ' + (r.puede ? 'Sí' : 'No (< 10 años para la edad de pensión)'));
+  L.push('  Umbral de reforma (≤2,3 SMMLV): ' + (r.refOblig ? 'Sí — cotizaría a Colpensiones si reforma entra' : 'No'));
+  L.push('');
+  L.push(sub);
+  L.push('ESCENARIOS');
+  L.push('');
+  [r.colp, r.afp].forEach(sc => {
+    if (!sc) return;
+    const w = sc.regimen === r.mejor.regimen ? ' ← MEJOR RESULTADO' : '';
+    L.push('  ' + sc.regimen + w);
+    if (sc.logra_pension) {
+      L.push('    Mesada: ' + sc.mesada + ' SMMLV/mes ≈ ' + fmt(sc.mesada));
+      if (sc.mesada_lo) L.push('    Rango: ' + sc.mesada_lo + '–' + sc.mesada_hi + ' SMMLV');
+      if (sc.edad_pension) L.push('    Edad de pensión: ' + sc.edad_pension + ' años');
+      if (sc.edad_anticipada) L.push('    Pensión anticipada: ' + sc.edad_anticipada + ' años — ' + sc.mesada_anticipada + ' SMMLV/mes');
+    } else {
+      L.push('    Sin pensión mensual — ' + (sc.beneficio_desc || 'indemnización sustitutiva'));
+    }
+    L.push('');
+  });
+
+  const ia = localStorage.getItem('pension_IA');
+  if (ia) {
+    L.push(sub);
+    L.push('ANÁLISIS DEL ASISTENTE IA');
+    L.push('');
+    L.push(ia.replace(/<[^>]+>/g, '').replace(/\*\*/g, '').trim());
+    L.push('');
+  }
+
+  L.push(sep);
+  L.push('Documento orientativo — no es asesoría jurídica ni actuarial.');
+  L.push('Acuerdo PCSJA24-12243 · Sentencia T-323/2024.');
+
+  const txt = L.join('\n');
+  const pre = document.getElementById('txt-preview');
+  if (pre) pre.textContent = txt;
+  return txt;
+}
+
+function descargarTxt() {
+  const txt = generarTexto();
+  if (!txt) return;
+  const blob = new Blob([txt], { type:'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'reporte-pensional-' + new Date().toISOString().split('T')[0] + '.txt';
+  a.click();
+}
+
+function copiarResultado() {
+  const txt = generarTexto();
+  if (!txt) return;
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = event.currentTarget;
+    const orig = btn.querySelector('.ab-title').textContent;
+    btn.querySelector('.ab-title').textContent = '✅ Copiado';
+    setTimeout(() => btn.querySelector('.ab-title').textContent = orig, 2000);
+  });
+}
+
+function descargarFichaHtml() {
+  if (!_S || !_LAST) return;
+  const r = _LAST;
+  const fecha = new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' });
+  const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">
+<title>Ficha de Afiliado Pensional</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 600px; margin: 30px auto; color: #1a1a2e; font-size: 13px; }
+  h1 { font-size: 1.2rem; color: #003893; border-bottom: 3px solid #003893; padding-bottom: 8px; }
+  .flag { height: 5px; border-radius: 3px; max-width: 120px; margin-bottom: 14px;
+    background: linear-gradient(to right, #FCD116 33.33%, #003893 33.33% 66.66%, #CE1126 66.66%); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+  .campo { border: 1px solid #ccc; border-radius: 6px; padding: 8px 10px; }
+  .lbl { font-size: 0.65rem; font-weight: 700; color: #666; text-transform: uppercase; }
+  .val { font-weight: 700; margin-top: 3px; }
+  .seccion { font-size: 0.7rem; font-weight: 800; color: #003893; text-transform: uppercase;
+    margin: 16px 0 8px; border-bottom: 1px solid #e0e4ed; padding-bottom: 4px; }
+  .nota { background: #fff8e1; border-left: 3px solid #f59e0b; padding: 8px 10px;
+    font-size: 0.72rem; color: #856404; margin-top: 14px; border-radius: 4px; }
+  @media print { body { margin: 1cm; } }
+</style></head><body>
+<div class="flag"></div>
+<h1>🪪 Ficha de Afiliado Pensional</h1>
+<p style="font-size:.75rem;color:#666;">Generada el ${fecha} · Herramienta ¿Colpensiones o AFP?</p>
+
+<div class="seccion">Datos personales</div>
+<div class="grid">
+  <div class="campo"><div class="lbl">Nombre completo</div><div class="val">___________________________</div></div>
+  <div class="campo"><div class="lbl">Cédula de ciudadanía</div><div class="val">___________________________</div></div>
+  <div class="campo"><div class="lbl">Edad</div><div class="val">${_S.edad} años</div></div>
+  <div class="campo"><div class="lbl">Sexo</div><div class="val">${_S.sexo === 'M' ? 'Hombre' : 'Mujer'}</div></div>
+  <div class="campo"><div class="lbl">Teléfono</div><div class="val">___________________________</div></div>
+  <div class="campo"><div class="lbl">Correo electrónico</div><div class="val">___________________________</div></div>
+</div>
+
+<div class="seccion">Situación pensional</div>
+<div class="grid">
+  <div class="campo"><div class="lbl">Fondo / Régimen actual</div><div class="val">${_S.fondo_actual || '—'}</div></div>
+  <div class="campo"><div class="lbl">Semanas cotizadas</div><div class="val">${_S.semanas_actuales || 0} semanas</div></div>
+  <div class="campo"><div class="lbl">Rango salarial</div><div class="val">${SAL_LBL[_S.salario] || '—'}</div></div>
+  <div class="campo"><div class="lbl">Régimen de transición</div><div class="val">${r.transicion ? 'Sí (Ley 100)' : 'No'}</div></div>
+  <div class="campo"><div class="lbl">¿Puede trasladarse?</div><div class="val">${r.puede ? 'Sí' : 'No'}</div></div>
+  <div class="campo"><div class="lbl">Régimen recomendado (orientativo)</div><div class="val">${r.mejor.regimen}</div></div>
+</div>
+
+<div class="seccion">Proyecciones orientativas</div>
+<div class="grid">
+  <div class="campo"><div class="lbl">Mesada estimada — Colpensiones</div>
+    <div class="val">${r.colp?.logra_pension ? r.colp.mesada + ' SMMLV/mes ≈ ' + fmt(r.colp.mesada) : 'Sin pensión mensual'}</div></div>
+  <div class="campo"><div class="lbl">Mesada estimada — AFP</div>
+    <div class="val">${r.afp?.logra_pension ? r.afp.mesada + ' SMMLV/mes ≈ ' + fmt(r.afp.mesada) : 'Sin pensión mensual'}</div></div>
+</div>
+
+<div class="nota">⚠️ Esta ficha es orientativa. Los cálculos son aproximaciones.
+Confirma todos los datos con Colpensiones, tu AFP o un asesor pensional certificado.
+Acuerdo PCSJA24-12243 · Sentencia T-323/2024.</div>
+</body></html>`;
+
+  const blob = new Blob([html], { type:'text/html;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ficha-afiliado-' + new Date().toISOString().split('T')[0] + '.html';
+  a.click();
+}
+
+function renderMd(text) {
+  if (!text) return '';
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/^### (.+)$/gm,'<h4 style="color:#003893;margin:12px 0 4px;">$1</h4>')
+    .replace(/^## (.+)$/gm,'<h3 style="color:#003893;margin:14px 0 6px;">$1</h3>')
+    .replace(/^- (.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/gs, '<ul style="padding-left:18px;margin:6px 0;">$1</ul>')
+    .replace(/\n\n/g,'</p><p style="margin-bottom:8px;">')
+    .replace(/\n/g,'<br>');
+}
+
+cargar();
+</script>
+</body>
+</html>

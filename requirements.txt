@@ -1,0 +1,12 @@
+# Dependencias del servidor principal (server.py)
+# Instalar con:  pip install -r requirements.txt
+
+docling>=2.65.0
+rapidocr>=3.4.5
+flask>=3.0.0
+flask-cors>=4.0.0
+python-dotenv>=1.0.0
+
+# requests viene incluido con Python, pero se lista por claridad
+# (usado en /analyze para llamar a OpenRouter/OpenAI)
+requests>=2.31.0
