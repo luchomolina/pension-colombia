@@ -48,7 +48,7 @@ if not exist "%~dp0.env" (
 
 echo.
 echo Iniciando servidor en http://localhost:5050 ...
-echo Deja esta ventana abierta mientras usas pensioncolombia.html
+echo Deja esta ventana abierta mientras usas index.html
 echo Presiona Ctrl+C para detener.
 echo.
 
